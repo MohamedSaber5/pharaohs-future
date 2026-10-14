@@ -1,16 +1,13 @@
-import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import projectService from '@services/project.service.js';
 
 const HERO_IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuATa4Oi0yS3kNRr9mqsKyGZ9KGvNs9D7VXdLif8ppgdccHMYATEOM3UtfCyjUGxEwIDJYKbwr9pTJZr3rx9eP6VbPxYArgcxur_UnXZTzZjEyA7NemszADlJ4BSmuNbNe6IfXr83qE-1nZhM5N-7qgB-awykAk1gA7dBBPxyNvTbc96PqW79x9iDlAPSOCYi5nDU5tidE3MgEL-rpTPl4shrCLB52IRNhgjy4FczXjTS34wph2WKzOHqw';
 const P1IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPXkPc2KaLFiRV8RHJQhqfstMFlyq8dBqmhxBFocqKU8pB6mxFWJQdKJbYH0h6yCqBJIDjzC5o6OAIqz-VBvC3JV3QGJCDjOANvPEMNXi3tFdaBb0yqjj69JaxpBeTxXLhvRkJUWZS2kDxO4wXomD72DPIhFBq4E2pNChVNfhBIVa1b7UzWbxCxS0j0tQH04JF3VB_bdIPMeRNVw';
 const P2IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCq7bUFXb2v6zfL4o9YIVqfH59ePMYGVqLBxMoJeZ69J6hHNcJMoFY9MZfD8S9t4jMiCAnzjdSK4GWJJ7h33o9hVQ3-5VCa0c_cFLiF_rkS_xQI9x3WjrKkRGP0YkFl4H3sxfJpHpDhpKXvBfJ5EoRSdlwL7ztcMiHBLjI1IsTz6fHENs4_Sf3Wep9VRi4nzH9Ei1gDl0RaLqz9M';
-const P3IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgN7gJIFTUPxhAD01uGXvKqLy_wgWfGgp5D9GHJFmpqB5MHvTSPBi6XSF-LtmJj7zOq5N3kUBHE0ilfAzJOhgdHWRi_6S2RhCbJlILRhwMxD0EfBDjH8tN3Wg9fJd8sVH-ZX7Gi7r-RiSmUuaXFcGDhv1m_h5E0gYaxcqIoW_Mgg0lMunRqAP3KRBzDxRnnVdABB_1VoITNIHhY';
 
-const PROJECTS = [
-  { id:1, name:'أبراج حورس الاستثمارية', location:'العاصمة الإدارية (R7)', area:'32,000 م²', units:240, price:'3,800,000', status:'تحت الإنشاء', delivery:'ديسمبر 2026', badge:'مميز', img:P1IMG },
-  { id:2, name:'كمبوند سيتيا الراقي',    location:'القاهرة الجديدة',        area:'48,000 م²', units:180, price:'2,500,000', status:'قيد البيع',    delivery:'يونيو 2027',    badge:'',     img:P2IMG },
-  { id:3, name:'فيلات الملكية',           location:'الشيخ زايد',              area:'8,000 م²',  units:64,  price:'7,200,000', status:'قيد البيع',    delivery:'مارس 2026',     badge:'',     img:P3IMG },
-];
+const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80";
+const P3IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgN7gJIFTUPxhAD01uGXvKqLy_wgWfGgp5D9GHJFmpqB5MHvTSPBi6XSF-LtmJj7zOq5N3kUBHE0ilfAzJOhgdHWRi_6S2RhCbJlILRhwMxD0EfBDjH8tN3Wg9fJd8sVH-ZX7Gi7r-RiSmUuaXFcGDhv1m_h5E0gYaxcqIoW_Mgg0lMunRqAP3KRBzDxRnnVdABB_1VoITNIHhY';
 
 const UNITS = [
   { id:1, type:'شقة فاخرة 3 غرف',  project:'أبراج حورس', location:'العاصمة الإدارية', area:210, floor:18, price:'5,200,000', finishing:'سوبر لوكس',    img:P1IMG },
@@ -21,6 +18,15 @@ const UNITS = [
 const S = { 'تحت الإنشاء':'bg-blue-100 text-blue-800', 'قيد البيع':'bg-amber-100 text-amber-800', 'مكتمل':'bg-green-100 text-green-800' };
 
 export default function HomePage() {
+  const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading]   = useState(true);
+
+  useEffect(() => {
+    projectService.getAll({ limit: 6 })
+      .then(res => setFeaturedProjects(res?.data ?? res ?? []))
+      .catch(() => {})
+      .finally(() => setProjectsLoading(false));
+  }, []);
   const [tab, setTab] = useState('سكني فاخر');
   return (
     <div className='flex flex-col w-full'>
@@ -100,32 +106,71 @@ export default function HomePage() {
           </div>
           <Link to='/projects' className='hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant font-title-md text-title-md hover:bg-surface-container transition-all'>عرض جميع المشروعات<span className='material-symbols-outlined text-[18px]'>arrow_left_alt</span></Link>
         </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {PROJECTS.map(p=>(
-            <div key={p.id} className='group bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300'>
-              <div className='relative aspect-[4/3] overflow-hidden'>
-                <img src={p.img} alt={p.name} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500' />
-                <div className='absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent' />
-                <div className='absolute top-3 right-3 flex gap-2'>
-                  {p.badge&&<span className='px-2.5 py-1 rounded-full bg-secondary text-on-primary font-label-sm text-label-sm font-bold'>{p.badge}</span>}
-                  <span className={`px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold ${S[p.status]||''}`}>{p.status}</span>
-                </div>
-                <div className='absolute bottom-3 right-3 left-3'><p className='font-label-sm text-label-sm text-white/70'>{p.location}</p><p className='font-title-lg text-title-lg text-on-primary font-bold'>{p.name}</p></div>
-              </div>
-              <div className='p-5'>
-                <div className='grid grid-cols-3 gap-3 mb-4 pb-4 border-b border-outline-variant/30'>
-                  {[{i:'straighten',l:'المساحة',v:p.area},{i:'holiday_village',l:'الوحدات',v:p.units},{i:'event_available',l:'التسليم',v:p.delivery}].map(m=>(
-                    <div key={m.l} className='flex flex-col items-center text-center gap-1'><span className='material-symbols-outlined text-secondary text-[18px]'>{m.i}</span><span className='font-label-sm text-label-sm text-on-surface-variant'>{m.l}</span><span className='font-title-md text-title-md text-on-surface font-semibold text-[13px] leading-tight'>{m.v}</span></div>
-                  ))}
-                </div>
-                <div className='flex items-center justify-between'>
-                  <div><p className='font-label-sm text-label-sm text-on-surface-variant'>يبدأ من</p><p className='font-financial-numeric text-financial-numeric text-on-surface font-bold'>{p.price} <span className='font-label-md text-label-md text-on-surface-variant'>ج.م</span></p></div>
-                  <Link to={`/projects/${p.id}`} className='inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-all text-sm'>تفاصيل<span className='material-symbols-outlined text-[16px]'>arrow_left_alt</span></Link>
+        {/* Real projects from API */}
+        {projectsLoading ? (
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {[1,2,3].map(i=>(
+              <div key={i} className='bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm'>
+                <div className='aspect-[4/3] bg-neutral-100 animate-pulse' />
+                <div className='p-5 flex flex-col gap-3'>
+                  <div className='h-4 bg-neutral-100 animate-pulse rounded-lg w-3/4' />
+                  <div className='h-4 bg-neutral-100 animate-pulse rounded-lg w-1/2' />
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : featuredProjects.length === 0 ? (
+          <div className='col-span-3 flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-neutral-100'>
+            <span className='material-symbols-outlined text-[56px] text-neutral-300 mb-4'>apartment</span>
+            <h3 className='text-[18px] font-bold text-neutral-600 mb-2'>لا توجد مشروعات بعد</h3>
+            <p className='text-[14px] text-neutral-400'>سيتم إضافة المشروعات قريباً</p>
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {featuredProjects.map(p=>(
+              <div key={p._id} className='group bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300'>
+                <div className='relative aspect-[4/3] overflow-hidden'>
+                  <img src={p.images?.[0]||'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'} alt={p.name} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500' onError={e=>{e.target.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'}} />
+                  <div className='absolute inset-0 bg-gradient-to-t from-[#000e1f]/70 to-transparent' />
+                  <div className='absolute top-3 right-3'>
+                    <span className='px-2.5 py-1 rounded-full text-[12px] font-bold bg-white/90 text-neutral-800'>{p.status}</span>
+                  </div>
+                  <div className='absolute bottom-3 right-3 left-3'>
+                    <p className='text-[12px] text-white/70 mb-0.5 flex items-center gap-1'><span className='material-symbols-outlined text-[14px]'>location_on</span>{p.location}</p>
+                    <p className='text-[16px] text-white font-bold leading-tight'>{p.name}</p>
+                  </div>
+                </div>
+                <div className='p-5'>
+                  <div className='grid grid-cols-3 gap-3 mb-4 pb-4 border-b border-neutral-100'>
+                    {[
+                      {i:'straighten',      l:'المساحة',  v:p.totalArea?p.totalArea+'م²':'—'},
+                      {i:'holiday_village', l:'الوحدات',  v:(p.unitCount??p.totalUnits??0)+' وحدة'},
+                      {i:'event_available', l:'التسليم',  v:p.delivery||'—'},
+                    ].map(m=>(
+                      <div key={m.l} className='flex flex-col items-center text-center gap-0.5'>
+                        <span className='material-symbols-outlined text-[18px]' style={{color:'#775a1a'}}>{m.i}</span>
+                        <span className='text-[11px] text-neutral-400'>{m.l}</span>
+                        <span className='text-[12px] font-bold text-neutral-800 leading-tight'>{m.v}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <div>
+                      <p className='text-[11px] text-neutral-400'>سعر يبدأ من</p>
+                      <p className='text-[15px] font-bold text-neutral-900'>
+                        {p.startPrice ? Number(p.startPrice).toLocaleString() : 'اتصل بنا'}
+                        {p.startPrice > 0 && <span className='text-[11px] text-neutral-400 font-normal mr-1'>ج.م</span>}
+                      </p>
+                    </div>
+                    <Link to={'/projects/'+p._id} className='inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-bold text-white hover:opacity-90 transition-all' style={{background:'#000e1f'}}>
+                      عرض<span className='material-symbols-outlined text-[16px]'>arrow_left_alt</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 4. STATS */}

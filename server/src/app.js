@@ -3,7 +3,11 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import compression from "compression";
+import compression from 'compression';
+import { fileURLToPath } from 'url';
+import { dirname, join }  from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 import mongoSanitize from "express-mongo-sanitize";
 
 import { apiLimiter } from "./config/rateLimiter.js";
@@ -79,6 +83,9 @@ app.use(cookieParser());
 // Compress responses
 app.use(compression());
 
+// Serve uploaded images
+app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+
 // Apply global rate limiting to all API routes
 app.use("/api", apiLimiter);
 
@@ -113,6 +120,7 @@ app.all("*", (req, res, next) => {
 app.use(errorHandler);
 
 export default app;
+
 
 
 
