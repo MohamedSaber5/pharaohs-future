@@ -5,15 +5,23 @@ import toast from "react-hot-toast";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser]                   = useState(null);
-  const [isLoading, setIsLoading]         = useState(true);
+  const [user,            setUser]            = useState(null);
+  const [isLoading,       setIsLoading]       = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const checkSession = useCallback(async () => {
     try {
-      const response = await authService.getMe();
-      setUser(response.data.data ?? response.data);
-      setIsAuthenticated(true);
+      // apiClient interceptor returns response.data, so this IS the server JSON body
+      // Server sends: { success, data: { token?, user? } } OR { success, data: <user> }
+      const res = await authService.getMe();
+      const userData = res?.data ?? res;
+      if (userData && userData._id) {
+        setUser(userData);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     } catch {
       setUser(null);
       setIsAuthenticated(false);
@@ -24,32 +32,34 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => { checkSession(); }, [checkSession]);
 
+  // Helper: extract user + token from API response
+  const extractAuth = (res) => {
+    // apiClient already returns response.data
+    // Server sends: { success:true, data: { token, user } }
+    const data = res?.data ?? res;
+    const token = data?.token;
+    const user  = data?.user ?? data;
+    return { token, user };
+  };
+
   const login = async (email, password) => {
-    const response = await authService.login({ email, password });
-    const userData = response.data?.data?.user ?? response.data?.user ?? response.data;
-    if (response.data?.data?.token) {
-      localStorage.setItem("authToken", response.data.data.token);
-    } else if (response.data?.token) {
-      localStorage.setItem("authToken", response.data.token);
-    }
+    const res  = await authService.login({ email, password });
+    const { token, user: userData } = extractAuth(res);
+    if (token) localStorage.setItem("authToken", token);
     setUser(userData);
     setIsAuthenticated(true);
-    toast.success(`مرحباً، ${userData?.name || ""}!`);
-    return response;
+    toast.success(`مرحباً ${userData?.name || ""}!`);
+    return res;
   };
 
   const register = async (data) => {
-    const response = await authService.register(data);
-    const userData = response.data?.data?.user ?? response.data?.user ?? response.data;
-    if (response.data?.data?.token) {
-      localStorage.setItem("authToken", response.data.data.token);
-    } else if (response.data?.token) {
-      localStorage.setItem("authToken", response.data.token);
-    }
+    const res  = await authService.register(data);
+    const { token, user: userData } = extractAuth(res);
+    if (token) localStorage.setItem("authToken", token);
     setUser(userData);
     setIsAuthenticated(true);
-    toast.success(`مرحباً، ${userData?.name || ""}! تم إنشاء حسابك بنجاح`);
-    return response;
+    toast.success(`أهلاً ${userData?.name || ""}! تم إنشاء حسابك بنجاح 🎉`);
+    return res;
   };
 
   const logout = async () => {
