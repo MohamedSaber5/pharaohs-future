@@ -1,3 +1,4 @@
+﻿import { startExpiryCron } from './jobs/expiryCron.js';
 import "dotenv/config";
 import app from "./app.js";
 import connectDB from "./config/database.js";
@@ -13,7 +14,8 @@ const startServer = async () => {
     await connectDB();
 
     const server = app.listen(PORT, () => {
-      logger.info(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      startExpiryCron();
+logger.info(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
       logger.info(`📡 API Base URL: http://localhost:${PORT}/api/v1`);
     });
 

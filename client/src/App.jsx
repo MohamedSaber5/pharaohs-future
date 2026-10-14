@@ -16,6 +16,8 @@ import ContactPage       from "@pages/ContactPage.jsx";
 
 import AdminDashboardPage from "@pages/AdminDashboardPage.jsx";
 import MyReservationsPage    from '@pages/MyReservationsPage.jsx';
+import EmployeeDashboard         from '@pages/EmployeeDashboard.jsx';
+import AdminAssignmentLogsPage   from '@pages/AdminAssignmentLogsPage.jsx';
 import AdminReservationsPage from '@pages/AdminReservationsPage.jsx';
 import AdminUnitsPage    from "@pages/AdminUnitsPage.jsx";
 import AdminProjectsPage  from "@pages/AdminProjectsPage.jsx";
@@ -59,7 +61,8 @@ const AppRoutes = () => (
       <Route path="dashboard" element={<AdminDashboardPage />} />
       <Route path="projects"  element={<AdminProjectsPage />} />
       <Route path="units"          element={<AdminUnitsPage />} />
-      <Route path="reservations"  element={<AdminReservationsPage />} />
+      <Route path="reservations"   element={<AdminReservationsPage />} />
+          <Route path="assignment-logs" element={<AdminAssignmentLogsPage />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />

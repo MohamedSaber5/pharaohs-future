@@ -1,45 +1,39 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true, "الاسم مطلوب"],
       trim: true,
-      maxlength: [50, "Name cannot be more than 50 characters"],
+      maxlength: [50, "الاسم لا يتجاوز 50 حرف"],
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, "البريد الإلكتروني مطلوب"],
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
+      match: [/^\S+@\S+\.\S+$/, "يرجى إدخال بريد إلكتروني صحيح"],
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [8, "Password must be at least 8 characters"],
-      select: false, // Never return password in queries by default
+      required: [true, "كلمة المرور مطلوبة"],
+      minlength: [8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"],
+      select: false,
     },
     role: {
       type: String,
-      enum: ["user", "agent", "admin"],
+      enum: ["user", "employee", "admin"],
       default: "user",
     },
-    phone: {
-      type: String,
-      trim: true,
-    },
-    avatar: {
-      type: String,
-      default: null,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    phone: { type: String, trim: true },
+    whatsapp: { type: String, trim: true }, // for employees
+    avatar: { type: String, default: null },
+    isActive: { type: Boolean, default: true },
+    // Employee: track assigned users count for round-robin
+    assignedCount: { type: Number, default: 0 },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -51,30 +45,16 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ─── Pre-save Hooks ───────────────────────────────────────────────────────────
-
-// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// Update passwordChangedAt when password changes
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password") || this.isNew) return next();
-  this.passwordChangedAt = Date.now() - 1000; // Ensure token issued after this timestamp
-  next();
-});
-
-// ─── Instance Methods ─────────────────────────────────────────────────────────
-
-// Compare candidate password with stored hash
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Check if password was changed after JWT was issued
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
@@ -84,5 +64,4 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 };
 
 const User = mongoose.model("User", userSchema);
-
 export default User;

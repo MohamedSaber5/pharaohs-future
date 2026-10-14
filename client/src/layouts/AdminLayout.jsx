@@ -4,7 +4,7 @@ import { useAuth } from "@context/AuthContext.jsx";
 const NAV = [
   { to:"/admin/dashboard",    icon:"dashboard",       label:"نظرة عامة" },
   { to:"/admin/projects",     icon:"apartment",       label:"المشروعات" },
-  { to:"/admin/units",        icon:"holiday_village", label:"الوحدات" }, { to:"/admin/reservations", icon:"bookmark", label:"الحجوزات" },
+  { to:"/admin/units",        icon:"holiday_village", label:"الوحدات" }, { to:"/admin/reservations", icon:"bookmark", label:"الحجوزات" }, { to:"/admin/assignment-logs", icon:"assignment_ind", label:"سجل التعيينات" },
   { to:"/admin/reservations", icon:"event_available", label:"الحجوزات" },
   { to:"/admin/clients",      icon:"groups",          label:"العملاء" },
 ];
