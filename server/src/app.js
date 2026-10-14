@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -13,7 +13,9 @@ import logger from "./utils/logger.js";
 
 // ─── Route Imports ────────────────────────────────────────────────────────────
 import healthRoutes from "./routes/health.routes.js";
-import authRoutes from "./routes/auth.routes.js";
+import authRoutes    from './routes/auth.routes.js';
+import projectRoutes from './routes/project.routes.js';
+import unitRoutes    from './routes/unit.routes.js';
 
 const app = express();
 
@@ -23,9 +25,17 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
+
 const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:5173",
+  "http://localhost:5173",
+  "http://localhost:5175",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5175",
+  ...(process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(",").map((url) => url.trim())
+    : []),
 ];
+
 
 app.use(
   cors({
@@ -101,3 +111,4 @@ app.all("*", (req, res, next) => {
 app.use(errorHandler);
 
 export default app;
+

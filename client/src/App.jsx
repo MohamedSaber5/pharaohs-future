@@ -15,6 +15,7 @@ import AboutPage         from "@pages/AboutPage.jsx";
 import ContactPage       from "@pages/ContactPage.jsx";
 
 import AdminDashboardPage from "@pages/AdminDashboardPage.jsx";
+import AdminUnitsPage    from "@pages/AdminUnitsPage.jsx";
 import AdminProjectsPage  from "@pages/AdminProjectsPage.jsx";
 
 const queryClient = new QueryClient({
@@ -55,6 +56,7 @@ const AppRoutes = () => (
       <Route index            element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<AdminDashboardPage />} />
       <Route path="projects"  element={<AdminProjectsPage />} />
+      <Route path="units"     element={<AdminUnitsPage />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />
@@ -72,3 +74,4 @@ const App = () => (
 );
 
 export default App;
+
