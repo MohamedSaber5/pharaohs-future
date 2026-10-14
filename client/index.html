@@ -4,15 +4,117 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="مستقبل الفراعنة - شركة رائدة في الاستثمار والتطوير العقاري في مصر." />
-    <meta name="keywords" content="مستقبل الفراعنة, عقارات, استثمار عقاري, تطوير عقاري, مصر" />
     <meta property="og:title" content="مستقبل الفراعنة | للاستثمار والتطوير العقاري" />
     <meta property="og:type" content="website" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+    <!-- IBM Plex Sans + Material Symbols (same as Stitch) -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <!-- Tailwind CDN with Stitch design system -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#071c32",
+              "inverse-primary": "#b5c8e5",
+              "inverse-surface": "#213145",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#b5c8e5",
+              "on-secondary": "#ffffff",
+              "error": "#ba1a1a",
+              "surface-container-high": "#dce9ff",
+              "inverse-on-surface": "#eaf1ff",
+              "tertiary-fixed-dim": "#eac076",
+              "surface-tint": "#4d6078",
+              "surface-dim": "#cbdbf5",
+              "on-tertiary-fixed-variant": "#5e4201",
+              "on-primary-fixed-variant": "#354860",
+              "primary": "#000e1f",
+              "surface": "#f8f9ff",
+              "tertiary": "#140b00",
+              "on-secondary-fixed": "#261900",
+              "outline": "#74777d",
+              "surface-container": "#e5eeff",
+              "on-error": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#775a1a",
+              "surface-variant": "#d3e4fe",
+              "secondary-fixed": "#ffdea3",
+              "secondary-container": "#fdd588",
+              "surface-container-highest": "#d3e4fe",
+              "tertiary-container": "#302000",
+              "primary-fixed": "#d2e4ff",
+              "on-surface-variant": "#44474d",
+              "on-tertiary-container": "#a88541",
+              "on-secondary-container": "#785a1a",
+              "tertiary-fixed": "#ffdea7",
+              "on-tertiary": "#ffffff",
+              "surface-container-low": "#eff4ff",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed": "#271900",
+              "on-secondary-fixed-variant": "#5c4201",
+              "primary-container": "#10243a",
+              "on-primary-container": "#798ca6",
+              "secondary-fixed-dim": "#e8c177",
+              "on-surface": "#0b1c30",
+              "on-background": "#0b1c30",
+              "outline-variant": "#c4c6cd",
+              "surface-bright": "#f8f9ff",
+              "background": "#f8f9ff",
+              "on-error-container": "#93000a"
+            },
+            borderRadius: {
+              "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"
+            },
+            fontFamily: {
+              "title-lg": ["IBM Plex Sans"],
+              "label-md": ["IBM Plex Sans"],
+              "headline-lg": ["IBM Plex Sans"],
+              "label-sm": ["IBM Plex Sans"],
+              "body-md": ["IBM Plex Sans"],
+              "display-lg": ["IBM Plex Sans"],
+              "headline-sm": ["IBM Plex Sans"],
+              "body-lg": ["IBM Plex Sans"],
+              "title-md": ["IBM Plex Sans"],
+              "financial-numeric": ["IBM Plex Sans"],
+              "headline-md": ["IBM Plex Sans"]
+            },
+            fontSize: {
+              "title-lg":   ["18px", { lineHeight: "26px", fontWeight: "600" }],
+              "label-md":   ["13px", { lineHeight: "18px", fontWeight: "500" }],
+              "headline-lg":["36px", { lineHeight: "48px", fontWeight: "600" }],
+              "label-sm":   ["11px", { lineHeight: "16px", letterSpacing: "0.04em", fontWeight: "600" }],
+              "body-md":    ["14px", { lineHeight: "22px", fontWeight: "400" }],
+              "display-lg": ["56px", { lineHeight: "68px", letterSpacing: "-0.02em", fontWeight: "700" }],
+              "display-lg-mobile": ["36px", { lineHeight: "44px", letterSpacing: "-0.01em", fontWeight: "700" }],
+              "headline-sm":["22px", { lineHeight: "30px", fontWeight: "600" }],
+              "body-lg":    ["16px", { lineHeight: "26px", fontWeight: "400" }],
+              "title-md":   ["16px", { lineHeight: "24px", fontWeight: "500" }],
+              "financial-numeric": ["20px", { lineHeight: "26px", letterSpacing: "0.01em", fontWeight: "700" }],
+              "headline-md":["28px", { lineHeight: "38px", fontWeight: "600" }]
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      @layer base {
+        html, body { margin: 0; padding: 0; }
+        body { overscroll-behavior: none; font-family: "IBM Plex Sans", sans-serif; }
+      }
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: #f8f9ff; }
+      ::-webkit-scrollbar-thumb { background: #775a1a; border-radius: 3px; }
+    </style>
+
     <title>مستقبل الفراعنة | للاستثمار والتطوير العقاري</title>
   </head>
-  <body>
+  <body class="bg-surface font-body-md text-on-surface antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
