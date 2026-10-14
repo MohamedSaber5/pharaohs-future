@@ -1,183 +1,131 @@
-import { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthContext.jsx";
+﻿import { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
+import logoImg from "@assets/images/logo.jpg";
 
 const navLinks = [
-  { label: "Home", to: "/" },
-  { label: "Properties", to: "/properties" },
-  { label: "Projects", to: "/projects" },
-  { label: "About", to: "/about" },
-  { label: "Contact", to: "/contact" },
+  { label: "الرئيسية",        to: "/" },
+  { label: "عن الشركة",       to: "/about" },
+  { label: "مشروعاتنا",       to: "/projects" },
+  { label: "الوحدات المتاحة", to: "/properties" },
+  { label: "تواصل معنا",      to: "/contact" },
 ];
 
-/**
- * Navbar - responsive navigation with scroll effect and auth state
- */
 const Navbar = () => {
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isScrolled,    setIsScrolled]    = useState(false);
+  const [isMobileOpen,  setIsMobileOpen]  = useState(false);
 
-  // Detect scroll to add background
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-dark-950/95 backdrop-blur-md shadow-lg shadow-black/20 border-b border-dark-800"
-          : "bg-transparent"
-      }`}
+      style={{
+        position: "fixed",
+        top: 0, right: 0, left: 0,
+        zIndex: 50,
+        backgroundColor: isScrolled ? "rgba(248,243,232,0.97)" : "#f8f3e8",
+        borderBottom: isScrolled ? "1px solid #e6d9be" : "1px solid transparent",
+        backdropFilter: isScrolled ? "blur(8px)" : "none",
+        transition: "all 0.3s ease",
+      }}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link
-            to="/"
-            id="nav-logo"
-            className="flex items-center gap-3 group"
-          >
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-400 to-brand-700 flex items-center justify-center font-display font-bold text-white text-lg shadow-lg shadow-brand-900/30">
-              PF
-            </div>
-            <div className="hidden sm:block">
-              <p className="font-display font-bold text-dark-50 text-lg leading-none group-hover:text-brand-400 transition-colors">
-                Pharaohs Future
-              </p>
-              <p className="text-xs text-dark-400 font-sans tracking-widest uppercase">
-                Real Estate
-              </p>
-            </div>
-          </Link>
+      <nav className="site-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px" }}>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                id={`nav-${link.label.toLowerCase()}`}
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "text-brand-400 bg-brand-500/10"
-                      : "text-dark-300 hover:text-dark-50 hover:bg-dark-800"
-                  }`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </div>
+        {/* ─── CTA Button (Left in RTL = visually left) ─── */}
+        <button id="navbar-cta" className="btn-gold" style={{ fontSize: "0.82rem", padding: "0.5rem 1.2rem" }}>
+          استفسر عن وحدة
+        </button>
 
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-dark-300">
-                  Hi, <span className="text-brand-400 font-medium">{user?.name}</span>
-                </span>
-                <button
-                  id="nav-logout"
-                  onClick={handleLogout}
-                  className="btn-secondary text-sm px-4 py-2"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <>
-                <Link
-                  id="nav-login"
-                  to="/login"
-                  className="text-sm font-medium text-dark-300 hover:text-dark-50 transition-colors px-4 py-2"
-                >
-                  Login
-                </Link>
-                <Link
-                  id="nav-register"
-                  to="/register"
-                  className="btn-primary text-sm px-4 py-2"
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            id="nav-mobile-toggle"
-            onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="md:hidden p-2 rounded-lg text-dark-300 hover:text-dark-50 hover:bg-dark-800 transition-colors"
-            aria-label="Toggle mobile menu"
-          >
-            {isMobileOpen ? <HiX size={24} /> : <HiMenu size={24} />}
-          </button>
+        {/* ─── Nav Links (Center) ─── */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }} className="desktop-nav">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              id={`nav-${link.label}`}
+              style={({ isActive }) => ({
+                padding: "0.4rem 0.85rem",
+                fontSize: "0.875rem",
+                fontWeight: isActive ? "600" : "400",
+                color: isActive ? "#1c1917" : "#57534e",
+                textDecoration: "none",
+                position: "relative",
+                transition: "color 0.2s",
+                fontFamily: "Cairo, sans-serif",
+              })}
+              className={({ isActive }) => isActive ? "nav-link-active" : ""}
+            >
+              {link.label}
+            </NavLink>
+          ))}
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileOpen && (
-          <div className="md:hidden py-4 border-t border-dark-800 animate-slide-down">
-            <div className="flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setIsMobileOpen(false)}
-                  className={({ isActive }) =>
-                    `px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? "text-brand-400 bg-brand-500/10"
-                        : "text-dark-300 hover:text-dark-50 hover:bg-dark-800"
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-              <div className="pt-3 mt-2 border-t border-dark-800 flex flex-col gap-2">
-                {isAuthenticated ? (
-                  <button
-                    onClick={() => { handleLogout(); setIsMobileOpen(false); }}
-                    className="btn-secondary text-sm w-full"
-                  >
-                    Logout
-                  </button>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMobileOpen(false)}
-                      className="btn-secondary text-sm text-center"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setIsMobileOpen(false)}
-                      className="btn-primary text-sm text-center"
-                    >
-                      Get Started
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        {/* ─── Logo (Right in RTL) ─── */}
+        <Link to="/" id="navbar-logo" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
+          <img
+            src={logoImg}
+            alt="مستقبل الفراعنة"
+            style={{ height: "44px", width: "auto", objectFit: "contain" }}
+          />
+        </Link>
+
+        {/* ─── Mobile Toggle ─── */}
+        <button
+          id="navbar-mobile-toggle"
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          aria-label="القائمة"
+          style={{
+            display: "none",
+            padding: "0.5rem",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#1c1917",
+          }}
+          className="mobile-toggle"
+        >
+          {isMobileOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+        </button>
       </nav>
+
+      {/* ─── Mobile Menu ─── */}
+      {isMobileOpen && (
+        <div style={{ backgroundColor: "#f8f3e8", borderTop: "1px solid #e6d9be", padding: "1rem 1.5rem 1.5rem" }}>
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              onClick={() => setIsMobileOpen(false)}
+              style={({ isActive }) => ({
+                display: "block",
+                padding: "0.75rem 0",
+                fontSize: "1rem",
+                fontWeight: isActive ? "600" : "400",
+                color: isActive ? "#c9952a" : "#44403c",
+                textDecoration: "none",
+                borderBottom: "1px solid #e6d9be",
+                fontFamily: "Cairo, sans-serif",
+              })}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          <button className="btn-gold" style={{ marginTop: "1rem", width: "100%" }}>
+            استفسر عن وحدة
+          </button>
+        </div>
+      )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-toggle { display: flex !important; }
+        }
+      `}</style>
     </header>
   );
 };

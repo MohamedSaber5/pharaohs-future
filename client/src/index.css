@@ -1,209 +1,247 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
-/* ─── Pharaohs Future Design System — Tailwind v4 CSS-first config ─────── */
+/* ─── Pharaohs Future Design System — RTL Arabic Light Theme ─────────────── */
 
 @theme {
-  /* Brand Colors — Gold Palette */
-  --color-brand-50:  #fdf8ee;
-  --color-brand-100: #f9edce;
-  --color-brand-200: #f2d899;
-  --color-brand-300: #eabd5e;
-  --color-brand-400: #e3a433;
-  --color-brand-500: #d4881a;
-  --color-brand-600: #b96e13;
-  --color-brand-700: #985213;
-  --color-brand-800: #7c4115;
-  --color-brand-900: #673615;
-  --color-brand-950: #3c1a07;
+  /* Brand — Warm Gold */
+  --color-gold-50:   #fdf8ee;
+  --color-gold-100:  #f8edcc;
+  --color-gold-200:  #f0d897;
+  --color-gold-300:  #e6bf5c;
+  --color-gold-400:  #daa83a;
+  --color-gold-500:  #c9952a;  /* Primary Gold */
+  --color-gold-600:  #b07d1f;
+  --color-gold-700:  #8d611a;
+  --color-gold-800:  #734e1c;
+  --color-gold-900:  #5f411a;
 
-  /* Dark Palette */
-  --color-dark-50:   #f6f6f7;
-  --color-dark-100:  #e0e1e5;
-  --color-dark-200:  #c1c2cb;
-  --color-dark-300:  #9799aa;
-  --color-dark-400:  #72748a;
-  --color-dark-500:  #595b70;
-  --color-dark-600:  #46485a;
-  --color-dark-700:  #3a3b4a;
-  --color-dark-800:  #22232e;
-  --color-dark-900:  #16171f;
-  --color-dark-950:  #0d0e14;
+  /* Cream / Background Palette */
+  --color-cream-50:  #fdfaf5;
+  --color-cream-100: #f8f3e8;
+  --color-cream-200: #f0e8d5;
+  --color-cream-300: #e6d9be;
+  --color-cream-400: #d4c4a0;
+  --color-cream-500: #bfaa7e;
+
+  /* Dark / Text Palette */
+  --color-stone-50:  #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
 
   /* Typography */
-  --font-sans:    "Inter", ui-sans-serif, system-ui;
-  --font-display: "Playfair Display", ui-serif, Georgia;
-  --font-arabic:  "Cairo", sans-serif;
+  --font-sans:    "Cairo", "Tajawal", ui-sans-serif, system-ui;
+  --font-arabic:  "Cairo", "Tajawal", sans-serif;
 
-  /* Custom Animations */
-  --animate-fade-in:  fadeIn 0.5s ease-in-out;
-  --animate-slide-up: slideUp 0.5s ease-out;
-  --animate-slide-down: slideDown 0.3s ease-out;
+  /* Animations */
+  --animate-fade-in:   fadeIn 0.6s ease-out;
+  --animate-slide-up:  slideUp 0.6s ease-out;
+  --animate-slide-rtl: slideRTL 0.5s ease-out;
 
   @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
   }
-
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
+  @keyframes slideRTL {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
   }
 }
 
-/* ─── Base Styles ─────────────────────────────────────────────────────────── */
+/* ─── Base ───────────────────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    scroll-behavior: smooth;
   }
 
   html {
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
-    background-color: var(--color-dark-950);
-    color: var(--color-dark-50);
+    background-color: var(--color-cream-100);
+    color: var(--color-stone-900);
     font-family: var(--font-sans);
+    direction: rtl;
+    text-align: right;
+    line-height: 1.7;
   }
 
-  h1, h2, h3, h4 {
-    font-family: var(--font-display);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-arabic);
+    line-height: 1.4;
+    color: var(--color-stone-900);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-brand-500);
+    outline: 2px solid var(--color-gold-500);
     outline-offset: 2px;
   }
 
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar       { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--color-dark-900); }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-brand-500);
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-brand-400);
-  }
+  /* Scrollbar */
+  ::-webkit-scrollbar       { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--color-cream-100); }
+  ::-webkit-scrollbar-thumb { background: var(--color-gold-500); border-radius: 3px; }
 }
 
-/* ─── Component Utilities ──────────────────────────────────────────────────── */
+/* ─── Components ──────────────────────────────────────────────────────────── */
 @layer components {
-  .btn-primary {
+
+  /* Buttons */
+  .btn-gold {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+    font-family: var(--font-arabic);
     font-weight: 600;
     font-size: 0.875rem;
-    background-color: var(--color-brand-500);
-    color: #fff;
-    border: 1px solid var(--color-brand-500);
+    background-color: var(--color-gold-500);
+    color: #ffffff;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s, transform 0.15s;
+    white-space: nowrap;
 
-    &:hover {
-      background-color: var(--color-brand-600);
-      border-color: var(--color-brand-600);
-    }
-    &:focus-visible {
-      outline: 2px solid var(--color-brand-500);
-      outline-offset: 2px;
-    }
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    &:hover  { background-color: var(--color-gold-600); transform: translateY(-1px); }
+    &:active { transform: translateY(0); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
   }
 
-  .btn-secondary {
+  .btn-outline-gold {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+    font-family: var(--font-arabic);
     font-weight: 600;
     font-size: 0.875rem;
     background-color: transparent;
-    color: var(--color-brand-400);
-    border: 1px solid var(--color-brand-500);
+    color: var(--color-gold-600);
+    border: 1.5px solid var(--color-gold-500);
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    transition: all 0.2s;
+    white-space: nowrap;
 
     &:hover {
-      background-color: var(--color-brand-500);
+      background-color: var(--color-gold-500);
       color: #fff;
-    }
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+      transform: translateY(-1px);
     }
   }
 
-  .card {
-    background-color: var(--color-dark-800);
-    border-radius: 1rem;
-    border: 1px solid var(--color-dark-700);
-    overflow: hidden;
+  .btn-dark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    border-radius: 999px;
+    font-family: var(--font-arabic);
+    font-weight: 600;
+    font-size: 0.875rem;
+    background-color: var(--color-stone-900);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+
+    &:hover { background-color: var(--color-stone-800); transform: translateY(-1px); }
   }
 
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.875rem, 5vw, 3rem);
-    font-weight: 700;
-    color: var(--color-dark-50);
-  }
-
-  .section-subtitle {
-    color: var(--color-brand-500);
+  /* Section Label */
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
+    color: var(--color-stone-500);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background-color: var(--color-gold-500);
+    }
   }
 
-  .input-field {
+  .section-heading {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 700;
+    color: var(--color-stone-900);
+    line-height: 1.35;
+  }
+
+  /* Card */
+  .property-card {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.25s, transform 0.25s;
+
+    &:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background-color: var(--color-cream-300);
+  }
+
+  /* Container */
+  .site-container {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  /* Logo placeholder image */
+  .logo-placeholder {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    background-color: var(--color-dark-800);
-    border: 1px solid var(--color-dark-600);
-    color: var(--color-dark-50);
-    transition: border-color 0.2s;
-
-    &::placeholder {
-      color: var(--color-dark-400);
-    }
-    &:focus {
-      outline: none;
-      border-color: var(--color-brand-500);
-      box-shadow: 0 0 0 1px var(--color-brand-500);
-    }
+    height: 100%;
+    object-fit: contain;
+    padding: 1.5rem;
+    background-color: var(--color-cream-100);
   }
 
-  .gold-gradient {
-    background: linear-gradient(135deg, #d4881a 0%, #e3a433 50%, #b96e13 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  /* Nav link active */
+  .nav-link-active {
+    color: var(--color-stone-900) !important;
+    position: relative;
 
-  .glass-card {
-    backdrop-filter: blur(12px);
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      right: 0;
+      left: 0;
+      height: 2px;
+      background-color: var(--color-gold-500);
+      border-radius: 2px;
+    }
   }
 }

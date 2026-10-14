@@ -1,20 +1,19 @@
-import { Outlet } from "react-router-dom";
+﻿import { Outlet } from "react-router-dom";
 import Navbar from "@components/layout/Navbar.jsx";
 import Footer from "@components/layout/Footer.jsx";
 
 /**
- * MainLayout - wraps all public-facing pages with Navbar + Footer
+ * MainLayout — يغلّف كل الصفحات بالـ Navbar والـ Footer
+ * يضيف padding-top لتعويض الـ Navbar الثابت (72px)
  */
-const MainLayout = () => {
-  return (
-    <div className="min-h-screen flex flex-col bg-dark-950">
-      <Navbar />
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
+const MainLayout = () => (
+  <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f8f3e8" }}>
+    <Navbar />
+    <div style={{ paddingTop: "72px", flex: 1 }}>
+      <Outlet />
     </div>
-  );
-};
+    <Footer />
+  </div>
+);
 
 export default MainLayout;

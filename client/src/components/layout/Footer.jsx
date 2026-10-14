@@ -1,92 +1,91 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
+import logoImg from "@assets/images/logo.jpg";
 
-const footerLinks = {
-  Company: [
-    { label: "About Us", to: "/about" },
-    { label: "Our Projects", to: "/projects" },
-    { label: "Careers", to: "/careers" },
-    { label: "News", to: "/news" },
-  ],
-  Properties: [
-    { label: "All Properties", to: "/properties" },
-    { label: "Residential", to: "/properties?type=residential" },
-    { label: "Commercial", to: "/properties?type=commercial" },
-    { label: "Investment", to: "/properties?type=investment" },
-  ],
-  Support: [
-    { label: "Contact Us", to: "/contact" },
-    { label: "FAQ", to: "/faq" },
-    { label: "Privacy Policy", to: "/privacy" },
-    { label: "Terms of Service", to: "/terms" },
-  ],
-};
+const quickLinks = [
+  { label: "الرئيسية",        to: "/" },
+  { label: "مشروعاتنا",       to: "/projects" },
+  { label: "الوحدات المتاحة", to: "/properties" },
+  { label: "عن الشركة",       to: "/about" },
+  { label: "سياسة الخصوصية",  to: "/privacy" },
+];
 
-/**
- * Footer - site-wide footer with links and brand info
- */
-const Footer = () => {
-  return (
-    <footer className="bg-dark-900 border-t border-dark-800 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-400 to-brand-700 flex items-center justify-center font-display font-bold text-white text-lg">
-                PF
-              </div>
-              <div>
-                <p className="font-display font-bold text-dark-50 text-lg leading-none">
-                  Pharaohs Future
-                </p>
-                <p className="text-xs text-dark-400 uppercase tracking-widest">
-                  Real Estate
-                </p>
-              </div>
-            </Link>
-            <p className="text-dark-400 text-sm leading-relaxed">
-              Building tomorrow's landmarks with the legacy of ancient wisdom.
-              Premium real estate development across Egypt.
-            </p>
-          </div>
+const Footer = () => (
+  <footer style={{ backgroundColor: "#ffffff", borderTop: "1px solid #e6d9be", paddingTop: "3.5rem", paddingBottom: "0", fontFamily: "Cairo, sans-serif" }}>
+    <div className="site-container">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "3rem", paddingBottom: "3rem" }}>
 
-          {/* Links */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h3 className="text-dark-50 font-semibold text-sm uppercase tracking-wider mb-4">
-                {title}
-              </h3>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.to}>
-                    <Link
-                      to={link.to}
-                      className="text-dark-400 hover:text-brand-400 text-sm transition-colors duration-200"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        {/* ─── Column 1: Logo + Description (Right in RTL) ─── */}
+        <div>
+          <Link to="/" style={{ display: "inline-block", marginBottom: "1rem" }}>
+            <img src={logoImg} alt="مستقبل الفراعنة" style={{ height: "52px", objectFit: "contain" }} />
+          </Link>
+          <p style={{ fontSize: "0.875rem", color: "#78716c", lineHeight: "1.8", maxWidth: "260px" }}>
+            سرح عقاري منفرد يجمع بين عبق الهندسة الخالدة ورؤى الاستثمار العقاري الحديثة في أرقى المواقع الحيوية بجمهورية مصر العربية.
+          </p>
         </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-dark-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-dark-500 text-sm text-center sm:text-left">
-            © {new Date().getFullYear()} Pharaohs Future Real Estate. All rights reserved.
-          </p>
-          <div className="flex items-center gap-1">
-            <span className="text-dark-500 text-xs">Built with</span>
-            <span className="text-brand-500 text-xs font-medium mx-1">♦</span>
-            <span className="text-dark-500 text-xs">in Egypt</span>
-          </div>
+        {/* ─── Column 2: Quick Links (Center) ─── */}
+        <div>
+          <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#1c1917", marginBottom: "1.25rem" }}>روابط سريعة</h3>
+          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            {quickLinks.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "#78716c",
+                    textDecoration: "none",
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={(e) => e.target.style.color = "#c9952a"}
+                  onMouseLeave={(e) => e.target.style.color = "#78716c"}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ─── Column 3: Sales Contact (Left in RTL) ─── */}
+        <div>
+          <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#1c1917", marginBottom: "1.25rem" }}>مبيعات المشاريع</h3>
+          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            {[
+              "+20 (2) 2345 6789",
+              "+20 100 000 8900 (واتساب)",
+              "sales@mostakbal-pharaohs.com",
+              "القاهرة، مصر",
+            ].map((item) => (
+              <li key={item} style={{ fontSize: "0.875rem", color: "#78716c" }}>{item}</li>
+            ))}
+          </ul>
         </div>
       </div>
-    </footer>
-  );
-};
+    </div>
+
+    {/* ─── Bottom Bar ─── */}
+    <div style={{ borderTop: "1px solid #e6d9be", padding: "1rem 0" }}>
+      <div className="site-container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+        <p style={{ fontSize: "0.78rem", color: "#a8a29e" }}>
+          جميع الحقوق محفوظة © مستقبل الفراعنة للاستثمار والتطوير العقاري
+        </p>
+        <p style={{ fontSize: "0.78rem", color: "#a8a29e" }}>
+          الهندسة والتطوير المعماري الراقي
+        </p>
+      </div>
+    </div>
+
+    <style>{`
+      @media (max-width: 768px) {
+        footer > div > div > div[style*="grid"] {
+          grid-template-columns: 1fr !important;
+          gap: 2rem !important;
+        }
+      }
+    `}</style>
+  </footer>
+);
 
 export default Footer;
