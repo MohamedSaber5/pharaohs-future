@@ -87,7 +87,9 @@ app.use("/api", apiLimiter);
 const API_PREFIX = "/api/v1";
 
 app.use(`${API_PREFIX}/health`, healthRoutes);
-app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/auth`,     authRoutes);
+app.use(`${API_PREFIX}/projects`, projectRoutes);
+app.use(`${API_PREFIX}/units`,    unitRoutes);
 
 // ─── Root Route ───────────────────────────────────────────────────────────────
 
@@ -111,4 +113,6 @@ app.all("*", (req, res, next) => {
 app.use(errorHandler);
 
 export default app;
+
+
 
