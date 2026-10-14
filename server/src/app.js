@@ -19,7 +19,8 @@ import logger from "./utils/logger.js";
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes    from './routes/auth.routes.js';
 import projectRoutes from './routes/project.routes.js';
-import unitRoutes    from './routes/unit.routes.js';
+import unitRoutes        from './routes/unit.routes.js';
+import reservationRoutes from './routes/reservation.routes.js';
 
 const app = express();
 
