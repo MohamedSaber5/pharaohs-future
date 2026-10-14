@@ -1,5 +1,4 @@
-﻿import logoImg from "@assets/images/logo.jpg";
-
+﻿
 const TIMELINE = [
   { year:"١٩٩٨", title:"التأسيس",             desc:"تأسست مستقبل الفراعنة برؤية معمارية فريدة لتغيير ملامح العقارات في مصر." },
   { year:"٢٠٠٥", title:"أول مشروع كبير",      desc:"أطلقنا أول كمبوند سكني متكامل في القاهرة الجديدة بـ ٣٢٠ وحدة." },
@@ -20,7 +19,7 @@ const AboutPage = () => (
     {/* Hero */}
     <section style={{ background:"linear-gradient(135deg,#1c1917 0%,#2d2520 100%)", padding:"5rem 0", textAlign:"center" }}>
       <div className="site-container">
-        <img src={logoImg} alt="مستقبل الفراعنة" style={{ height:"80px", objectFit:"contain", filter:"brightness(0) invert(1)", opacity:0.85, marginBottom:"1.5rem" }} />
+        <span className="material-symbols-outlined text-[28px]">account_balance</span>
         <h1 style={{ fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:"800", color:"#fff", marginBottom:"1rem" }}>من نحن</h1>
         <p style={{ fontSize:"1rem", color:"#a8a29e", maxWidth:"560px", margin:"0 auto", lineHeight:"1.9" }}>
           ربع قرن من بناء الأحلام — مستقبل الفراعنة رحلة فريدة في تطوير العقارات الفاخرة بمصر.
@@ -120,3 +119,4 @@ const AboutPage = () => (
 );
 
 export default AboutPage;
+

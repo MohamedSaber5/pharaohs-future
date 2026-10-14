@@ -1,5 +1,4 @@
 ﻿import { Link } from "react-router-dom";
-import logoImg from "@assets/images/logo.jpg";
 
 const HeroSection = () => (
   <section
@@ -66,18 +65,10 @@ const HeroSection = () => (
         marginTop: "0.5rem",
       }}
     >
-      <img
-        src={logoImg}
-        alt="مستقبل الفراعنة"
-        style={{
-          maxWidth: "320px",
-          maxHeight: "320px",
-          objectFit: "contain",
-          opacity: 0.5,
-        }}
-      />
+      <span className="material-symbols-outlined text-[28px]">account_balance</span>
     </div>
   </section>
 );
 
 export default HeroSection;
+

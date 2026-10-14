@@ -38,3 +38,6 @@ coverage/
 # Misc
 .cache/
 *.tgz
+
+write_*.cjs
+write_*.mjs

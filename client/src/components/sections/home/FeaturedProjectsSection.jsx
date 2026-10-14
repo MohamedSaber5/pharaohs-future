@@ -1,5 +1,4 @@
 ﻿import { Link } from "react-router-dom";
-import logoImg from "@assets/images/logo.jpg";
 
 const projects = [
   {
@@ -39,11 +38,7 @@ const ProjectCard = ({ project }) => (
         overflow: "hidden",
       }}
     >
-      <img
-        src={logoImg}
-        alt={project.name}
-        style={{ width: "60%", objectFit: "contain", opacity: 0.45 }}
-      />
+      <span className="material-symbols-outlined text-[28px]">account_balance</span>
     </div>
 
     {/* Card Content */}
@@ -126,3 +121,4 @@ const FeaturedProjectsSection = () => (
 );
 
 export default FeaturedProjectsSection;
+

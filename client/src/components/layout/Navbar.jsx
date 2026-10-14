@@ -1,133 +1,112 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { HiMenu, HiX } from "react-icons/hi";
-import logoImg from "@assets/images/logo.jpg";
+import { useAuth } from "@context/AuthContext.jsx";
 
-const navLinks = [
-  { label: "الرئيسية",        to: "/" },
-  { label: "عن الشركة",       to: "/about" },
-  { label: "مشروعاتنا",       to: "/projects" },
-  { label: "الوحدات المتاحة", to: "/properties" },
-  { label: "تواصل معنا",      to: "/contact" },
-];
-
-const Navbar = () => {
-  const [isScrolled,    setIsScrolled]    = useState(false);
-  const [isMobileOpen,  setIsMobileOpen]  = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0, right: 0, left: 0,
-        zIndex: 50,
-        backgroundColor: isScrolled ? "rgba(248,243,232,0.97)" : "#f8f3e8",
-        borderBottom: isScrolled ? "1px solid #e6d9be" : "1px solid transparent",
-        backdropFilter: isScrolled ? "blur(8px)" : "none",
-        transition: "all 0.3s ease",
-      }}
-    >
-      <nav className="site-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px" }}>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(16,36,58,0.06)]">
+      <div className="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-space-md">
 
-        {/* ─── CTA Button (Left in RTL = visually left) ─── */}
-        <button id="navbar-cta" className="btn-gold" style={{ fontSize: "0.82rem", padding: "0.5rem 1.2rem" }}>
-          استفسر عن وحدة
-        </button>
+        {/* Logo */}
+        <div className="flex items-center gap-space-lg">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-11 h-11 rounded-lg bg-primary-container flex items-center justify-center text-secondary-fixed shadow-[0_2px_10px_rgba(16,36,58,0.15)]">
+              <span className="material-symbols-outlined text-[24px]">account_balance</span>
+            </div>
+            <div className="flex flex-col text-right">
+              <span className="font-title-lg text-title-lg text-primary tracking-tight leading-tight">مستقبل الفراعنة</span>
+              <span className="font-label-sm text-label-sm text-secondary tracking-normal">للاستثمار والتطوير العقاري</span>
+            </div>
+          </Link>
 
-        {/* ─── Nav Links (Center) ─── */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }} className="desktop-nav">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              id={`nav-${link.label}`}
-              style={({ isActive }) => ({
-                padding: "0.4rem 0.85rem",
-                fontSize: "0.875rem",
-                fontWeight: isActive ? "600" : "400",
-                color: isActive ? "#1c1917" : "#57534e",
-                textDecoration: "none",
-                position: "relative",
-                transition: "color 0.2s",
-                fontFamily: "Cairo, sans-serif",
-              })}
-              className={({ isActive }) => isActive ? "nav-link-active" : ""}
-            >
-              {link.label}
-            </NavLink>
-          ))}
+          {/* Desktop Nav */}
+          <nav className="hidden xl:flex items-center gap-space-lg mr-space-md">
+            {[
+              { to:"/",          label:"الرئيسية",        exact:true },
+              { to:"/projects",  label:"مشروعاتنا",       exact:false },
+              { to:"/properties",label:"الوحدات المتاحة", exact:false },
+              { to:"/about",     label:"من نحن",           exact:false },
+              { to:"/contact",   label:"تواصل معنا",       exact:false },
+            ].map(item => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.exact}
+                className={({ isActive }) =>
+                  `font-title-md text-title-md transition-colors py-2 ${isActive ? "text-secondary" : "text-on-surface-variant hover:text-on-surface"}`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
         </div>
 
-        {/* ─── Logo (Right in RTL) ─── */}
-        <Link to="/" id="navbar-logo" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
-          <img
-            src={logoImg}
-            alt="مستقبل الفراعنة"
-            style={{ height: "44px", width: "auto", objectFit: "contain" }}
-          />
-        </Link>
+        {/* Actions */}
+        <div className="flex items-center gap-space-md">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface">
+            <span className="material-symbols-outlined text-secondary text-[18px]">payments</span>
+            <span className="font-label-md text-label-md text-secondary">ج.م</span>
+            <span className="font-label-sm text-label-sm text-outline">EGP</span>
+          </div>
 
-        {/* ─── Mobile Toggle ─── */}
-        <button
-          id="navbar-mobile-toggle"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          aria-label="القائمة"
-          style={{
-            display: "none",
-            padding: "0.5rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#1c1917",
-          }}
-          className="mobile-toggle"
-        >
-          {isMobileOpen ? <HiX size={24} /> : <HiMenu size={24} />}
-        </button>
-      </nav>
+          {user ? (
+            <div className="flex items-center gap-2">
+              {user.role === "admin" && (
+                <Link to="/admin/dashboard" className="hidden md:inline-flex items-center justify-center h-10 px-4 rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+                  لوحة التحكم
+                </Link>
+              )}
+              <button onClick={logout} className="hidden md:inline-flex items-center justify-center h-10 px-4 rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container transition-colors">
+                خروج
+              </button>
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                <span className="font-label-sm text-label-sm text-on-primary font-bold">{user.name?.[0] || "م"}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link to="/auth" className="hidden md:inline-flex items-center justify-center h-10 px-4 rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+                تسجيل الدخول
+              </Link>
+              <Link to="/auth" className="inline-flex items-center justify-center h-10 px-5 rounded-lg bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-all shadow-[0_4px_16px_-4px_rgba(16,36,58,0.25)]">
+                إنشاء حساب جديد
+              </Link>
+            </div>
+          )}
 
-      {/* ─── Mobile Menu ─── */}
-      {isMobileOpen && (
-        <div style={{ backgroundColor: "#f8f3e8", borderTop: "1px solid #e6d9be", padding: "1rem 1.5rem 1.5rem" }}>
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => setIsMobileOpen(false)}
-              style={({ isActive }) => ({
-                display: "block",
-                padding: "0.75rem 0",
-                fontSize: "1rem",
-                fontWeight: isActive ? "600" : "400",
-                color: isActive ? "#c9952a" : "#44403c",
-                textDecoration: "none",
-                borderBottom: "1px solid #e6d9be",
-                fontFamily: "Cairo, sans-serif",
-              })}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          <button className="btn-gold" style={{ marginTop: "1rem", width: "100%" }}>
-            استفسر عن وحدة
+          {/* Mobile toggle */}
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="xl:hidden w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+            <span className="material-symbols-outlined">{mobileOpen ? "close" : "menu"}</span>
           </button>
         </div>
-      )}
+      </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-toggle { display: flex !important; }
-        }
-      `}</style>
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="xl:hidden bg-surface border-t border-outline-variant/30 px-6 py-4 flex flex-col gap-1">
+          {[
+            { to:"/",          label:"الرئيسية" },
+            { to:"/projects",  label:"مشروعاتنا" },
+            { to:"/properties",label:"الوحدات المتاحة" },
+            { to:"/about",     label:"من نحن" },
+            { to:"/contact",   label:"تواصل معنا" },
+          ].map(item => (
+            <NavLink key={item.to} to={item.to} onClick={() => setMobileOpen(false)}
+              className={({ isActive }) => `block py-3 px-4 rounded-lg font-title-md text-title-md transition-colors ${isActive ? "bg-secondary-container text-on-secondary-container" : "text-on-surface-variant hover:bg-surface-container"}`}>
+              {item.label}
+            </NavLink>
+          ))}
+          {!user && (
+            <Link to="/auth" onClick={() => setMobileOpen(false)} className="mt-2 h-11 flex items-center justify-center rounded-lg bg-primary-container text-on-primary font-title-md text-title-md">
+              إنشاء حساب / تسجيل الدخول
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   );
-};
-
-export default Navbar;
+}

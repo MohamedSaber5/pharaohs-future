@@ -1,5 +1,4 @@
 ﻿import { Link } from "react-router-dom";
-import logoImg from "@assets/images/logo.jpg";
 
 const VisionSection = () => (
   <section
@@ -64,11 +63,7 @@ const VisionSection = () => (
           justifyContent: "center",
         }}
       >
-        <img
-          src={logoImg}
-          alt="نبني للمستقبل"
-          style={{ width: "65%", objectFit: "contain", opacity: 0.45 }}
-        />
+        <span className="material-symbols-outlined text-[28px]">account_balance</span>
       </div>
     </div>
 
@@ -88,3 +83,4 @@ const VisionSection = () => (
 );
 
 export default VisionSection;
+
