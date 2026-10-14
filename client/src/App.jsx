@@ -13,22 +13,19 @@ import ProjectDetailPage from "@pages/ProjectDetailPage.jsx";
 import PropertiesPage    from "@pages/PropertiesPage.jsx";
 import UnitDetailPage    from "@pages/UnitDetailPage.jsx";
 import AuthPage          from "@pages/AuthPage.jsx";
-import AboutPage         from "@pages/AboutPage.jsx";
-import ContactPage       from "@pages/ContactPage.jsx";
 
 // Admin Pages
-import AdminDashboardPage from "@pages/admin/AdminDashboardPage.jsx";
-import AdminProjectsPage  from "@pages/admin/AdminProjectsPage.jsx";
+import AdminDashboardPage from "@pages/AdminDashboardPage.jsx";
+import AdminProjectsPage  from "@pages/AdminProjectsPage.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 5 * 60 * 1000 } }
 });
 
-/** Guard: يمنع غير المسجلين من الوصول لـ Admin */
 const ProtectedRoute = ({ children, requiredRole = "admin" }) => {
   const { user, isLoading } = useAuth();
   if (isLoading) return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100vh", fontFamily:"Cairo,sans-serif", color:"#78716c" }}>
+    <div className="flex items-center justify-center h-screen font-body-md text-body-md text-on-surface-variant">
       جاري التحميل...
     </div>
   );
@@ -39,21 +36,19 @@ const ProtectedRoute = ({ children, requiredRole = "admin" }) => {
 
 const AppRoutes = () => (
   <Routes>
-    {/* ── Public Routes (with Navbar + Footer) ── */}
+    {/* Public Routes */}
     <Route element={<MainLayout />}>
       <Route index                element={<HomePage />} />
       <Route path="projects"      element={<ProjectsPage />} />
       <Route path="projects/:id"  element={<ProjectDetailPage />} />
       <Route path="properties"    element={<PropertiesPage />} />
       <Route path="properties/:id" element={<UnitDetailPage />} />
-      <Route path="about"         element={<AboutPage />} />
-      <Route path="contact"       element={<ContactPage />} />
     </Route>
 
-    {/* ── Auth Route (no navbar/footer) ── */}
+    {/* Auth Route (fullscreen - no navbar/footer) */}
     <Route path="auth" element={<AuthPage />} />
 
-    {/* ── Admin Routes (sidebar layout) ── */}
+    {/* Admin Routes */}
     <Route path="admin" element={
       <ProtectedRoute requiredRole="admin">
         <AdminLayout />
@@ -64,7 +59,7 @@ const AppRoutes = () => (
       <Route path="projects"  element={<AdminProjectsPage />} />
     </Route>
 
-    {/* ── Catch All ── */}
+    {/* Catch All */}
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
