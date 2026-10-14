@@ -1,25 +1,20 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+﻿import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import authService from "../services/auth.service.js";
 import toast from "react-hot-toast";
 
 const AuthContext = createContext(null);
 
-/**
- * AuthProvider - wraps the app and provides auth state to all children
- */
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // loading initial session
+  const [user, setUser]                   = useState(null);
+  const [isLoading, setIsLoading]         = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Try to restore session on app load
   const checkSession = useCallback(async () => {
     try {
       const response = await authService.getMe();
-      setUser(response.data);
+      setUser(response.data.data ?? response.data);
       setIsAuthenticated(true);
     } catch {
-      // Not authenticated — that's okay
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -27,67 +22,57 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+  useEffect(() => { checkSession(); }, [checkSession]);
 
-  const login = async (credentials) => {
-    const response = await authService.login(credentials);
-    setUser(response.data.user);
-    setIsAuthenticated(true);
-    if (response.data.token) {
+  const login = async (email, password) => {
+    const response = await authService.login({ email, password });
+    const userData = response.data?.data?.user ?? response.data?.user ?? response.data;
+    if (response.data?.data?.token) {
+      localStorage.setItem("authToken", response.data.data.token);
+    } else if (response.data?.token) {
       localStorage.setItem("authToken", response.data.token);
     }
-    toast.success(`Welcome back, ${response.data.user.name}!`);
+    setUser(userData);
+    setIsAuthenticated(true);
+    toast.success(`مرحباً، ${userData?.name || ""}!`);
     return response;
   };
 
   const register = async (data) => {
     const response = await authService.register(data);
-    setUser(response.data.user);
-    setIsAuthenticated(true);
-    if (response.data.token) {
+    const userData = response.data?.data?.user ?? response.data?.user ?? response.data;
+    if (response.data?.data?.token) {
+      localStorage.setItem("authToken", response.data.data.token);
+    } else if (response.data?.token) {
       localStorage.setItem("authToken", response.data.token);
     }
-    toast.success(`Welcome to Pharaohs Future, ${response.data.user.name}!`);
+    setUser(userData);
+    setIsAuthenticated(true);
+    toast.success(`مرحباً، ${userData?.name || ""}! تم إنشاء حسابك بنجاح`);
     return response;
   };
 
   const logout = async () => {
-    try {
-      await authService.logout();
-    } catch {
-      // Proceed with local logout even if API call fails
-    } finally {
+    try { await authService.logout(); } catch {}
+    finally {
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem("authToken");
-      toast.success("You have been logged out.");
+      toast.success("تم تسجيل الخروج بنجاح");
     }
   };
 
-  const value = {
-    user,
-    isLoading,
-    isAuthenticated,
-    login,
-    register,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-/**
- * useAuth - custom hook to consume AuthContext
- * @returns {object} Auth state and methods
- */
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 };
 
 export default AuthContext;

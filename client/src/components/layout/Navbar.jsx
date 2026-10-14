@@ -1,11 +1,14 @@
 ﻿import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "@context/AuthContext.jsx";
+import logoSrc from "@assets/images/logo.png";
 
 const NAV_ITEMS = [
-  { to:"/",           label:"الرئيسية",         exact:true  },
-  { to:"/projects",   label:"مشروعاتنا",        exact:false },
-  { to:"/properties", label:"الوحدات المتاحة",  exact:false },
+  { to:"/",           label:"الرئيسية",        exact:true  },
+  { to:"/projects",   label:"مشروعاتنا",       exact:false },
+  { to:"/properties", label:"الوحدات المتاحة", exact:false },
+  { to:"/about",      label:"نبذة عنّا",        exact:false },
+  { to:"/contact",    label:"تواصل معنا",       exact:false },
 ];
 
 export default function Navbar() {
@@ -16,19 +19,13 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-neutral-100 shadow-sm">
       <div className="h-20 max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between">
 
-        {/* ── Logo ── */}
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-3 flex-shrink-0">
-          <div className="w-11 h-11 rounded-xl bg-[#000e1f] flex items-center justify-center shadow-md">
-            <span className="material-symbols-outlined text-[22px]" style={{color:"#c9952a"}}>account_balance</span>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-[15px] font-bold text-[#000e1f] tracking-tight">مستقبل الفراعنة</span>
-            <span className="text-[11px] text-[#775a1a]">للاستثمار والتطوير العقاري</span>
-          </div>
+          <img src={logoSrc} alt="مستقبل الفراعنة" className="h-12 w-auto object-contain" />
         </Link>
 
-        {/* ── Desktop Nav ── */}
-        <nav className="hidden lg:flex items-center gap-8">
+        {/* Desktop Nav */}
+        <nav className="hidden lg:flex items-center gap-7">
           {NAV_ITEMS.map(item => (
             <NavLink
               key={item.to}
@@ -47,9 +44,8 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* ── Actions ── */}
+        {/* Actions */}
         <div className="flex items-center gap-3">
-          {/* EGP Badge */}
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-600 text-[13px] font-medium">
             <span className="material-symbols-outlined text-[#775a1a] text-[16px]">payments</span>
             <span className="text-[#775a1a] font-bold">EGP</span>
@@ -84,7 +80,6 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 transition-colors">
@@ -93,29 +88,22 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── Mobile Menu ── */}
+      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-neutral-100 px-6 py-4 flex flex-col gap-1">
           {NAV_ITEMS.map(item => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.exact}
+            <NavLink key={item.to} to={item.to} end={item.exact}
               onClick={() => setMobileOpen(false)}
               className={({ isActive }) =>
                 `block py-3 px-4 rounded-xl text-[14px] font-semibold transition-colors ${
-                  isActive
-                    ? "bg-[#000e1f]/5 text-[#775a1a]"
-                    : "text-neutral-600 hover:bg-neutral-50 hover:text-[#000e1f]"
+                  isActive ? "bg-[#000e1f]/5 text-[#775a1a]" : "text-neutral-600 hover:bg-neutral-50 hover:text-[#000e1f]"
                 }`
               }>
               {item.label}
             </NavLink>
           ))}
           {!user && (
-            <Link
-              to="/auth"
-              onClick={() => setMobileOpen(false)}
+            <Link to="/auth" onClick={() => setMobileOpen(false)}
               className="mt-3 h-11 flex items-center justify-center rounded-xl bg-[#000e1f] text-white text-[14px] font-bold">
               ابدأ الاستثمار
             </Link>

@@ -1,4 +1,4 @@
-import { Outlet, Link, NavLink, useNavigate } from "react-router-dom";
+﻿import { Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext.jsx";
 
 const NAV = [
@@ -63,3 +63,4 @@ export default function AdminLayout() {
     </div>
   );
 }
+
