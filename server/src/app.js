@@ -98,7 +98,7 @@ app.use(`${API_PREFIX}/health`, healthRoutes);
 app.use(`${API_PREFIX}/auth`,     authRoutes);
 app.use(`${API_PREFIX}/projects`, projectRoutes);
 app.use(`${API_PREFIX}/units`,    unitRoutes);
-app.use(`${API_PREFIX}/reservations`, reservationRoutes);
+app.use(`/reservations`, reservationRoutes);
 
 // ─── Root Route ───────────────────────────────────────────────────────────────
 

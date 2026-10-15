@@ -3,6 +3,7 @@
 const reservationService = {
   create:             (data)         => apiClient.post("/reservations", data),
   agentBook:          (data)         => apiClient.post("/reservations/agent-book", data),
+  getMyReservations: () => apiClient.get("/reservations/my"),
   getMy:              ()             => apiClient.get("/reservations/my"),
   getAssigned:        (params)       => apiClient.get("/reservations/assigned", { params }),
   getAll:             (params)       => apiClient.get("/reservations", { params }),
@@ -12,3 +13,4 @@ const reservationService = {
 };
 
 export default reservationService;
+
