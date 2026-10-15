@@ -21,6 +21,7 @@ import authRoutes    from './routes/auth.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import unitRoutes        from './routes/unit.routes.js';
 import reservationRoutes from './routes/reservation.routes.js';
+import adminRoutes      from './routes/admin.routes.js';
 
 const app = express();
 
@@ -98,7 +99,8 @@ app.use(`${API_PREFIX}/health`, healthRoutes);
 app.use(`${API_PREFIX}/auth`,     authRoutes);
 app.use(`${API_PREFIX}/projects`, projectRoutes);
 app.use(`${API_PREFIX}/units`,    unitRoutes);
-app.use(`/reservations`, reservationRoutes);
+app.use(`${API_PREFIX}/reservations`, reservationRoutes);
+app.use(`${API_PREFIX}/admin`,      adminRoutes);
 
 // ─── Root Route ───────────────────────────────────────────────────────────────
 

@@ -24,6 +24,7 @@ const authService = {
   /**
    * Get the currently authenticated user profile
    */
+  resetPasswordByPhone: (data) => apiClient.post("/auth/reset-password-phone", data),
   getMe: () => apiClient.get("/auth/me"),
 };
 

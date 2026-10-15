@@ -17,6 +17,7 @@ import ContactPage       from "@pages/ContactPage.jsx";
 import AdminDashboardPage from "@pages/AdminDashboardPage.jsx";
 import MyReservationsPage    from '@pages/MyReservationsPage.jsx';
 import EmployeeDashboard         from '@pages/EmployeeDashboard.jsx';
+import AdminUsersPage         from '@pages/AdminUsersPage.jsx';
 import AdminAssignmentLogsPage   from '@pages/AdminAssignmentLogsPage.jsx';
 import AdminReservationsPage from '@pages/AdminReservationsPage.jsx';
 import AdminUnitsPage    from "@pages/AdminUnitsPage.jsx";
@@ -63,6 +64,7 @@ const AppRoutes = () => (
       <Route path="units"          element={<AdminUnitsPage />} />
       <Route path="reservations"   element={<AdminReservationsPage />} />
           <Route path="assignment-logs" element={<AdminAssignmentLogsPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />
