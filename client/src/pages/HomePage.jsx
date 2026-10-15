@@ -78,7 +78,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end'>
-            {[{label:'المنطقة',icon:'location_on',opts:['العاصمة الإدارية','القاهرة الجديدة','الساحل الشمالي','الشيخ زايد']},{label:'نوع الوحدة',icon:'home_work',opts:['فيلا مستقلة','بنتهاوس','دوبلكس','شقة']},{label:'الميزانية',icon:'payments',opts:['2-4 مليون','4-7 مليون','7-12 مليون','+12 مليون']},{label:'الهدف',icon:'target',opts:['للسكن','للاستثمار','لكليهما']}].map(f=>(
+            {[{label:'المنطقة',icon:'location_on',opts:['أسوان الجديدة','غرب سهيل','شرق أسوان','النصر']},{label:'نوع الوحدة',icon:'home_work',opts:['فيلا مستقلة','بنتهاوس','دوبلكس','شقة']},{label:'الميزانية',icon:'payments',opts:['2-4 مليون','4-7 مليون','7-12 مليون','+12 مليون']},{label:'الهدف',icon:'target',opts:['للسكن','للاستثمار','لكليهما']}].map(f=>(
               <div key={f.label} className='flex flex-col gap-1.5'>
                 <label className='font-label-md text-label-md text-on-surface-variant flex items-center gap-1.5'><span className='material-symbols-outlined text-secondary text-[16px]'>{f.icon}</span>{f.label}</label>
                 <div className='relative'>

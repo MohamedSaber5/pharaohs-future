@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useEffect, useCallback } from "react";
+﻿import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import authService from "../services/auth.service.js";
 import toast from "react-hot-toast";
 
@@ -8,11 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [user,            setUser]            = useState(null);
   const [isLoading,       setIsLoading]       = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const sessionChecked = useRef(false);
 
   const checkSession = useCallback(async () => {
+    // Only check once on mount
+    if (sessionChecked.current) return;
+    sessionChecked.current = true;
     try {
-      // apiClient interceptor returns response.data, so this IS the server JSON body
-      // Server sends: { success, data: { token?, user? } } OR { success, data: <user> }
       const res = await authService.getMe();
       const userData = res?.data ?? res;
       if (userData && userData._id) {
@@ -32,18 +34,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => { checkSession(); }, [checkSession]);
 
-  // Helper: extract user + token from API response
   const extractAuth = (res) => {
-    // apiClient already returns response.data
-    // Server sends: { success:true, data: { token, user } }
     const data = res?.data ?? res;
-    const token = data?.token;
-    const user  = data?.user ?? data;
-    return { token, user };
+    return { token: data?.token, user: data?.user ?? data };
   };
 
   const login = async (email, password) => {
-    const res  = await authService.login({ email, password });
+    const res = await authService.login({ email, password });
     const { token, user: userData } = extractAuth(res);
     if (token) localStorage.setItem("authToken", token);
     setUser(userData);
@@ -53,12 +50,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (data) => {
-    const res  = await authService.register(data);
+    const res = await authService.register(data);
     const { token, user: userData } = extractAuth(res);
     if (token) localStorage.setItem("authToken", token);
     setUser(userData);
     setIsAuthenticated(true);
-    toast.success(`أهلاً ${userData?.name || ""}! تم إنشاء حسابك بنجاح 🎉`);
+    toast.success(`أهلاً ${userData?.name || ""}! تم إنشاء حسابك بنجاح`);
     return res;
   };
 
@@ -68,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem("authToken");
+      sessionChecked.current = false; // allow re-check on next mount
       toast.success("تم تسجيل الخروج بنجاح");
     }
   };
@@ -81,7 +79,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  if (!ctx) throw new Error("useAuth must be inside AuthProvider");
   return ctx;
 };
 
