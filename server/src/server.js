@@ -15,7 +15,7 @@ const startServer = async () => {
 
     const server = app.listen(PORT, () => {
       startExpiryCron();
-logger.info(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      logger.info(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
       logger.info(`📡 API Base URL: http://localhost:${PORT}/api/v1`);
     });
 
