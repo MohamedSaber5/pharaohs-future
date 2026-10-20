@@ -1,33 +1,27 @@
 import axios from "axios";
 
-/**
- * Axios instance pre-configured with base URL and credentials.
- * All API calls should use this instance instead of raw axios.
- */
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "/api/v1",
-  withCredentials: true, // Required for HTTP-only cookie auth
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000, // 15 second timeout
+  timeout: 15000,
 });
-
-// ─── Request Interceptor ──────────────────────────────────────────────────────
 
 apiClient.interceptors.request.use(
   (config) => {
-    // Attach token from localStorage if available (fallback for non-cookie setups)
     const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
-
-// ─── Response Interceptor ─────────────────────────────────────────────────────
 
 apiClient.interceptors.response.use(
   (response) => response.data,
@@ -35,18 +29,26 @@ apiClient.interceptors.response.use(
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Something went wrong. Please try again.";
+      "حدث خطأ ما. يرجى المحاولة مرة أخرى.";
 
-    // Handle global 401 (unauthorized) - redirect to login
+    // Prevent any infinite refresh loop on 401
     if (error.response?.status === 401) {
       localStorage.removeItem("authToken");
-      // Avoid redirect loops on the login page itself
-      if (!window.location.pathname.includes("/login")) {
-        window.location.href = "/login";
+
+      const skipRedirect = error.config?.skipAuthRedirect || error.config?.url?.includes("/auth/me");
+      const currentPath = window.location.pathname;
+      const isPublicPath = ["/", "/properties", "/projects", "/about", "/contact", "/auth", "/login"].includes(currentPath);
+
+      // Only redirect if specifically on a protected route (e.g. /admin, /my-reservations, /employee)
+      if (!skipRedirect && !isPublicPath) {
+        window.location.href = "/auth";
       }
     }
 
-    return Promise.reject(new Error(message));
+    const customError = new Error(message);
+    customError.response = error.response;
+    customError.status = error.response?.status;
+    return Promise.reject(customError);
   }
 );
 

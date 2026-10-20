@@ -1,66 +1,153 @@
-﻿import { Outlet, Link, NavLink, useNavigate } from "react-router-dom";
+﻿import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext.jsx";
 
-const NAV = [
-  { to:"/admin/dashboard",    icon:"dashboard",       label:"نظرة عامة" },
-  { to:"/admin/projects",     icon:"apartment",       label:"المشروعات" },
-  { to:"/admin/units",        icon:"holiday_village", label:"الوحدات" }, { to:"/admin/reservations", icon:"bookmark", label:"الحجوزات" }, { to:"/admin/assignment-logs", icon:"assignment_ind", label:"سجل التعيينات" },
-  { to:"/admin/reservations", icon:"event_available", label:"الحجوزات" },
-  { to:"/admin/clients",      icon:"groups",          label:"العملاء" },
+const NAV_SECTIONS = [
+  {
+    title: "الرئيسية",
+    items: [
+      { to: "/admin/dashboard", icon: "dashboard", label: "لوحة التحكم" },
+    ],
+  },
+  {
+    title: "العقارات",
+    items: [
+      { to: "/admin/projects", icon: "apartment",       label: "المشاريع" },
+      { to: "/admin/units",    icon: "holiday_village", label: "الوحدات" },
+    ],
+  },
+  {
+    title: "المبيعات",
+    items: [
+      { to: "/admin/reservations",    icon: "bookmark",       label: "الحجوزات" },
+      { to: "/admin/assignment-logs", icon: "assignment_ind", label: "سجل التعيين" },
+    ],
+  },
+  {
+    title: "الإدارة",
+    items: [
+      { to: "/admin/users",              icon: "group",         label: "المستخدمون" },
+      { to: "/admin/employee-rotation",  icon: "swap_vert",     label: "توزيع الموظفين" },
+    ],
+  },
 ];
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const doLogout = async () => { try { await logout(); } catch(_){} navigate("/auth"); };
+  const doLogout = async () => {
+    try { await logout(); } catch (_) {}
+    navigate("/auth");
+  };
 
   return (
-    <div className="flex min-h-screen bg-surface">
-      <aside className="fixed right-0 top-0 h-full w-72 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between select-none">
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="p-space-lg flex items-center gap-space-sm border-b border-outline-variant/30">
-            <div className="w-11 h-11 rounded-lg bg-primary-container text-secondary-fixed flex items-center justify-center shadow-md flex-shrink-0">
-              <span className="material-symbols-outlined text-[24px]">account_balance</span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-title-md text-title-md text-primary font-bold truncate leading-tight">مستقبل الفراعنة</span>
-              <span className="font-label-sm text-label-sm text-secondary truncate mt-0.5">لوحة الإدارة</span>
-            </div>
+    <div className="flex min-h-screen" style={{ background: "#f8f9fa" }} dir="rtl">
+      {/* Sidebar */}
+      <aside
+        className="fixed right-0 top-0 h-full w-64 flex flex-col z-50 select-none"
+        style={{ background: "#000e1f", borderLeft: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        {/* Brand */}
+        <div
+          className="flex items-center gap-3 px-5 py-5"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: "rgba(201,149,42,0.2)" }}
+          >
+            <span className="material-symbols-outlined text-[20px]" style={{ color: "#c9952a" }}>
+              account_balance
+            </span>
           </div>
-          <nav className="flex-1 px-space-md py-space-sm overflow-y-auto flex flex-col gap-1">
-            {NAV.map(item => (
-              <NavLink key={item.to} to={item.to} end={item.to === "/admin/dashboard"}
-                className={({ isActive }) =>
-                  "flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors " +
-                  (isActive ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface")
-                }
-              >
-                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                <span className="font-title-md text-title-md">{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold text-white truncate leading-tight">
+              مستقبل الفراعنة
+            </p>
+            <p className="text-[11px] truncate" style={{ color: "rgba(255,255,255,0.4)" }}>
+              لوحة الإدارة
+            </p>
+          </div>
         </div>
-        <div className="p-space-md border-t border-outline-variant/30">
-          <div className="flex items-center gap-space-sm px-space-md py-space-sm mb-2">
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-              <span className="font-label-sm text-on-primary font-bold">{user?.name?.[0] || "م"}</span>
+
+        {/* Nav Sections */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-5">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.title}>
+              <p
+                className="text-[10px] font-bold uppercase tracking-widest px-3 mb-2"
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              >
+                {section.title}
+              </p>
+              <div className="flex flex-col gap-0.5">
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/admin/dashboard"}
+                    className={({ isActive }) =>
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all " +
+                      (isActive
+                        ? "text-[#c9952a]"
+                        : "hover:bg-white/5 text-white/50 hover:text-white/80")
+                    }
+                    style={({ isActive }) =>
+                      isActive ? { background: "rgba(201,149,42,0.15)" } : {}
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                        <span className="flex-1">{item.label}</span>
+                        {isActive && (
+                          <span
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ background: "#c9952a" }}
+                          />
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
             </div>
-            <div>
-              <p className="font-title-md text-title-md text-on-surface font-bold truncate">{user?.name || "المسؤول"}</p>
-              <p className="font-label-sm text-label-sm text-on-surface-variant">مسؤول النظام</p>
+          ))}
+        </nav>
+
+        {/* User footer */}
+        <div
+          className="px-3 py-4"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <div className="flex items-center gap-3 px-2 mb-3">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-[13px] text-white"
+              style={{ background: "rgba(201,149,42,0.3)" }}
+            >
+              {user?.name?.[0]?.toUpperCase() || "A"}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] font-bold text-white truncate">{user?.name || "المسؤول"}</p>
+              <p className="text-[11px] truncate" style={{ color: "rgba(255,255,255,0.4)" }}>
+                مسؤول النظام
+              </p>
             </div>
           </div>
-          <button onClick={doLogout} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-error-container hover:text-on-error-container font-label-md text-label-md transition-colors">
-            <span className="material-symbols-outlined text-[18px]">logout</span>
-            تسجيل خروج
+          <button
+            onClick={doLogout}
+            className="w-full flex items-center justify-center gap-2 h-9 rounded-xl text-[13px] font-semibold transition-all hover:bg-red-500/20"
+            style={{ color: "rgba(255,255,255,0.5)" }}
+          >
+            <span className="material-symbols-outlined text-[16px]">logout</span>
+            تسجيل الخروج
           </button>
         </div>
       </aside>
-      <div className="mr-72 flex-1 min-w-0">
+
+      {/* Main Content */}
+      <div className="mr-64 flex-1 min-w-0">
         <Outlet />
       </div>
     </div>
   );
 }
-

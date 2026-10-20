@@ -34,7 +34,17 @@ export const protect = catchAsync(async (req, res, next) => {
     return next(new AppError("The user belonging to this token no longer exists.", 401));
   }
 
-  // 4) Attach user to request
+  // 4) Check if user is active
+  if (!currentUser.isActive) {
+    return next(new AppError("تم إلغاء تنشيط هذا الحساب. يرجى التواصل مع الإدارة.", 403));
+  }
+
+  // 5) Check if user changed password after token was issued
+  if (currentUser.changedPasswordAfter && currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError("تم تغيير كلمة المرور مؤخراً. يرجى تسجيل الدخول مرة أخرى.", 401));
+  }
+
+  // 6) Attach user to request
   req.user = currentUser;
   next();
 });

@@ -14,9 +14,8 @@ const validate = (req, res, next) => {
       message: err.msg,
     }));
 
-    return next(
-      new AppError("Validation failed. Please check your inputs.", 422)
-    );
+    const firstMsg = extractedErrors[0]?.message || "Validation failed. Please check your inputs.";
+    return next(new AppError(firstMsg, 422, true, extractedErrors));
   }
 
   next();

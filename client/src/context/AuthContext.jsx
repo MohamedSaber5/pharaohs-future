@@ -1,38 +1,50 @@
-﻿import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import authService from "../services/auth.service.js";
 import toast from "react-hot-toast";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user,            setUser]            = useState(null);
-  const [isLoading,       setIsLoading]       = useState(true);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const sessionChecked = useRef(false);
 
   const checkSession = useCallback(async () => {
-    // Only check once on mount
     if (sessionChecked.current) return;
     sessionChecked.current = true;
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const res = await authService.getMe();
       const userData = res?.data ?? res;
-      if (userData && userData._id) {
+      if (userData && (userData._id || userData.id)) {
         setUser(userData);
         setIsAuthenticated(true);
       } else {
         setUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem("authToken");
       }
     } catch {
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem("authToken");
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => { checkSession(); }, [checkSession]);
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
 
   const extractAuth = (res) => {
     const data = res?.data ?? res;
@@ -55,17 +67,20 @@ export const AuthProvider = ({ children }) => {
     if (token) localStorage.setItem("authToken", token);
     setUser(userData);
     setIsAuthenticated(true);
-    toast.success(`أهلاً ${userData?.name || ""}! تم إنشاء حسابك بنجاح`);
+    toast.success(`أهلاً بك ${userData?.name || ""}! تم إنشاء الحساب بنجاح`);
     return res;
   };
 
   const logout = async () => {
-    try { await authService.logout(); } catch {}
-    finally {
+    try {
+      await authService.logout();
+    } catch {
+      // ignore
+    } finally {
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem("authToken");
-      sessionChecked.current = false; // allow re-check on next mount
+      sessionChecked.current = false;
       toast.success("تم تسجيل الخروج بنجاح");
     }
   };

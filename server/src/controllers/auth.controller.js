@@ -104,13 +104,18 @@ export const resetPasswordByPhone = catchAsync(async (req, res, next) => {
   if (!phone || !newPassword) return next(new AppError('يرجى إدخال رقم الهاتف وكلمة المرور الجديدة', 400));
   if (newPassword.length < 8) return next(new AppError('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 400));
 
-  const user = await User.findOne({ phone: phone.trim() }).select('+password');
+  const cleanPhone = phone.trim();
+  const user = await User.findOne({ phone: cleanPhone }).select('+password');
   if (!user) return next(new AppError('لا يوجد حساب مرتبط بهذا الرقم', 404));
+
+  if (user.role === "admin" || user.role === "employee") {
+    return next(new AppError("لا يمكن إعادة تعيين كلمة مرور موظف أو مسؤول من هنا. يرجى مراجعة إدارة النظام.", 403));
+  }
 
   user.password = newPassword;
   user.passwordChangedAt = Date.now();
   await user.save();
 
-  sendTokenResponse(user, 200, res);
+  createSendToken(user, 200, res);
 });
 

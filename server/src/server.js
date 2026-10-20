@@ -1,5 +1,5 @@
-﻿import { startExpiryCron } from './jobs/expiryCron.js';
 import "dotenv/config";
+import { startExpiryCron } from './jobs/expiryCron.js';
 import app from "./app.js";
 import connectDB from "./config/database.js";
 import logger from "./utils/logger.js";

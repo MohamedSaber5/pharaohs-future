@@ -1,3 +1,4 @@
+import { getImageUrl } from "@utils/imageHelper.js";
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import projectService from '@services/project.service.js';
@@ -5,7 +6,7 @@ import projectService from '@services/project.service.js';
 const STATUS_COLORS = { "قيد البيع":"bg-amber-100 text-amber-800","مكتمل":"bg-green-100 text-green-800","تحت الإنشاء":"bg-blue-100 text-blue-800" };
 
 function ProjectCard({ p }) {
-  const img = p.images?.[0] || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80";
+  const img = p.images?.[0] ? getImageUrl(p.images[0]) : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80";
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm hover:shadow-lg transition-all group flex flex-col">
       <div className="relative h-52 overflow-hidden">

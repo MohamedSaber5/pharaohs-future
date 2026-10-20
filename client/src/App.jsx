@@ -1,5 +1,5 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth }     from "@context/AuthContext.jsx";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@context/AuthContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import MainLayout  from "@layouts/MainLayout.jsx";
@@ -14,33 +14,39 @@ import AuthPage          from "@pages/AuthPage.jsx";
 import AboutPage         from "@pages/AboutPage.jsx";
 import ContactPage       from "@pages/ContactPage.jsx";
 
-import AdminDashboardPage from "@pages/AdminDashboardPage.jsx";
-import MyReservationsPage    from '@pages/MyReservationsPage.jsx';
-import EmployeeDashboard         from '@pages/EmployeeDashboard.jsx';
-import AdminUsersPage         from '@pages/AdminUsersPage.jsx';
-import AdminAssignmentLogsPage   from '@pages/AdminAssignmentLogsPage.jsx';
-import AdminReservationsPage from '@pages/AdminReservationsPage.jsx';
-import AdminUnitsPage    from "@pages/AdminUnitsPage.jsx";
-import AdminProjectsPage  from "@pages/AdminProjectsPage.jsx";
+import MyReservationsPage    from "@pages/MyReservationsPage.jsx";
+import EmployeeDashboard     from "@pages/EmployeeDashboard.jsx";
+
+import AdminDashboardPage       from "@pages/AdminDashboardPage.jsx";
+import AdminProjectsPage        from "@pages/AdminProjectsPage.jsx";
+import AdminUnitsPage           from "@pages/AdminUnitsPage.jsx";
+import AdminReservationsPage    from "@pages/AdminReservationsPage.jsx";
+import AdminAssignmentLogsPage  from "@pages/AdminAssignmentLogsPage.jsx";
+import AdminUsersPage           from "@pages/AdminUsersPage.jsx";
+import AdminEmployeeRotationPage from "@pages/admin/AdminEmployeeRotationPage.jsx";
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, staleTime: 5 * 60 * 1000 } }
+  defaultOptions: { queries: { retry: 1, staleTime: 5 * 60 * 1000 } },
 });
 
 const ProtectedRoute = ({ children, requiredRole = "admin" }) => {
   const { user, isLoading } = useAuth();
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-screen font-body-md text-body-md text-on-surface-variant">
-      جاري التحميل...
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen text-neutral-500 text-[16px]">
+        جاري التحميل...
+      </div>
+    );
   if (!user) return <Navigate to="/auth" replace />;
   if (requiredRole === "admin" && user.role !== "admin") return <Navigate to="/" replace />;
+  if (requiredRole === "employee" && !["admin", "employee"].includes(user.role))
+    return <Navigate to="/" replace />;
   return children;
 };
 
 const AppRoutes = () => (
   <Routes>
+    {/* Public / Client Routes */}
     <Route element={<MainLayout />}>
       <Route index                 element={<HomePage />} />
       <Route path="projects"       element={<ProjectsPage />} />
@@ -49,22 +55,49 @@ const AppRoutes = () => (
       <Route path="properties/:id" element={<UnitDetailPage />} />
       <Route path="about"          element={<AboutPage />} />
       <Route path="contact"        element={<ContactPage />} />
+
+      {/* Authenticated Client */}
+      <Route
+        path="my-reservations"
+        element={
+          <ProtectedRoute requiredRole="user">
+            <MyReservationsPage />
+          </ProtectedRoute>
+        }
+      />
     </Route>
 
+    {/* Auth & Login */}
     <Route path="auth" element={<AuthPage />} />
+    <Route path="login" element={<Navigate to="/auth" replace />} />
 
-    <Route path="admin" element={
-      <ProtectedRoute requiredRole="admin">
-        <AdminLayout />
-      </ProtectedRoute>
-    }>
-      <Route index            element={<Navigate to="dashboard" replace />} />
-      <Route path="dashboard" element={<AdminDashboardPage />} />
-      <Route path="projects"  element={<AdminProjectsPage />} />
-      <Route path="units"          element={<AdminUnitsPage />} />
-      <Route path="reservations"   element={<AdminReservationsPage />} />
-          <Route path="assignment-logs" element={<AdminAssignmentLogsPage />} />
-            <Route path="users" element={<AdminUsersPage />} />
+    {/* Employee Dashboard */}
+    <Route
+      path="employee"
+      element={
+        <ProtectedRoute requiredRole="employee">
+          <EmployeeDashboard />
+        </ProtectedRoute>
+      }
+    />
+
+    {/* Admin Routes */}
+    <Route
+      path="admin"
+      element={
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout />
+        </ProtectedRoute>
+      }
+    >
+      <Route index                  element={<Navigate to="dashboard" replace />} />
+      <Route path="dashboard"       element={<AdminDashboardPage />} />
+      <Route path="projects"        element={<AdminProjectsPage />} />
+      <Route path="units"           element={<AdminUnitsPage />} />
+      <Route path="reservations"    element={<AdminReservationsPage />} />
+      <Route path="assignment-logs" element={<AdminAssignmentLogsPage />} />
+      <Route path="users"           element={<AdminUsersPage />} />
+      <Route path="employee-rotation" element={<AdminEmployeeRotationPage />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />
@@ -82,4 +115,3 @@ const App = () => (
 );
 
 export default App;
-

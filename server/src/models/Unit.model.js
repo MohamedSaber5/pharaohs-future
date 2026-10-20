@@ -1,4 +1,4 @@
-﻿import mongoose from "mongoose";
+import mongoose from "mongoose";
 
 const unitSchema = new mongoose.Schema(
   {
@@ -38,13 +38,15 @@ const unitSchema = new mongoose.Schema(
 
 // Virtual: calculated down payment amount
 unitSchema.virtual("downPaymentAmount").get(function () {
+  if (typeof this.price !== "number") return 0;
   return Math.round((this.price * (this.downPaymentPercent || 0)) / 100);
 });
 
 // Virtual: monthly installment
 unitSchema.virtual("monthlyInstallment").get(function () {
-  if (!this.installmentYears || this.installmentYears === 0) return 0;
-  const remaining = this.price - this.downPaymentAmount;
+  if (typeof this.price !== "number" || !this.installmentYears || this.installmentYears <= 0) return 0;
+  const downPayment = this.downPaymentAmount || 0;
+  const remaining = this.price - downPayment;
   return Math.round(remaining / (this.installmentYears * 12));
 });
 

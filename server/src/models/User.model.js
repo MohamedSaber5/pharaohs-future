@@ -1,4 +1,4 @@
-﻿import mongoose from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, "يرجى إدخال بريد إلكتروني صحيح"],
+      match: [/^\S+@\S+\.\S+$/, "يرجى تقديم بريد إلكتروني صالح"],
     },
     password: {
       type: String,
@@ -32,8 +32,12 @@ const userSchema = new mongoose.Schema(
     whatsapp: { type: String, trim: true }, // for employees
     avatar: { type: String, default: null },
     isActive: { type: Boolean, default: true },
-    // Employee: track assigned users count for round-robin
-    assignedCount: { type: Number, default: 0 },
+    
+    // Employee Rotation Management
+    rotationActive: { type: Boolean, default: true }, // active in round-robin queue
+    rotationOrder:  { type: Number, default: 0 },     // sequence priority in queue
+    assignedCount:  { type: Number, default: 0 },     // track workload
+
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -45,10 +49,9 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 12);
-  next();
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
