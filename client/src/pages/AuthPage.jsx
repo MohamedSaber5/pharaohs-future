@@ -3,7 +3,10 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext.jsx';
 import authService from '@services/auth.service.js';
 import logo from '@assets/images/logo.png';
+import bgImg from '@assets/images/Aswan Sunset Waterfront with Luxury Resort Branding.png';
 import toast from 'react-hot-toast';
+
+const DARK = '#000e1f';
 
 // Egyptian phone validator: exactly 11 digits starting with 010, 011, 012, or 015
 const isEgPhone = (p) => /^(010|011|012|015)\d{8}$/.test(p.trim());
@@ -33,111 +36,63 @@ const checkPasswordStrength = (pass) => {
 
 function PasswordStrengthMeter({ password }) {
   if (!password) return null;
-  const { score, hasMinLen, hasLower, hasUpper, hasNumberOrSymbol } = checkPasswordStrength(password);
-
+  const { score } = checkPasswordStrength(password);
   const levels = [
-    { label: 'ضعيفة جداً', color: '#ef4444', width: '25%' },
-    { label: 'مقبولة', color: '#f59e0b', width: '50%' },
-    { label: 'جيدة', color: '#3b82f6', width: '75%' },
-    { label: 'قوية ومحمية', color: '#10b981', width: '100%' },
+    { label: 'ضعيفة',  color: '#ef4444' },
+    { label: 'مقبولة', color: '#f59e0b' },
+    { label: 'جيدة',   color: '#3b82f6' },
+    { label: 'قوية',   color: '#16a34a' },
   ];
   const cur = levels[Math.max(0, score - 1)] || levels[0];
-
   return (
-    <div className="flex flex-col gap-2 mt-2 p-3.5 rounded-2xl bg-amber-50/50 border border-[#c9952a]/20">
-      <div className="flex items-center justify-between text-[11px]">
-        <span className="font-semibold text-neutral-600">درجة أمان كلمة المرور:</span>
-        <span className="font-bold px-2 py-0.5 rounded-md text-white text-[10px]" style={{ background: cur.color }}>
-          {cur.label}
-        </span>
+    <div style={{ marginTop: 5, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ flex: 1, height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.2)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', borderRadius: 99, width: `${(score / 4) * 100}%`, background: cur.color, transition: 'width 0.3s, background 0.3s' }} />
       </div>
-      <div className="w-full h-1.5 rounded-full overflow-hidden bg-neutral-200">
-        <div
-          className="h-full rounded-full transition-all duration-300"
-          style={{ width: cur.width, background: cur.color }}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-1.5 pt-1 text-[11px]">
-        <span className={`flex items-center gap-1 ${hasMinLen ? 'text-green-600 font-bold' : 'text-neutral-400'}`}>
-          <span className="material-symbols-outlined text-[14px]">{hasMinLen ? 'check_circle' : 'radio_button_unchecked'}</span>
-          8 أحرف على الأقل
-        </span>
-        <span className={`flex items-center gap-1 ${hasUpper ? 'text-green-600 font-bold' : 'text-neutral-400'}`}>
-          <span className="material-symbols-outlined text-[14px]">{hasUpper ? 'check_circle' : 'radio_button_unchecked'}</span>
-          حرف كبير (A-Z)
-        </span>
-        <span className={`flex items-center gap-1 ${hasLower ? 'text-green-600 font-bold' : 'text-neutral-400'}`}>
-          <span className="material-symbols-outlined text-[14px]">{hasLower ? 'check_circle' : 'radio_button_unchecked'}</span>
-          حرف صغير (a-z)
-        </span>
-        <span className={`flex items-center gap-1 ${hasNumberOrSymbol ? 'text-green-600 font-bold' : 'text-neutral-400'}`}>
-          <span className="material-symbols-outlined text-[14px]">{hasNumberOrSymbol ? 'check_circle' : 'radio_button_unchecked'}</span>
-          أرقام أو رموز (#1)
-        </span>
-      </div>
+      <span style={{ fontSize: 10, fontWeight: 700, color: cur.color, whiteSpace: 'nowrap' }}>{cur.label}</span>
     </div>
   );
 }
 
-function Field({
-  label,
-  icon,
-  type = 'text',
-  value,
-  onChange,
-  placeholder,
-  hint = '',
-  error = '',
-  maxLength,
-  showCounter = false,
-}) {
+function Field({ label, icon, type = 'text', value, onChange, placeholder, hint = '', error = '', maxLength, showCounter = false }) {
   const [focused, setFocused] = useState(false);
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
-        <label className="text-[13px] font-bold text-neutral-800">{label}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{label}</label>
         {showCounter && maxLength && (
-          <span className={`text-[11px] font-mono px-2 py-0.5 rounded-md ${
-            value.length === maxLength ? 'bg-green-100 text-green-700 font-bold' : 'bg-neutral-100 text-neutral-500'
-          }`}>
-            {value.length} / {maxLength}
+          <span style={{ fontSize: 10, fontFamily: 'monospace', padding: '1px 6px', borderRadius: 5, background: value.length === maxLength ? 'rgba(22,163,74,0.3)' : 'rgba(255,255,255,0.12)', color: value.length === maxLength ? '#4ade80' : 'rgba(255,255,255,0.55)', fontWeight: 700 }}>
+            {value.length}/{maxLength}
           </span>
         )}
       </div>
-      <div className="relative">
-        <span
-          className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-[20px] transition-colors"
-          style={{ color: error ? '#dc2626' : focused ? '#c9952a' : '#9ca3af' }}
-        >
+      <div style={{ position: 'relative' }}>
+        <span className="material-symbols-outlined"
+          style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: error ? '#f87171' : focused ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', transition: 'color 0.2s' }}>
           {icon}
         </span>
         <input
-          type={type}
-          value={value}
-          maxLength={maxLength}
+          type={type} value={value} maxLength={maxLength}
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder={placeholder}
-          className="w-full h-12 pr-11 pl-4 rounded-xl text-[14px] outline-none transition-all shadow-sm"
           style={{
-            border: error
-              ? '1.5px solid #dc2626'
-              : focused
-              ? '1.5px solid #c9952a'
-              : '1.5px solid #e5e7eb',
-            background: error ? '#fef2f2' : focused ? '#ffffff' : '#f9fafb',
-            boxShadow: focused ? '0 0 0 3px rgba(201, 149, 42, 0.12)' : 'none',
+            width: '100%', height: 42, paddingRight: 38, paddingLeft: 12,
+            borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit',
+            background: error ? 'rgba(239,68,68,0.15)' : focused ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.1)',
+            border: error ? '1.5px solid rgba(248,113,113,0.7)' : focused ? '1.5px solid rgba(255,255,255,0.55)' : '1.5px solid rgba(255,255,255,0.2)',
+            color: '#fff',
+            boxShadow: focused ? '0 0 0 3px rgba(255,255,255,0.07)' : 'none',
+            transition: 'all 0.2s',
+            boxSizing: 'border-box',
           }}
         />
       </div>
-      {error && (
-        <p className="text-[11px] text-red-600 flex items-center gap-1 font-medium mt-0.5">
-          <span className="material-symbols-outlined text-[13px]">error</span>
-          {error}
-        </p>
-      )}
-      {!error && hint && <p className="text-[11px] text-neutral-400">{hint}</p>}
+      {error && <p style={{ fontSize: 10, color: '#f87171', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 600 }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 12 }}>error</span>{error}
+      </p>}
+      {!error && hint && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>{hint}</p>}
     </div>
   );
 }
@@ -443,595 +398,375 @@ export default function AuthPage({ defaultMode = 'login' }) {
 
   const isLogin = mode === 'login';
 
+  // ─── Shared visual tokens ──────────────────────────────────────
+  const ACCENT = '#000e1f';
+  const GOLD   = '#c9952a';
+
+  const btn = (disabled = false) => ({
+    width: '100%', height: 44, borderRadius: 10,
+    fontWeight: 700, fontSize: 14, color: '#fff',
+    background: disabled ? 'rgba(255,255,255,0.2)' : ACCENT,
+    border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+    boxShadow: disabled ? 'none' : '0 4px 20px rgba(0,14,31,0.45)',
+    transition: 'opacity 0.2s, background 0.2s',
+    fontFamily: 'inherit', opacity: disabled ? 0.5 : 1,
+  });
+
+  const passInput = (hasErr) => ({
+    width: '100%', height: 42, paddingRight: 38, paddingLeft: 38,
+    borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit',
+    background: hasErr ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.1)',
+    border: hasErr ? '1.5px solid rgba(248,113,113,0.7)' : '1.5px solid rgba(255,255,255,0.2)',
+    color: '#fff', transition: 'all 0.2s', boxSizing: 'border-box',
+  });
+
+  const errRow = (msg) => msg ? (
+    <p style={{ fontSize: 10, color: '#f87171', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 600, margin: 0 }}>
+      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>error</span>{msg}
+    </p>
+  ) : null;
+
+  const iconBtn = (icon, onClick, title) => (
+    <button type="button" onClick={onClick} title={title}
+      style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.45)', padding: 0 }}>
+      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{icon}</span>
+    </button>
+  );
+
+  const spinner = (
+    <span style={{ width: 17, height: 17, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'auth-spin 0.8s linear infinite', flexShrink: 0 }} />
+  );
+
+  // ─── Stepper for Forgot Password ─────────────────────────────
+  const Stepper = () => (
+    <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 20, position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 13, right: 14, left: 14, height: 2, background: 'rgba(255,255,255,0.15)', zIndex: 0 }} />
+      {[{ s: 1, lbl: 'البريد' }, { s: 2, lbl: 'الرمز' }, { s: 3, lbl: 'كلمة المرور' }].map(({ s, lbl }) => {
+        const active = fpStep === s, passed = fpStep > s;
+        return (
+          <div key={s} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, position: 'relative', zIndex: 1 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 800,
+              background: passed ? '#16a34a' : active ? '#fff' : 'rgba(255,255,255,0.15)',
+              color: passed ? '#fff' : active ? ACCENT : 'rgba(255,255,255,0.5)',
+              boxShadow: active ? '0 0 0 4px rgba(255,255,255,0.15)' : 'none',
+              transition: 'all 0.3s',
+            }}>
+              {passed ? <span className="material-symbols-outlined" style={{ fontSize: 15 }}>check</span> : s}
+            </div>
+            <span style={{ fontSize: 10, fontWeight: 600, color: active ? '#fff' : passed ? '#4ade80' : 'rgba(255,255,255,0.4)' }}>{lbl}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen flex" dir="rtl" style={{ background: '#f8f9fa' }}>
-      {/* ── Left Side: Majestic Branding Panel ── */}
-      <div
-        className="hidden lg:flex flex-col justify-between p-12 w-[520px] flex-shrink-0 relative overflow-hidden shadow-2xl"
-        style={{ background: '#000e1f' }}
-      >
-        {/* Background Overlay */}
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+    <>
+      {/* ── Global + animation styles ── */}
+      <style>{`
+        @keyframes auth-spin { to { transform: rotate(360deg); } }
+        .auth-input::placeholder { color: rgba(255,255,255,0.28) !important; }
+        /* Card right-aligned on desktop, centered on mobile */
+        .auth-outer {
+          position: fixed; inset: 0; overflow: hidden;
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Cairo','Tajawal',sans-serif;
+        }
+        .auth-col {
+          position: relative; z-index: 2;
+          width: 100%; max-width: 400px;
+          max-height: 100dvh;
+          overflow-y: auto; overflow-x: hidden;
+          padding: 20px 16px;
+          display: flex; flex-direction: column; align-items: center;
+        }
+        @media (min-width: 768px) {
+          .auth-outer { justify-content: center; }
+          .auth-col { transform: translateX(-15vw); }
+        }
+      `}</style>
 
-        {/* Golden Gradient Glow Effect */}
-        <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full bg-[#c9952a]/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-[#c9952a]/15 blur-3xl pointer-events-none" />
+      <div dir="rtl" className="auth-outer">
 
-        {/* Top: Large Prominent Logo in Sidebar */}
-        <div className="relative z-10 flex flex-col items-start gap-4">
-          <Link to="/" className="flex items-center gap-4 group">
-            <div className="p-3.5 rounded-2xl bg-white/10 border border-[#c9952a]/40 shadow-xl backdrop-blur-md group-hover:scale-105 transition-all">
-              <img
-                src={logo}
-                alt="شعار مستقبل الفراعنة"
-                className="h-16 w-auto object-contain filter drop-shadow-md brightness-0 invert"
-              />
-            </div>
-            <div>
-              <p className="text-white font-black text-[20px] tracking-wide">مستقبل الفراعنة</p>
-              <p className="text-[12px] text-[#c9952a] font-semibold tracking-wider">PHARAOHS FUTURE REAL ESTATE</p>
-            </div>
+        {/* ── Background image ── */}
+        <img src={bgImg} alt="" style={{
+          position: 'absolute', inset: 0, width: '100%', height: '100%',
+          objectFit: 'cover', objectPosition: 'center 40%', zIndex: 0,
+        }} />
+
+        {/* ── Overlay ── */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 1,
+          background: 'linear-gradient(to left, rgba(0,14,31,0.82) 0%, rgba(0,14,31,0.55) 45%, rgba(0,14,31,0.15) 100%)',
+        }} />
+
+        {/* ── Scrollable card column ── */}
+        <div className="auth-col">
+
+          {/* Logo */}
+          <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18, gap: 6 }}>
+            <img src={logo} alt="مستقبل الفراعنة" style={{ height: 62, width: 'auto', filter: 'drop-shadow(0 4px 18px rgba(0,0,0,0.55))' }} />
+            <span style={{ color: '#fff', fontSize: 18, fontWeight: 900, textShadow: '0 2px 10px rgba(0,0,0,0.6)', textAlign: 'center' }}>مستقبل الفراعنة</span>
+            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 9, fontWeight: 600, letterSpacing: '0.22em' }}>PHARAOHS FUTURE</span>
           </Link>
-        </div>
 
-        {/* Middle: Golden Slogan */}
-        <div className="relative z-10 my-auto py-10">
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-            style={{ background: 'rgba(201,149,42,0.15)', border: '1px solid rgba(201,149,42,0.35)' }}
-          >
-            <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: '#c9952a' }} />
-            <span className="text-[12px] font-bold uppercase tracking-widest text-[#c9952a]">
-              بوابتك للاستثمار العقاري الفاخر
-            </span>
-          </div>
+          {/* ════════════════════════════════════
+              FORGOT PASSWORD — 3-step wizard
+          ════════════════════════════════════ */}
+          {mode === 'forgot' ? (
+            <div style={{
+              width: '100%',
+              background: 'rgba(0,14,31,0.60)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: 18, border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4)', overflow: 'hidden',
+            }}>
+              {/* gold top stripe */}
+              <div style={{ height: 3, background: `linear-gradient(90deg, ${GOLD}, rgba(201,149,42,0.5), ${GOLD})` }} />
 
-          <h2 className="text-white font-extrabold text-[38px] leading-tight mb-4">
-            امتلك وحدتك في
-            <br />
-            <span className="bg-gradient-to-l from-[#c9952a] via-[#f1cb79] to-[#c9952a] bg-clip-text text-transparent">
-              أرقى مشروعات مصر
-            </span>
-          </h2>
-          <p className="text-white/70 text-[15px] leading-relaxed max-w-sm">
-            نخبة من أرقى المشروعات السكنية والتجارية في القاهرة والتجمع وأسوان والعاصمة الإدارية بأعلى عائد استثماري.
-          </p>
-        </div>
+              <div style={{ padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {/* back button */}
+                <button onClick={() => switchMode('login')}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 600, marginBottom: 16, padding: 0, fontFamily: 'inherit' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_forward</span>
+                  العودة لتسجيل الدخول
+                </button>
 
-        {/* Bottom: Statistics */}
-        <div className="relative z-10 grid grid-cols-3 gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-          {[
-            { num: '500+', label: 'مشروع منجز' },
-            { num: '15K+', label: 'عميل راضٍ' },
-            { num: '98%', label: 'نسبة الرضا' },
-          ].map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-[22px] font-black text-white">{s.num}</p>
-              <p className="text-[11px] text-white/60 font-semibold">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+                <Stepper />
 
-      {/* ── Right Side: Main Interactive Form Section ── */}
-      <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-10 max-w-xl mx-auto w-full">
-        {/* Large Prominent Logo Above Form */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          <Link to="/" className="inline-block group mb-3">
-            <div className="relative p-3 rounded-3xl bg-gradient-to-b from-[#000e1f] to-[#041d38] border-2 border-[#c9952a]/40 shadow-xl group-hover:scale-105 transition-transform duration-300">
-              <img
-                src={logo}
-                alt="شعار مستقبل الفراعنة للاستثمار العقاري"
-                className="h-20 sm:h-24 w-auto object-contain brightness-0 invert mx-auto filter drop-shadow-lg"
-              />
-            </div>
-          </Link>
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 border border-[#c9952a]/30">
-            <span className="w-2 h-2 rounded-full bg-[#c9952a]" />
-            <span className="text-[12px] font-bold text-[#775a1a]">مستقبل الفراعنة للاستثمار العقاري</span>
-          </div>
-        </div>
-
-        {/* ── Mode 1: Forgot Password Wizard ────────────────────────── */}
-        {mode === 'forgot' ? (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200/80 shadow-xl">
-            <button
-              onClick={() => switchMode('login')}
-              className="flex items-center gap-1.5 text-[13px] font-bold text-neutral-500 hover:text-neutral-800 mb-6 transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              العودة لتسجيل الدخول
-            </button>
-
-            {/* Stepper Progress Indicator */}
-            <div className="flex items-center justify-between mb-8 relative">
-              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-neutral-200 -translate-y-1/2 -z-0" />
-              {[
-                { s: 1, label: 'البريد الإلكتروني' },
-                { s: 2, label: 'رمز التحقق (OTP)' },
-                { s: 3, label: 'كلمة السر الجديدة' },
-              ].map((step) => {
-                const isActive = fpStep === step.s;
-                const isPassed = fpStep > step.s;
-                return (
-                  <div key={step.s} className="relative z-10 flex flex-col items-center gap-1.5 bg-white px-2">
-                    <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-[13px] transition-all shadow-sm ${
-                        isPassed
-                          ? 'bg-green-600 text-white'
-                          : isActive
-                          ? 'bg-[#000e1f] text-white ring-4 ring-[#000e1f]/10'
-                          : 'bg-neutral-200 text-neutral-500'
-                      }`}
-                    >
-                      {isPassed ? (
-                        <span className="material-symbols-outlined text-[18px]">check</span>
-                      ) : (
-                        step.s
-                      )}
+                {/* ── Step 1: Email ── */}
+                {fpStep === 1 && (
+                  <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }} noValidate>
+                    <div>
+                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>استعادة كلمة المرور</h1>
+                      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+                        أدخل بريدك المسجّل وسنرسل رمز تحقق من 6 أرقام.
+                      </p>
                     </div>
-                    <span
-                      className={`text-[11px] font-bold ${
-                        isActive ? 'text-[#000e1f]' : isPassed ? 'text-green-600' : 'text-neutral-400'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Step 1: Request OTP (ONLY Email input! No password!) */}
-            {fpStep === 1 && (
-              <div>
-                <div className="mb-6">
-                  <h1 className="text-[22px] font-black text-[#000e1f] mb-1">استعادة كلمة المرور</h1>
-                  <p className="text-[13px] text-neutral-500 leading-relaxed">
-                    أدخل بريدك الإلكتروني المسجّل لدينا فقط، وسنرسل لك رمز تحقق مؤلفاً من 6 أرقام للتأكد من هويتك.
-                  </p>
-                </div>
-
-                <form onSubmit={handleRequestOtp} className="flex flex-col gap-4" noValidate>
-                  <Field
-                    label="البريد الإلكتروني المسجّل *"
-                    icon="mail"
-                    type="email"
-                    value={fpEmail}
-                    onChange={(v) => {
-                      setFpEmail(v);
-                      setFpErrs((p) => ({ ...p, email: '' }));
-                    }}
-                    placeholder="example@email.com"
-                    error={fpErrs.email}
-                  />
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-12 rounded-xl font-bold text-[15px] text-white mt-2 disabled:opacity-60 flex items-center justify-center gap-2 hover:opacity-95 transition-all shadow-lg active:scale-[0.98]"
-                    style={{ background: '#000e1f' }}
-                  >
-                    {loading ? (
-                      <>
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        جارٍ إرسال رمز التحقق...
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-symbols-outlined text-[20px]">send</span>
-                        إرسال رمز التحقق (OTP)
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* Step 2: Enter & Verify 6-digit OTP (NO password!) */}
-            {fpStep === 2 && (
-              <div>
-                <div className="mb-6">
-                  <h1 className="text-[22px] font-black text-[#000e1f] mb-1">رمز التحقق (OTP)</h1>
-                  <p className="text-[13px] text-neutral-500 leading-relaxed">
-                    تم إرسال رمز التحقق إلى بريدك الإلكتروني:
-                    <br />
-                    <span className="font-bold text-[#000e1f] font-mono">{fpEmail}</span>
-                    <button
-                      type="button"
-                      onClick={() => setFpStep(1)}
-                      className="text-[12px] text-[#775a1a] mr-2 underline hover:text-[#5a4413] font-semibold"
-                    >
-                      تعديل البريد
+                    <Field label="البريد الإلكتروني *" icon="mail" type="email"
+                      value={fpEmail} onChange={(v) => { setFpEmail(v); setFpErrs(p => ({ ...p, email: '' })); }}
+                      placeholder="example@email.com" error={fpErrs.email} />
+                    <button type="submit" disabled={loading} style={btn(loading)}>
+                      {loading ? <>{spinner}جارٍ الإرسال...</> : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>send</span>إرسال رمز التحقق</>}
                     </button>
-                  </p>
-                </div>
+                  </form>
+                )}
 
-                <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-bold text-neutral-700 text-center">
-                      أدخل رمز التحقق (6 أرقام)
-                    </label>
-                    <div className="flex justify-center gap-2 sm:gap-3" dir="ltr">
+                {/* ── Step 2: OTP ── */}
+                {fpStep === 2 && (
+                  <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div>
+                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>رمز التحقق</h1>
+                      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0 }}>
+                        أُرسل الرمز إلى <strong style={{ color: '#fff' }}>{fpEmail}</strong>
+                        <button type="button" onClick={() => setFpStep(1)}
+                          style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.65)', fontSize: 11, cursor: 'pointer', fontWeight: 700, marginRight: 6, textDecoration: 'underline', fontFamily: 'inherit' }}>
+                          تعديل
+                        </button>
+                      </p>
+                    </div>
+                    {/* OTP boxes */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }} dir="ltr">
                       {fpOtp.map((digit, idx) => (
-                        <input
-                          key={idx}
-                          ref={(el) => (otpInputs.current[idx] = el)}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          value={digit}
-                          onChange={(e) => handleOtpChange(idx, e.target.value)}
-                          onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                          className={`w-11 sm:w-12 h-14 text-center text-[24px] font-extrabold font-mono rounded-xl border outline-none transition-all shadow-sm ${
-                            digit
-                              ? 'border-[#c9952a] bg-amber-50/30 text-[#000e1f] ring-2 ring-[#c9952a]/20'
-                              : 'border-neutral-300 bg-neutral-50 focus:border-[#c9952a] focus:bg-white'
-                          }`}
-                        />
+                        <input key={idx} ref={el => (otpInputs.current[idx] = el)}
+                          type="text" inputMode="numeric" maxLength={1} value={digit}
+                          onChange={e => handleOtpChange(idx, e.target.value)}
+                          onKeyDown={e => handleOtpKeyDown(idx, e)}
+                          className="auth-input"
+                          style={{
+                            width: 42, height: 50, textAlign: 'center', fontSize: 22, fontWeight: 800,
+                            fontFamily: 'monospace', borderRadius: 10, outline: 'none',
+                            border: digit ? '2px solid rgba(255,255,255,0.7)' : '2px solid rgba(255,255,255,0.2)',
+                            background: digit ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
+                            color: '#fff', transition: 'all 0.15s', boxSizing: 'border-box',
+                          }} />
                       ))}
                     </div>
-                    {fpErrs.otp && (
-                      <p className="text-[12px] text-red-600 text-center mt-1 flex items-center justify-center gap-1 font-semibold">
-                        <span className="material-symbols-outlined text-[15px]">error</span>
-                        {fpErrs.otp}
-                      </p>
-                    )}
-                  </div>
+                    {errRow(fpErrs.otp)}
+                    <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+                      {canResend
+                        ? <button type="button" onClick={handleRequestOtp} disabled={loading}
+                            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontWeight: 700, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                            إعادة إرسال رمز جديد
+                          </button>
+                        : <span>إعادة الإرسال خلال <strong style={{ color: '#fff', fontFamily: 'monospace' }}>{fpCountdown}</strong> ثانية</span>}
+                    </div>
+                    <button type="submit" disabled={loading || fpOtp.join('').length !== 6} style={btn(loading || fpOtp.join('').length !== 6)}>
+                      {loading ? <>{spinner}جارٍ التحقق...</> : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>verified</span>تأكيد الرمز</>}
+                    </button>
+                  </form>
+                )}
 
-                  {/* Resend Countdown */}
-                  <div className="text-center text-[13px] text-neutral-500">
-                    {canResend ? (
-                      <button
-                        type="button"
-                        onClick={handleRequestOtp}
-                        disabled={loading}
-                        className="font-bold text-[#775a1a] hover:underline"
-                      >
-                        إعادة إرسال رمز جديد الآن
-                      </button>
-                    ) : (
-                      <span>
-                        يمكنك إعادة طلب الرمز خلال{' '}
-                        <span className="font-bold font-mono text-[#000e1f]">{fpCountdown}</span> ثانية
-                      </span>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || fpOtp.join('').length !== 6}
-                    className="w-full h-12 rounded-xl font-bold text-[15px] text-white mt-1 disabled:opacity-50 flex items-center justify-center gap-2 hover:opacity-95 transition-all shadow-lg active:scale-[0.98]"
-                    style={{ background: '#000e1f' }}
-                  >
-                    {loading ? (
-                      <>
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        جارٍ التحقق من الرمز...
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-symbols-outlined text-[20px]">verified</span>
-                        تأكيد رمز التحقق
-                      </>
-                    )}
-                  </button>
-                </form>
+                {/* ── Step 3: New Password ── */}
+                {fpStep === 3 && (
+                  <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div>
+                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>كلمة المرور الجديدة</h1>
+                      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0 }}>تم التحقق بنجاح ✅ أنشئ كلمة مرور قوية.</p>
+                    </div>
+                    {/* new pass */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>كلمة المرور الجديدة *</label>
+                      <div style={{ position: 'relative' }}>
+                        <span className="material-symbols-outlined" style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'rgba(255,255,255,0.4)' }}>lock</span>
+                        <input type={fpShowPass ? 'text' : 'password'} value={fpPass} className="auth-input"
+                          onChange={e => { setFpPass(e.target.value); setFpErrs(p => ({ ...p, pass: '' })); }}
+                          placeholder="كلمة المرور الجديدة" style={passInput(!!fpErrs.pass)} />
+                        {iconBtn(fpShowPass ? 'visibility_off' : 'visibility', () => setFpShowPass(v => !v))}
+                      </div>
+                      {errRow(fpErrs.pass)}
+                      <PasswordStrengthMeter password={fpPass} />
+                    </div>
+                    {/* confirm pass */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>تأكيد كلمة المرور *</label>
+                      <div style={{ position: 'relative' }}>
+                        <span className="material-symbols-outlined" style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'rgba(255,255,255,0.4)' }}>lock_clock</span>
+                        <input type={fpShowPass ? 'text' : 'password'} value={fpConfirmPass} className="auth-input"
+                          onChange={e => { setFpConfirmPass(e.target.value); setFpErrs(p => ({ ...p, confirm: '' })); }}
+                          placeholder="تأكيد كلمة المرور"
+                          style={{ ...passInput(!!fpErrs.confirm), paddingLeft: 12, border: fpConfirmPass && fpPass === fpConfirmPass ? '1.5px solid rgba(74,222,128,0.6)' : passInput(!!fpErrs.confirm).border }} />
+                      </div>
+                      {fpConfirmPass && (
+                        <p style={{ fontSize: 10, display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700, color: fpPass === fpConfirmPass ? '#4ade80' : '#f87171', margin: 0 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 12 }}>{fpPass === fpConfirmPass ? 'check_circle' : 'cancel'}</span>
+                          {fpPass === fpConfirmPass ? 'كلمتا المرور متطابقتان' : 'كلمتا المرور غير متطابقتين'}
+                        </p>
+                      )}
+                      {errRow(fpErrs.confirm)}
+                    </div>
+                    <button type="submit"
+                      disabled={loading || !checkPasswordStrength(fpPass).isStrong || fpPass !== fpConfirmPass}
+                      style={{ ...btn(loading || !checkPasswordStrength(fpPass).isStrong || fpPass !== fpConfirmPass), marginTop: 4 }}>
+                      {loading ? <>{spinner}جارٍ الحفظ...</> : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_reset</span>حفظ كلمة المرور</>}
+                    </button>
+                  </form>
+                )}
               </div>
-            )}
+            </div>
 
-            {/* Step 3: Enter New Password (ONLY after OTP is verified!) */}
-            {fpStep === 3 && (
-              <div>
-                <div className="mb-6">
-                  <h1 className="text-[22px] font-black text-[#000e1f] mb-1">تعيين كلمة المرور الجديدة</h1>
-                  <p className="text-[13px] text-neutral-500 leading-relaxed">
-                    تم التحقق من هويتك بنجاح. يرجى إنشاء كلمة مرور قوية وجديدة لحسابك.
+          ) : (
+            /* ════════════════════════════════════
+                LOGIN / REGISTER
+            ════════════════════════════════════ */
+            <div style={{
+              width: '100%',
+              background: 'rgba(0,14,31,0.60)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: 18, border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4)', overflow: 'hidden',
+            }}>
+              {/* gold top stripe */}
+              <div style={{ height: 3, background: `linear-gradient(90deg, ${GOLD}, rgba(201,149,42,0.5), ${GOLD})` }} />
+
+              <div style={{ padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                {/* heading */}
+                <div>
+                  <h1 style={{ color: '#fff', fontSize: 19, fontWeight: 800, margin: '0 0 3px' }}>
+                    {isLogin ? 'مرحباً بكم مجدداً' : 'إنشاء حساب جديد'}
+                  </h1>
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, margin: 0 }}>
+                    {isLogin ? 'سعداء بعودتك — لنبنِ مستقبلاً أفضل معاً' : 'انضم إلى رحلتنا نحو مستقبل عقاري أفضل'}
                   </p>
                 </div>
 
-                <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
-                  {/* New Password */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[13px] font-bold text-neutral-800">كلمة المرور الجديدة *</label>
-                    <div className="relative">
-                      <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400">
-                        lock
-                      </span>
-                      <input
-                        type={fpShowPass ? 'text' : 'password'}
-                        value={fpPass}
-                        onChange={(e) => {
-                          setFpPass(e.target.value);
-                          setFpErrs((p) => ({ ...p, pass: '' }));
-                        }}
-                        placeholder="8 أحرف + أحرف كبيرة وصغيرة وأرقام"
-                        className="w-full h-12 pr-11 pl-11 rounded-xl text-[14px] outline-none transition-all border border-neutral-300 bg-neutral-50 focus:border-[#c9952a] focus:bg-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setFpShowPass(!fpShowPass)}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">
-                          {fpShowPass ? 'visibility_off' : 'visibility'}
-                        </span>
-                      </button>
+                {/* tabs */}
+                <div style={{ display: 'flex', background: 'rgba(255,255,255,0.07)', borderRadius: 10, padding: 3 }}>
+                  {[['login', 'تسجيل الدخول'], ['register', 'إنشاء حساب']].map(([m, lbl]) => (
+                    <button key={m} type="button" onClick={() => switchMode(m)} style={{
+                      flex: 1, height: 34, borderRadius: 8, border: 'none', cursor: 'pointer',
+                      fontSize: 13, fontWeight: 700, transition: 'all 0.2s', fontFamily: 'inherit',
+                      background: mode === m ? ACCENT : 'transparent',
+                      color: mode === m ? '#fff' : 'rgba(255,255,255,0.4)',
+                      boxShadow: mode === m ? '0 2px 8px rgba(0,0,0,0.4)' : 'none',
+                    }}>{lbl}</button>
+                  ))}
+                </div>
+
+                {/* API error */}
+                {apiError && (
+                  <div style={{ background: 'rgba(239,68,68,0.18)', border: '1px solid rgba(248,113,113,0.4)', borderRadius: 10, padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span className="material-symbols-outlined" style={{ color: '#f87171', fontSize: 18, flexShrink: 0 }}>error</span>
+                    <p style={{ fontSize: 12, color: '#fca5a5', margin: 0, flex: 1 }}>{apiError}</p>
+                    <button type="button" onClick={() => setApiError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f87171', opacity: 0.7, padding: 0 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* form */}
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 11 }} noValidate>
+                  {!isLogin && (
+                    <Field label="الاسم الكامل *" icon="person" value={name}
+                      onChange={v => { setName(v); clearErr('name'); }}
+                      placeholder="اسمك الكامل" error={errs.name} />
+                  )}
+                  <Field label="البريد الإلكتروني *" icon="mail" type="email" value={email}
+                    onChange={v => { setEmail(v); clearErr('email'); }}
+                    placeholder="example@domain.com" error={errs.email} />
+                  {!isLogin && (
+                    <Field label="رقم الهاتف *" icon="call" type="tel" value={phone}
+                      maxLength={11} showCounter onChange={handlePhoneChange}
+                      placeholder="01XXXXXXXXX" error={errs.phone}
+                      hint="11 رقماً يبدأ بـ 010 / 011 / 012 / 015" />
+                  )}
+
+                  {/* password field */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>كلمة المرور *</label>
+                      {isLogin && (
+                        <button type="button" onClick={() => switchMode('forgot')}
+                          style={{ background: 'none', border: 'none', fontSize: 11, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                          نسيت كلمة المرور؟
+                        </button>
+                      )}
                     </div>
-                    {fpErrs.pass && (
-                      <p className="text-[11px] text-red-600 flex items-center gap-1 font-medium">
-                        <span className="material-symbols-outlined text-[13px]">error</span>
-                        {fpErrs.pass}
-                      </p>
-                    )}
-                    <PasswordStrengthMeter password={fpPass} />
+                    <div style={{ position: 'relative' }}>
+                      <span className="material-symbols-outlined" style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: errs.password ? '#f87171' : 'rgba(255,255,255,0.4)' }}>lock</span>
+                      <input type={showPass ? 'text' : 'password'} value={password} className="auth-input"
+                        onChange={e => { setPassword(e.target.value); clearErr('password'); }}
+                        placeholder="كلمة المرور"
+                        style={passInput(!!errs.password)} />
+                      {iconBtn(showPass ? 'visibility_off' : 'visibility', () => setShowPass(v => !v))}
+                    </div>
+                    {errRow(errs.password)}
+                    {!isLogin && <PasswordStrengthMeter password={password} />}
                   </div>
 
-                  {/* Confirm Password */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[13px] font-bold text-neutral-800">تأكيد كلمة المرور الجديدة *</label>
-                    <div className="relative">
-                      <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400">
-                        lock_clock
-                      </span>
-                      <input
-                        type={fpShowPass ? 'text' : 'password'}
-                        value={fpConfirmPass}
-                        onChange={(e) => {
-                          setFpConfirmPass(e.target.value);
-                          setFpErrs((p) => ({ ...p, confirm: '' }));
-                        }}
-                        placeholder="أعد إدخال كلمة المرور للتأكيد"
-                        className="w-full h-12 pr-11 pl-4 rounded-xl text-[14px] outline-none transition-all border border-neutral-300 bg-neutral-50 focus:border-[#c9952a] focus:bg-white"
-                      />
-                    </div>
-                    {fpConfirmPass && (
-                      <p
-                        className={`text-[11px] flex items-center gap-1 font-bold ${
-                          fpPass === fpConfirmPass ? 'text-green-600' : 'text-red-500'
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-[14px]">
-                          {fpPass === fpConfirmPass ? 'check_circle' : 'cancel'}
-                        </span>
-                        {fpPass === fpConfirmPass ? 'كلمتا المرور متطابقتان تماماً' : 'كلمتا المرور غير متطابقتين'}
-                      </p>
-                    )}
-                    {fpErrs.confirm && (
-                      <p className="text-[11px] text-red-600 flex items-center gap-1 font-medium">
-                        <span className="material-symbols-outlined text-[13px]">error</span>
-                        {fpErrs.confirm}
-                      </p>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || !checkPasswordStrength(fpPass).isStrong || fpPass !== fpConfirmPass}
-                    className="w-full h-12 rounded-xl font-bold text-[15px] text-white mt-3 disabled:opacity-50 flex items-center justify-center gap-2 hover:opacity-95 transition-all shadow-lg active:scale-[0.98]"
-                    style={{ background: '#000e1f' }}
-                  >
-                    {loading ? (
-                      <>
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        جارٍ حفظ كلمة المرور وتسجيل الدخول...
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-symbols-outlined text-[20px]">lock_reset</span>
-                        حفظ كلمة المرور وتسجيل الدخول
-                      </>
-                    )}
+                  <button type="submit" disabled={loading} style={{ ...btn(loading), marginTop: 4 }}>
+                    {loading
+                      ? <>{spinner}{isLogin ? 'جارٍ تسجيل الدخول...' : 'جارٍ إنشاء الحساب...'}</>
+                      : isLogin
+                        ? <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>← تسجيل الدخول</>
+                        : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>إنشاء الحساب</>}
                   </button>
                 </form>
-              </div>
-            )}
-          </div>
-        ) : (
-          /* ── Mode 2 & 3: Login & Sign Up Screens ───────────────────── */
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200/80 shadow-xl">
-            {/* Elegant Luxury Tabs */}
-            <div className="flex bg-neutral-100 rounded-2xl p-1 mb-8">
-              {[
-                ['login', 'تسجيل الدخول'],
-                ['register', 'إنشاء حساب جديد'],
-              ].map(([m, lbl]) => (
-                <button
-                  key={m}
-                  onClick={() => switchMode(m)}
-                  className={`flex-1 h-11 rounded-xl text-[14px] font-bold transition-all ${
-                    mode === m
-                      ? 'bg-white shadow-md text-[#000e1f] border border-neutral-200/50'
-                      : 'text-neutral-500 hover:text-neutral-800'
-                  }`}
-                >
-                  {lbl}
-                </button>
-              ))}
-            </div>
 
-            {/* Screen Header */}
-            <div className="mb-6">
-              <h1 className="text-[24px] font-black text-[#000e1f] mb-1">
-                {isLogin ? 'مرحباً بعودتك!' : 'انضم إلى نخبة عملائنا'}
-              </h1>
-              <p className="text-[13px] text-neutral-500 leading-relaxed">
-                {isLogin
-                  ? 'أدخل بريدك الإلكتروني وكلمة المرور لمتابعة حجوزاتك العقارية'
-                  : 'سجّل بياناتك الآن للبدء في حجز واستعراض أفخم مشروعات مصر'}
-              </p>
-            </div>
-
-            {/* API Error Alert Box */}
-            {apiError && (
-              <div
-                className="flex items-start gap-3 p-4 rounded-2xl mb-5 text-[13px] shadow-sm animate-in fade-in"
-                style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}
-              >
-                <span className="material-symbols-outlined text-[20px] flex-shrink-0 mt-0.5">error</span>
-                <div className="flex-1">
-                  <p className="font-bold mb-0.5">تنبيه:</p>
-                  <p className="opacity-90">{apiError}</p>
-                </div>
-                <button onClick={() => setApiError('')} className="opacity-60 hover:opacity-100">
-                  <span className="material-symbols-outlined text-[18px]">close</span>
-                </button>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-              {!isLogin && (
-                <Field
-                  label="الاسم الكامل *"
-                  icon="person"
-                  value={name}
-                  onChange={(v) => {
-                    setName(v);
-                    clearErr('name');
-                  }}
-                  placeholder="محمد أحمد"
-                  error={errs.name}
-                />
-              )}
-
-              <Field
-                label="البريد الإلكتروني *"
-                icon="mail"
-                type="email"
-                value={email}
-                onChange={(v) => {
-                  setEmail(v);
-                  clearErr('email');
-                }}
-                placeholder="example@email.com"
-                error={errs.email}
-              />
-
-              {!isLogin && (
-                <Field
-                  label="رقم الهاتف (مصر) *"
-                  icon="call"
-                  type="tel"
-                  value={phone}
-                  maxLength={11}
-                  showCounter={true}
-                  onChange={handlePhoneChange}
-                  placeholder="01012345678"
-                  error={errs.phone}
-                  hint="11 رقماً فقط يبدأ بـ (010 / 011 / 012 / 015)"
-                />
-              )}
-
-              {/* Password Field */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-bold text-neutral-800">كلمة المرور *</label>
-                <div className="relative">
-                  <span
-                    className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-[20px]"
-                    style={{ color: errs.password ? '#dc2626' : '#9ca3af' }}
-                  >
-                    lock
-                  </span>
-                  <input
-                    type={showPass ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      clearErr('password');
-                    }}
-                    placeholder={isLogin ? 'أدخل كلمة المرور الخاصة بحسابك' : '8 أحرف + أحرف كبيرة وصغيرة وأرقام'}
-                    className="w-full h-12 pr-11 pl-11 rounded-xl text-[14px] outline-none transition-all shadow-sm"
-                    style={{
-                      border: errs.password ? '1.5px solid #dc2626' : '1.5px solid #e5e7eb',
-                      background: errs.password ? '#fef2f2' : '#f9fafb',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">
-                      {showPass ? 'visibility_off' : 'visibility'}
-                    </span>
+                {/* switch mode */}
+                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                  {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}{' '}
+                  <button type="button" onClick={() => switchMode(isLogin ? 'register' : 'login')}
+                    style={{ background: 'none', border: 'none', color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                    {isLogin ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
                   </button>
-                </div>
-                {errs.password && (
-                  <p className="text-[11px] text-red-600 flex items-center gap-1 font-medium mt-0.5">
-                    <span className="material-symbols-outlined text-[13px]">error</span>
-                    {errs.password}
-                  </p>
-                )}
-                {!isLogin && <PasswordStrengthMeter password={password} />}
+                </p>
               </div>
-
-              {/* Forgot Password Link on Login Screen */}
-              {isLogin && (
-                <div className="flex justify-start">
-                  <button
-                    type="button"
-                    onClick={() => switchMode('forgot')}
-                    className="text-[13px] font-bold text-[#775a1a] hover:text-[#5a4413] hover:underline transition-colors"
-                  >
-                    نسيت كلمة المرور؟
-                  </button>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full h-12 rounded-xl font-bold text-[15px] text-white mt-2 disabled:opacity-60 flex items-center justify-center gap-2 hover:opacity-95 transition-all shadow-lg active:scale-[0.98]"
-                style={{ background: '#000e1f' }}
-              >
-                {loading ? (
-                  <>
-                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    {isLogin ? 'جارٍ تسجيل الدخول...' : 'جارٍ إنشاء الحساب...'}
-                  </>
-                ) : isLogin ? (
-                  <>
-                    <span className="material-symbols-outlined text-[20px]">login</span>
-                    تسجيل الدخول
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[20px]">person_add</span>
-                    إنشاء حساب جديد
-                  </>
-                )}
-              </button>
-            </form>
-
-            {/* Bottom Mode Switch Link */}
-            <p className="text-center text-[13px] text-neutral-600 mt-6 font-medium">
-              {isLogin ? 'ليس لديك حساب بعد؟' : 'لديك حساب مسجل بالفعل؟'}{' '}
-              <button
-                onClick={() => switchMode(isLogin ? 'register' : 'login')}
-                className="font-black hover:underline mr-1"
-                style={{ color: '#775a1a' }}
-              >
-                {isLogin ? 'أنشئ حسابك الآن مجاناً' : 'سجّل الدخول لحسابك'}
-              </button>
-            </p>
-
-            <div className="mt-8 pt-5 border-t border-neutral-100 text-center">
-              <p className="text-[11px] text-neutral-400">
-                تسجيلك في المنصة يعني موافقتك على{' '}
-                <span className="underline cursor-pointer hover:text-neutral-600">شروط الاستخدام</span> و{' '}
-                <span className="underline cursor-pointer hover:text-neutral-600">سياسة الخصوصية</span>
-              </p>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Privacy */}
+          <p style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 14, marginBottom: 4 }}>
+            بتسجيلك توافق على{' '}
+            <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>شروط الاستخدام</span>
+            {' '}و{' '}
+            <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>سياسة الخصوصية</span>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
