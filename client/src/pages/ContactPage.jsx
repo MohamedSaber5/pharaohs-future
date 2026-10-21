@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import logoSrc from '@assets/images/logo.png';
 
 export default function ContactPage() {
@@ -59,26 +59,71 @@ export default function ContactPage() {
             ) : (
               <>
                 <h3 className="text-[20px] font-bold text-[#000e1f] mb-6">أرسل رسالتك</h3>
-                <form onSubmit={e=>{ e.preventDefault(); setSent(true); }} className="flex flex-col gap-4">
-                  {[
-                    { label:"الاسم الكامل",  ph:"محمد أحمد",              type:"text" },
-                    { label:"البريد الإلكتروني", ph:"example@email.com",  type:"email" },
-                    { label:"رقم الهاتف",    ph:"01xxxxxxxxx",             type:"tel" },
-                  ].map(f=>(
-                    <div key={f.label} className="flex flex-col gap-1.5">
-                      <label className="text-[13px] font-semibold text-neutral-700">{f.label}</label>
-                      <input type={f.type} placeholder={f.ph} required
-                        className="w-full h-12 px-4 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 transition-all focus:border-[#775a1a] focus:bg-white" />
-                    </div>
-                  ))}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const phoneVal = e.target.phone.value.trim();
+                    if (phoneVal.length !== 11 || !/^(010|011|012|015)\d{8}$/.test(phoneVal)) {
+                      alert("رقم الهاتف يجب أن يتكون من 11 رقماً ويبدأ بـ (010 أو 011 أو 012 أو 015)");
+                      return;
+                    }
+                    setSent(true);
+                  }}
+                  className="flex flex-col gap-4"
+                >
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[13px] font-semibold text-neutral-700">رسالتك</label>
-                    <textarea rows={4} placeholder="اكتب رسالتك هنا..." required
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 resize-none transition-all focus:border-[#775a1a] focus:bg-white" />
+                    <label className="text-[13px] font-semibold text-neutral-700">الاسم الكامل *</label>
+                    <input
+                      name="name"
+                      type="text"
+                      placeholder="محمد أحمد"
+                      required
+                      className="w-full h-12 px-4 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 transition-all focus:border-[#775a1a] focus:bg-white"
+                    />
                   </div>
-                  <button type="submit"
-                    className="w-full h-12 rounded-xl bg-[#000e1f] text-white font-bold text-[15px] hover:bg-[#0d1f35] transition-all flex items-center justify-center gap-2 mt-2">
-                    <span className="material-symbols-outlined text-[20px]">send</span>إرسال الرسالة
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[13px] font-semibold text-neutral-700">البريد الإلكتروني *</label>
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="example@email.com"
+                      required
+                      className="w-full h-12 px-4 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 transition-all focus:border-[#775a1a] focus:bg-white"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[13px] font-semibold text-neutral-700">رقم الهاتف (مصر) *</label>
+                      <span className="text-[11px] text-neutral-400">11 رقماً فقط</span>
+                    </div>
+                    <input
+                      name="phone"
+                      type="tel"
+                      maxLength={11}
+                      placeholder="01012345678"
+                      required
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+                      }}
+                      className="w-full h-12 px-4 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 transition-all focus:border-[#775a1a] focus:bg-white"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[13px] font-semibold text-neutral-700">رسالتك *</label>
+                    <textarea
+                      name="message"
+                      rows={4}
+                      placeholder="اكتب استفسارك أو رسالتك هنا..."
+                      required
+                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 resize-none transition-all focus:border-[#775a1a] focus:bg-white"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full h-12 rounded-xl bg-[#000e1f] text-white font-bold text-[15px] hover:bg-[#0d1f35] transition-all flex items-center justify-center gap-2 mt-2 shadow-md active:scale-[0.98]"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">send</span>
+                    إرسال الرسالة
                   </button>
                 </form>
               </>

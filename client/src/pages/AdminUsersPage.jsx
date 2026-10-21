@@ -185,14 +185,24 @@ export default function AdminUsersPage() {
               {/* WhatsApp (only for employee) */}
               {newRole === 'employee' && (
                 <div>
-                  <label className="text-[13px] font-semibold text-neutral-700 mb-1.5 block">رقم واتساب الموظف</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[13px] font-semibold text-neutral-700">رقم واتساب الموظف</label>
+                    <span className={`text-[11px] font-mono ${whatsapp.length === 11 ? 'text-green-600 font-bold' : 'text-neutral-400'}`}>
+                      {whatsapp.length}/11
+                    </span>
+                  </div>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[20px]">call</span>
-                    <input value={whatsapp} onChange={e=>setWhatsapp(e.target.value)}
+                    <input
+                      type="tel"
+                      maxLength={11}
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value.replace(/\D/g, '').slice(0, 11))}
                       placeholder="01012345678"
-                      className="w-full h-11 pr-10 pl-4 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 focus:border-[#775a1a] transition-all"/>
+                      className="w-full h-11 pr-10 pl-4 rounded-xl border border-neutral-200 text-[14px] outline-none bg-neutral-50 focus:border-[#775a1a] transition-all"
+                    />
                   </div>
-                  <p className="text-[11px] text-neutral-400 mt-1">سيُعرض هذا الرقم للعملاء المعيّنين لهذا الموظف</p>
+                  <p className="text-[11px] text-neutral-400 mt-1">يجب أن يتكون من 11 رقماً ويبدأ بـ (010, 011, 012, 015)</p>
                 </div>
               )}
 

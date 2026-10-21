@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import User from "../models/User.model.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
 import { sendSuccess } from "../utils/apiResponse.js";
+import sendEmail, { generateOtpEmailHtml } from "../utils/sendEmail.js";
 
 // ─── Token Helpers ────────────────────────────────────────────────────────────
 
@@ -97,7 +99,136 @@ export const getMe = catchAsync(async (req, res) => {
   sendSuccess(res, 200, "User profile retrieved", req.user);
 });
 
-// ─── Reset Password via Phone ─────────────────────────────────────────────────
+// ─── Forgot & Reset Password via Email & OTP ──────────────────────────────────
+
+/**
+ * @desc    Request 6-digit OTP to reset password via email
+ * @route   POST /api/v1/auth/forgot-password
+ * @access  Public
+ */
+export const forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) return next(new AppError("يرجى إدخال البريد الإلكتروني", 400));
+
+  const cleanEmail = email.toLowerCase().trim();
+  const user = await User.findOne({ email: cleanEmail });
+
+  // Always return success response to prevent email discovery attacks
+  if (!user) {
+    return sendSuccess(
+      res,
+      200,
+      "إذا كان هذا البريد مسجلاً لدينا، فقد تم إرسال رمز التحقق إلى بريدك الإلكتروني."
+    );
+  }
+
+  if (!user.isActive) {
+    return next(new AppError("تم إلغاء تنشيط هذا الحساب. يرجى التواصل مع الإدارة.", 403));
+  }
+
+  // Generate 6-digit OTP and set expiry (10 mins)
+  const otp = user.createPasswordResetOTP();
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    const html = generateOtpEmailHtml(user.name, otp);
+    await sendEmail({
+      email: user.email,
+      subject: "رمز التحقق لإعادة تعيين كلمة المرور - مستقبل الفراعنة",
+      message: `رمز التحقق الخاص بك هو: ${otp} (صالح لمدة 10 دقائق)`,
+      html,
+    });
+
+    sendSuccess(
+      res,
+      200,
+      "تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك الإلكتروني بنجاح."
+    );
+  } catch (err) {
+    user.passwordResetOtp = undefined;
+    user.passwordResetOtpExpires = undefined;
+    user.passwordResetVerified = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new AppError("تعذر إرسال البريد الإلكتروني. يرجى المحاولة لاحقاً.", 500));
+  }
+});
+
+/**
+ * @desc    Verify 6-digit OTP
+ * @route   POST /api/v1/auth/verify-otp
+ * @access  Public
+ */
+export const verifyOTP = catchAsync(async (req, res, next) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    return next(new AppError("يرجى إدخال البريد الإلكتروني ورمز التحقق", 400));
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+  const cleanOtp = otp.toString().trim();
+  const hashedOtp = crypto.createHash("sha256").update(cleanOtp).digest("hex");
+
+  const user = await User.findOne({
+    email: cleanEmail,
+    passwordResetOtp: hashedOtp,
+    passwordResetOtpExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(
+      new AppError("رمز التحقق غير صحيح أو انتهت صلاحيته (صلاحية الرمز 10 دقائق)", 400)
+    );
+  }
+
+  user.passwordResetVerified = true;
+  await user.save({ validateBeforeSave: false });
+
+  sendSuccess(res, 200, "تم التحقق من الرمز بنجاح. يمكنك الآن تعيين كلمة مرور جديدة.");
+});
+
+/**
+ * @desc    Reset password after OTP verification
+ * @route   POST /api/v1/auth/reset-password
+ * @access  Public
+ */
+export const resetPassword = catchAsync(async (req, res, next) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return next(new AppError("يرجى ملء جميع الحقول المطلوبة", 400));
+  }
+
+  if (newPassword.length < 8) {
+    return next(new AppError("كلمة المرور يجب أن تكون 8 أحرف على الأقل", 400));
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+  const cleanOtp = otp.toString().trim();
+  const hashedOtp = crypto.createHash("sha256").update(cleanOtp).digest("hex");
+
+  const user = await User.findOne({
+    email: cleanEmail,
+    passwordResetOtp: hashedOtp,
+    passwordResetOtpExpires: { $gt: Date.now() },
+  });
+
+  if (!user || !user.passwordResetVerified) {
+    return next(
+      new AppError("جلسة التحقق غير صالحة أو انتهت مدتها. يرجى إعادة طلب رمز التحقق.", 400)
+    );
+  }
+
+  user.password = newPassword;
+  user.passwordChangedAt = Date.now();
+  user.passwordResetOtp = undefined;
+  user.passwordResetOtpExpires = undefined;
+  user.passwordResetVerified = undefined;
+
+  await user.save();
+
+  createSendToken(user, 200, res);
+});
+
+// ─── Legacy Reset Password via Phone (Fallback) ───────────────────────────────
 
 export const resetPasswordByPhone = catchAsync(async (req, res, next) => {
   const { phone, newPassword } = req.body;

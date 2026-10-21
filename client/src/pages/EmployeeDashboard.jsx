@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import reservationService from "@services/reservation.service.js";
 import { useAuth } from "@context/AuthContext.jsx";
 
@@ -110,6 +110,14 @@ export default function EmployeeDashboard() {
   const handleAgentBook = async () => {
     if (!bookForm.unitId || !bookForm.clientName || !bookForm.clientPhone) {
       setAlertMsg({ type: "error", text: "يرجى تعبئة الحقول الإلزامية (*)" });
+      return;
+    }
+    const cleanPhone = bookForm.clientPhone.trim();
+    if (cleanPhone.length !== 11 || !/^(010|011|012|015)\d{8}$/.test(cleanPhone)) {
+      setAlertMsg({
+        type: "error",
+        text: "رقم هاتف العميل يجب أن يتكون من 11 رقماً ويبدأ بـ (010 أو 011 أو 012 أو 015)",
+      });
       return;
     }
     setBooking(true);
@@ -469,12 +477,21 @@ export default function EmployeeDashboard() {
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-bold text-neutral-700 mb-1">رقم الهاتف (مصر)*</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[13px] font-bold text-neutral-700">رقم الهاتف (مصر)*</label>
+                  <span className={`text-[11px] font-mono ${bookForm.clientPhone.length === 11 ? 'text-green-600 font-bold' : 'text-neutral-400'}`}>
+                    {bookForm.clientPhone.length}/11
+                  </span>
+                </div>
                 <input
-                  type="text"
+                  type="tel"
+                  maxLength={11}
                   placeholder="01012345678"
                   value={bookForm.clientPhone}
-                  onChange={(e) => setBookForm((p) => ({ ...p, clientPhone: e.target.value }))}
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    setBookForm((p) => ({ ...p, clientPhone: clean }));
+                  }}
                   className="w-full h-10 px-3 rounded-xl border border-neutral-200 bg-neutral-50 text-[13px] outline-none focus:border-[#775a1a]"
                 />
               </div>

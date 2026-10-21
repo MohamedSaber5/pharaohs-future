@@ -67,9 +67,11 @@ const AppRoutes = () => (
       />
     </Route>
 
-    {/* Auth & Login */}
+    {/* Auth & Registration Routes */}
     <Route path="auth" element={<AuthPage />} />
-    <Route path="login" element={<Navigate to="/auth" replace />} />
+    <Route path="login" element={<AuthPage defaultMode="login" />} />
+    <Route path="register" element={<AuthPage defaultMode="register" />} />
+    <Route path="forgot-password" element={<AuthPage defaultMode="forgot" />} />
 
     {/* Employee Dashboard */}
     <Route
