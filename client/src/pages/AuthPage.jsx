@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext.jsx';
 import authService from '@services/auth.service.js';
-import logo from '@assets/images/logo.png';
+import logo from '@assets/images/erasebg-transformed.png';
 import bgImg from '@assets/images/Aswan Sunset Waterfront with Luxury Resort Branding.png';
 import toast from 'react-hot-toast';
 
@@ -470,23 +470,26 @@ export default function AuthPage({ defaultMode = 'login' }) {
       <style>{`
         @keyframes auth-spin { to { transform: rotate(360deg); } }
         .auth-input::placeholder { color: rgba(255,255,255,0.28) !important; }
-        /* Card right-aligned on desktop, centered on mobile */
         .auth-outer {
-          position: fixed; inset: 0; overflow: hidden;
-          display: flex; align-items: center; justify-content: center;
+          position: relative;
+          width: 100%;
+          min-height: calc(100vh - 72px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 16px 60px;
+          overflow: clip;
           font-family: 'Cairo','Tajawal',sans-serif;
         }
         .auth-col {
-          position: relative; z-index: 2;
-          width: 100%; max-width: 400px;
-          max-height: 100dvh;
-          overflow-y: auto; overflow-x: hidden;
-          padding: 20px 16px;
-          display: flex; flex-direction: column; align-items: center;
-        }
-        @media (min-width: 768px) {
-          .auth-outer { justify-content: center; }
-          .auth-col { transform: translateX(-15vw); }
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 440px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 0 auto;
         }
       `}</style>
 
@@ -506,13 +509,6 @@ export default function AuthPage({ defaultMode = 'login' }) {
 
         {/* ── Scrollable card column ── */}
         <div className="auth-col">
-
-          {/* Logo */}
-          <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18, gap: 6 }}>
-            <img src={logo} alt="مستقبل الفراعنة" style={{ height: 62, width: 'auto', filter: 'drop-shadow(0 4px 18px rgba(0,0,0,0.55))' }} />
-            <span style={{ color: '#fff', fontSize: 18, fontWeight: 900, textShadow: '0 2px 10px rgba(0,0,0,0.6)', textAlign: 'center' }}>مستقبل الفراعنة</span>
-            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 9, fontWeight: 600, letterSpacing: '0.22em' }}>PHARAOHS FUTURE</span>
-          </Link>
 
           {/* ════════════════════════════════════
               FORGOT PASSWORD — 3-step wizard

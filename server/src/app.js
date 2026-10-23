@@ -23,6 +23,7 @@ import unitRoutes from "./routes/unit.routes.js";
 import reservationRoutes from "./routes/reservation.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import settingRoutes from "./routes/setting.routes.js";
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use(`${API_PREFIX}/units`, unitRoutes);
 app.use(`${API_PREFIX}/reservations`, reservationRoutes);
 app.use(`${API_PREFIX}/admin`, adminRoutes);
 app.use(`${API_PREFIX}/notifications`, notificationRoutes);
+app.use(`${API_PREFIX}/settings`, settingRoutes);
 
 app.get("/", (req, res) => {
   res.json({

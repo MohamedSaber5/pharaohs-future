@@ -1,4 +1,5 @@
 import User from "../models/User.model.js";
+import Setting from "../models/Setting.model.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError  from "../utils/AppError.js";
 import { sendSuccess } from "../utils/apiResponse.js";
@@ -111,4 +112,55 @@ export const reorderEmployeesRotation = catchAsync(async (req, res, next) => {
     .sort({ rotationOrder: 1, createdAt: 1 });
 
   sendSuccess(res, 200, "تم إعادة ترتيب موظفي المبيعات بنجاح", updated);
+});
+
+// --- Site Settings Management ---
+
+// GET /api/v1/admin/settings
+export const getSiteSettings = catchAsync(async (req, res) => {
+  let settings = await Setting.findOne();
+  if (!settings) {
+    settings = await Setting.create({
+      companyAddress: "أسوان الجديدة - الحي الثاني (المقر الرئيسي)",
+      googleMapsUrl: "https://maps.google.com/?q=أسوان+الجديدة+الحي+الثاني",
+    });
+  } else if (!settings.companyAddress || settings.companyAddress.includes("القاهرة") || settings.companyAddress.includes("التجمع")) {
+    settings.companyAddress = "أسوان الجديدة - الحي الثاني (المقر الرئيسي)";
+    if (!settings.googleMapsUrl) {
+      settings.googleMapsUrl = "https://maps.google.com/?q=أسوان+الجديدة+الحي+الثاني";
+    }
+    await settings.save();
+  }
+  sendSuccess(res, 200, "إعدادات الموقع", settings);
+});
+
+// PATCH /api/v1/admin/settings
+export const updateSiteSettings = catchAsync(async (req, res) => {
+  const allowedFields = [
+    "companyPhone",
+    "companyWhatsapp",
+    "companyEmail",
+    "companyAddress",
+    "googleMapsUrl",
+    "workingHours",
+    "homeFeaturedProjectsCount",
+    "facebookUrl",
+    "instagramUrl",
+    "linkedinUrl",
+  ];
+
+  const updates = {};
+  for (const field of allowedFields) {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
+  }
+
+  let settings = await Setting.findOneAndUpdate({}, updates, {
+    new: true,
+    upsert: true,
+    runValidators: true,
+  });
+
+  sendSuccess(res, 200, "تم تحديث إعدادات الموقع بنجاح", settings);
 });

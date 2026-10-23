@@ -1,4 +1,4 @@
-﻿import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext.jsx";
 
 const NAV_SECTIONS = [
@@ -23,10 +23,11 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    title: "الإدارة",
+    title: "الإدارة والتحكم",
     items: [
       { to: "/admin/users",              icon: "group",         label: "المستخدمون" },
       { to: "/admin/employee-rotation",  icon: "swap_vert",     label: "توزيع الموظفين" },
+      { to: "/admin/settings",           icon: "tune",          label: "إعدادات الموقع" },
     ],
   },
 ];
@@ -67,6 +68,18 @@ export default function AdminLayout() {
               لوحة الإدارة
             </p>
           </div>
+        </div>
+
+        {/* Back to Home Button */}
+        <div className="px-3 pt-3">
+          <Link
+            to="/"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl text-xs font-bold transition-all text-[#000e1f] shadow-md hover:opacity-95"
+            style={{ background: "linear-gradient(135deg, #f0d897 0%, #c9952a 100%)" }}
+          >
+            <span className="material-symbols-outlined text-[17px]">arrow_forward</span>
+            <span>العودة للموقع الرئيسي</span>
+          </Link>
         </div>
 
         {/* Nav Sections */}

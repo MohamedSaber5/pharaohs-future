@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * AdminProjectsPage
@@ -145,12 +145,11 @@ const html = `<aside className="fixed right-0 top-0 h-full w-72 bg-surface-conta
 <div className="flex items-center gap-1.5 bg-surface-container-low px-space-sm rounded-lg h-11">
 <span className="material-symbols-outlined text-secondary text-[18px]">location_on</span>
 <select className="bg-transparent text-on-surface font-title-md text-title-md focus:outline-none cursor-pointer" id="regionFilter" onchange="filterProjectTable()">
-<option value="all">كافة المواقع والمحافظات</option>
-<option value="العاصمة الإدارية">العاصمة الإدارية الجديدة</option>
-<option value="القاهرة الجديدة">القاهرة الجديدة (التجمع)</option>
-<option value="الساحل الشمالي">الساحل الشمالي (رأس الحكمة)</option>
-<option value="الشيخ زايد">الشيخ زايد وأكتوبر</option>
-<option value="البحر الأحمر">البحر الأحمر (الجونة)</option>
+<option value="all">كافة مناطق أسوان</option>
+<option value="أسوان الجديدة">أسوان الجديدة (الحي الثاني - المقر)</option>
+<option value="الحي الأول">أسوان الجديدة - الحي الأول</option>
+<option value="الحي الثالث">أسوان الجديدة - الحي الثالث</option>
+<option value="كورنيش النيل">كورنيش النيل بأسوان</option>
 </select>
 </div>
 <!-- Project Status Filter -->
@@ -290,8 +289,8 @@ const html = `<aside className="fixed right-0 top-0 h-full w-72 bg-surface-conta
 </td>
 <td className="py-space-md px-space-md">
 <div className="flex flex-col">
-<span className="font-title-md text-title-md text-primary font-semibold">القاهرة الجديدة</span>
-<span className="font-label-sm text-label-sm text-on-surface-variant">مثلث الأمل - التجمع السادس</span>
+<span className="font-title-md text-title-md text-primary font-semibold">أسوان الجديدة</span>
+<span className="font-label-sm text-label-sm text-on-surface-variant">الحي الثاني - المقر الرئيسي</span>
 </div>
 </td>
 <td className="py-space-md px-space-sm text-center">
@@ -494,8 +493,8 @@ const html = `<aside className="fixed right-0 top-0 h-full w-72 bg-surface-conta
 </td>
 <td className="py-space-md px-space-md">
 <div className="flex flex-col">
-<span className="font-title-md text-title-md text-primary font-semibold">القاهرة الجديدة</span>
-<span className="font-label-sm text-label-sm text-on-surface-variant">النرجس الجديدة</span>
+<span className="font-title-md text-title-md text-primary font-semibold">أسوان الجديدة</span>
+<span className="font-label-sm text-label-sm text-on-surface-variant">الحي الأول المتميز</span>
 </div>
 </td>
 <td className="py-space-md px-space-sm text-center">
@@ -642,11 +641,11 @@ const html = `<aside className="fixed right-0 top-0 h-full w-72 bg-surface-conta
 <div>
 <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1.5">المحافظة / المدينة *</label>
 <select className="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary transition-all" id="inputProjCity">
-<option>العاصمة الإدارية الجديدة</option>
-<option>القاهرة الجديدة (التجمع الخامس/السادس)</option>
-<option>الساحل الشمالي (رأس الحكمة/العلمين)</option>
-<option>الشيخ زايد ومدينة 6 أكتوبر</option>
-<option>البحر الأحمر (الجونة/سهل حشيش)</option>
+<option>أسوان الجديدة - الحي الثاني</option>
+<option>أسوان الجديدة - الحي الأول</option>
+<option>أسوان الجديدة - الحي الثالث</option>
+<option>كورنيش النيل بأسوان</option>
+<option>حي اللوتس وزهرة النيل</option>
 </select>
 </div>
 <div>

@@ -24,6 +24,7 @@ import AdminReservationsPage    from "@pages/AdminReservationsPage.jsx";
 import AdminAssignmentLogsPage  from "@pages/AdminAssignmentLogsPage.jsx";
 import AdminUsersPage           from "@pages/AdminUsersPage.jsx";
 import AdminEmployeeRotationPage from "@pages/admin/AdminEmployeeRotationPage.jsx";
+import AdminSettingsPage         from "@pages/AdminSettingsPage.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 5 * 60 * 1000 } },
@@ -56,6 +57,12 @@ const AppRoutes = () => (
       <Route path="about"          element={<AboutPage />} />
       <Route path="contact"        element={<ContactPage />} />
 
+      {/* Auth & Registration Routes inside MainLayout */}
+      <Route path="auth" element={<AuthPage />} />
+      <Route path="login" element={<AuthPage defaultMode="login" />} />
+      <Route path="register" element={<AuthPage defaultMode="register" />} />
+      <Route path="forgot-password" element={<AuthPage defaultMode="forgot" />} />
+
       {/* Authenticated Client */}
       <Route
         path="my-reservations"
@@ -66,12 +73,6 @@ const AppRoutes = () => (
         }
       />
     </Route>
-
-    {/* Auth & Registration Routes */}
-    <Route path="auth" element={<AuthPage />} />
-    <Route path="login" element={<AuthPage defaultMode="login" />} />
-    <Route path="register" element={<AuthPage defaultMode="register" />} />
-    <Route path="forgot-password" element={<AuthPage defaultMode="forgot" />} />
 
     {/* Employee Dashboard */}
     <Route
@@ -100,6 +101,7 @@ const AppRoutes = () => (
       <Route path="assignment-logs" element={<AdminAssignmentLogsPage />} />
       <Route path="users"           element={<AdminUsersPage />} />
       <Route path="employee-rotation" element={<AdminEmployeeRotationPage />} />
+      <Route path="settings"        element={<AdminSettingsPage />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />

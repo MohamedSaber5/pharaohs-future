@@ -1,32 +1,156 @@
-﻿import { Link } from 'react-router-dom';
-import logoSrc from '@assets/images/logo.png';
+import { Link } from 'react-router-dom';
+import logoSrc from '@assets/images/erasebg-transformed.png';
+import { PyramidIcon, PharaohPatternBackground, ScarabIcon, LotusIcon, AnkhIcon } from '@components/ui/PharaohIcons.jsx';
 
 export default function AboutPage() {
   return (
-    <div className="flex flex-col w-full bg-surface">
-      {/* Header */}
-      <div className="relative w-full bg-[#000e1f] overflow-hidden">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage:"url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPXkPc2KaLFiRV8RHJQhqfstMFlyq8dBqmhxBFocqKU8pB6mxFWJQdKJbYH0h6yCqBJIDjzC5o6OAIqz-VBvC3JV3QGJCDjOANvPEMNXi3tFdaBb0yqjj69JaxpBeTxXLhvRkJUWZS2kDxO4wXomD72DPIhFBq4E2pNChVNfhBIVa1b7UzWbxCxS0j0tQH04JF3VB_bdIPMeRNVw')",backgroundSize:"cover",backgroundPosition:"center" }} />
+    <div className="flex flex-col w-full bg-[#f8f9fc] text-neutral-900" dir="rtl">
+      
+      {/* ── 1. HERO BANNER ── */}
+      <div className="relative w-full bg-[#000e1f] overflow-hidden border-b border-[#c9952a]/20">
+        <PharaohPatternBackground className="opacity-10" />
+
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-[#c9952a]/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-[#775a1a]/15 blur-3xl pointer-events-none" />
+
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-24 text-center">
-          <img src={logoSrc} alt="مستقبل الفراعنة" className="h-20 w-auto mx-auto mb-8 object-contain" style={{ filter:"brightness(0) invert(1)" }} />
-          <h1 className="text-white font-bold text-[36px] md:text-[52px] leading-tight mb-4">نبذة عنّا</h1>
-          <p className="text-white/70 text-[18px] max-w-xl mx-auto">تعرّف على قصة مستقبل الفراعنة ورؤيتنا للاستثمار العقاري في مصر</p>
+          <img
+            src={logoSrc}
+            alt="مستقبل الفراعنة"
+            className="h-20 w-auto mx-auto mb-6 object-contain"
+          />
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4 bg-white/10 backdrop-blur-md border border-[#c9952a]/40 shadow-sm mx-auto">
+            <PyramidIcon className="w-4 h-4 text-[#f0d897]" />
+            <span className="text-xs font-bold text-[#f0d897] tracking-wider">
+              صرح الفراعنة للتطوير والاستثمار العقاري
+            </span>
+          </div>
+
+          <h1 className="text-white font-black text-3xl sm:text-4xl md:text-5xl leading-tight mb-4">
+            عراقة التاريخ تُعانق هندسة المستقبل
+          </h1>
+          <p className="text-white/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            نستلهم من عبقرية الأجداد الفراعنة في البناء والخلود، لنشيد مجتمعات سكنية واستثمارية حديثة ترتقي بحياة الأجيال القادمة.
+          </p>
         </div>
       </div>
 
-      {/* Coming Soon */}
-      <div className="flex-1 flex flex-col items-center justify-center py-28 px-6 text-center">
-        <div className="w-24 h-24 rounded-3xl bg-[#000e1f]/5 flex items-center justify-center mx-auto mb-8">
-          <span className="material-symbols-outlined text-[48px] text-[#775a1a]">hourglass_empty</span>
+      {/* ── 2. VISION & MISSION ── */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-16">
+          
+          <div className="bg-white p-8 sm:p-10 rounded-3xl border border-neutral-200/90 shadow-sm hover:shadow-xl transition-all duration-300">
+            <div className="w-13 h-13 rounded-2xl bg-[#000e1f] text-[#c9952a] flex items-center justify-center mb-6 shadow-md">
+              <PyramidIcon className="w-7 h-7 text-[#f0d897]" />
+            </div>
+            <h2 className="text-2xl font-black text-[#000e1f] mb-3">رؤيتنا الاستراتيجية</h2>
+            <p className="text-neutral-600 leading-relaxed text-sm sm:text-base">
+              أن نكون المطور العقاري الأكثر ثقة ومصداقية في مصر والشرق الأوسط، من خلال تشييد صروح معمارية تدمج بين الأصالة المصرية القديمة، وأحدث تكنولوجيا البناء المستدام والمدن الذكية.
+            </p>
+          </div>
+
+          <div className="bg-white p-8 sm:p-10 rounded-3xl border border-neutral-200/90 shadow-sm hover:shadow-xl transition-all duration-300">
+            <div className="w-13 h-13 rounded-2xl bg-[#000e1f] text-[#c9952a] flex items-center justify-center mb-6 shadow-md">
+              <LotusIcon className="w-7 h-7 text-[#f0d897]" />
+            </div>
+            <h2 className="text-2xl font-black text-[#000e1f] mb-3">رسالتنا للمستثمرين</h2>
+            <p className="text-neutral-600 leading-relaxed text-sm sm:text-base">
+              تمكين العملاء والمستثمرين من اقتناء وحدات تحقق أعلى عائد استثماري استثنائي، مع توفير أسلوب حياة استثنائي يجمع بين الفخامة والأمان والدقة الصارمة في مواعيد التسليم.
+            </p>
+          </div>
+
         </div>
-        <h2 className="text-[28px] font-bold text-[#000e1f] mb-4">قريباً...</h2>
-        <p className="text-[16px] text-neutral-500 max-w-md leading-relaxed mb-8">
-          نعمل على إعداد صفحة شاملة تحكي قصتنا وتُعرّف بفريقنا وقيمنا. تابعونا!
-        </p>
-        <Link to="/" className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-[#000e1f] text-white font-bold text-[15px] hover:bg-[#0d1f35] transition-all">
-          <span className="material-symbols-outlined text-[20px]">home</span>العودة للرئيسية
-        </Link>
+
+        {/* ── 3. FOUR REGAL PILLARS ── */}
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#c9952a]/15 text-[#775a1a] text-xs font-bold mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#c9952a]" />
+            قيم راسخة كالجرانيت
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#000e1f]">
+            المعايير الأربعة لمستقبل الفراعنة
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {[
+            {
+              icon: <ScarabIcon className="w-6 h-6 text-[#c9952a]" />,
+              title: "الأصالة والإبداع المعماري",
+              desc: "تصاميم تستمد هيبتها من الهوية الفرعونية الممزوجة بأحدث أساليب العمارة الحديثة العالمية.",
+            },
+            {
+              icon: <AnkhIcon className="w-6 h-6 text-[#c9952a]" />,
+              title: "الاستدامة وجودة الحياة",
+              desc: "بيئات سكنية صحية وخضراء تعتمد على الطاقة النظيفة وتكنولوجيا المدن الذكية الموفرة.",
+            },
+            {
+              icon: <PyramidIcon className="w-6 h-6 text-[#c9952a]" />,
+              title: "الصلابة والموثوقية القانونية",
+              desc: "100% من مشاريعنا بتراخيص معتمدة وقرارات وزارية واضحة ومسجلة بالشهر العقاري.",
+            },
+            {
+              icon: <LotusIcon className="w-6 h-6 text-[#c9952a]" />,
+              title: "خدمة العملاء الملكية",
+              desc: "فريق متخصص من المستشارين يرافقك خطوة بخطوة من المعاينة والتعاقد وحتى ما بعد الاستلام.",
+            },
+          ].map((pillar) => (
+            <div
+              key={pillar.title}
+              className="bg-white p-6 rounded-3xl border border-neutral-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#000e1f] flex items-center justify-center mb-5">
+                  {pillar.icon}
+                </div>
+                <h3 className="text-base font-bold text-[#000e1f] mb-2">{pillar.title}</h3>
+                <p className="text-xs text-neutral-600 leading-relaxed">{pillar.desc}</p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center gap-1.5 text-xs font-bold text-[#c9952a]">
+                <span>معيار معتمد</span>
+                <span className="material-symbols-outlined text-[15px]">verified</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── 4. CTA BANNER ── */}
+        <div className="bg-[#000e1f] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden border border-[#c9952a]/40 shadow-2xl">
+          <PharaohPatternBackground className="opacity-15" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#c9952a]/20 border border-[#c9952a]/40 text-[#f0d897] text-xs font-bold mb-3 shadow-sm">
+                <span className="material-symbols-outlined text-[16px]">stars</span>
+                <span>فرصتك الذهبية للاستثمار العقاري بأسوان الجديدة</span>
+              </div>
+              <h3 className="text-3xl sm:text-4xl font-black mb-3 text-[#f0d897] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] tracking-tight leading-tight">
+                كن جزءاً من تاريخ المستقبل
+              </h3>
+              <p className="text-white/90 text-sm sm:text-base max-w-xl font-medium leading-relaxed">
+                استكشف مشاريعنا السكنية والتجارية الاستثنائية في قلب أسوان الجديدة وتواصل مع مستشارينا المعتمدين لبدء رحلتك الاستثمارية الناجحة اليوم.
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Link
+                to="/projects"
+                className="h-13 px-7 rounded-2xl font-black text-xs sm:text-sm text-[#000e1f] flex items-center gap-2.5 shadow-xl transition-all pharaoh-gold-gradient hover:scale-105 active:scale-100"
+              >
+                <span>استكشف المشاريع</span>
+                <span className="material-symbols-outlined text-[19px]">arrow_left_alt</span>
+              </Link>
+              <Link
+                to="/contact"
+                className="h-13 px-7 rounded-2xl font-bold text-xs sm:text-sm text-white border border-white/30 hover:bg-white/10 flex items-center gap-2 transition-all"
+              >
+                <span>تواصل معنا</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
       </div>
+
     </div>
   );
 }

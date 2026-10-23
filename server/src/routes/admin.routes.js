@@ -8,6 +8,8 @@ import {
   getEmployeesRotation,
   updateEmployeeRotation,
   reorderEmployeesRotation,
+  getSiteSettings,
+  updateSiteSettings,
 } from "../controllers/admin.controller.js";
 
 import { body } from "express-validator";
@@ -33,5 +35,9 @@ router.delete("/users/:id",          deactivateUser);
 router.get("/employees/rotation",             getEmployeesRotation);
 router.patch("/employees/:id/rotation",       updateEmployeeRotation);
 router.post("/employees/rotation/reorder",     reorderEmployeesRotation);
+
+// Site Settings
+router.get("/settings",  getSiteSettings);
+router.patch("/settings", updateSiteSettings);
 
 export default router;

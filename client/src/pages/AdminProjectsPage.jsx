@@ -423,7 +423,7 @@ export default function AdminProjectsPage() {
                     value={form.location}
                     onChange={handleChange}
                     className="w-full h-11 px-4 rounded-xl border border-neutral-200 text-[13px] focus:outline-none focus:border-amber-700"
-                    placeholder="مثال: العاصمة الإدارية الجديدة"
+                    placeholder="مثال: أسوان الجديدة - الحي الثاني"
                   />
                 </div>
                 <div>

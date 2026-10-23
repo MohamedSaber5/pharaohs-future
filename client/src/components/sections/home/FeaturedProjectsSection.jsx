@@ -1,24 +1,24 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const projects = [
   {
     id: 1,
     name: "مشروع كيان",
-    location: "القاهرة الجديدة",
+    location: "أسوان الجديدة - الحي الثاني",
     description: "وحدات سكنية فاخرة تتسم بالتصميم المعاصر والمساحات الواسعة.",
     startingPrice: "٢٬٥٠٠٬٠٠٠ ج.م",
   },
   {
     id: 2,
     name: "مشروع سيتيا",
-    location: "العاصمة الإدارية",
-    description: "مجمع سكني متكامل الخدمات في أحدث المدن العصرية بمصر.",
+    location: "كورنيش النيل بأسوان الجديدة",
+    description: "مجمع سكني متكامل الخدمات في أحدث المواقع النيلية الساحرة.",
     startingPrice: "٣٬٨٠٠٬٠٠٠ ج.م",
   },
   {
     id: 3,
     name: "مشروع ملكية",
-    location: "الشيخ زايد",
+    location: "أسوان الجديدة - الحي الأول",
     description: "فيلات ومنازل راقية تجمع الهدوء والطبيعة بالتصميم الحديث.",
     startingPrice: "٥٬٢٠٠٬٠٠٠ ج.م",
   },

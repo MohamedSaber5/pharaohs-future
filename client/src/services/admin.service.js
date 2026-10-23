@@ -1,4 +1,4 @@
-﻿import apiClient from "./apiClient.js";
+import apiClient from "./apiClient.js";
 
 const adminService = {
   getUsers:                (params)       => apiClient.get("/admin/users", { params }),
@@ -10,6 +10,10 @@ const adminService = {
   getEmployeesRotation:    ()             => apiClient.get("/admin/employees/rotation"),
   updateEmployeeRotation:  (id, data)     => apiClient.patch(`/admin/employees/${id}/rotation`, data),
   reorderEmployeesRotation:(orderedIds)   => apiClient.post("/admin/employees/rotation/reorder", { orderedIds }),
+
+  // Site Settings
+  getSettings:             ()             => apiClient.get("/settings"),
+  updateSettings:          (data)         => apiClient.patch("/admin/settings", data),
 };
 
 export default adminService;

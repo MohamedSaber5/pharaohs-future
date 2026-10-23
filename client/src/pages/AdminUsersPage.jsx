@@ -14,6 +14,7 @@ export default function AdminUsersPage() {
   const [total,    setTotal]    = useState(0);
   const [loading,  setLoading]  = useState(true);
   const [search,   setSearch]   = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleF,    setRoleF]    = useState('all');
   const [page,     setPage]     = useState(1);
 
@@ -22,11 +23,19 @@ export default function AdminUsersPage() {
   const [whatsapp, setWhatsapp] = useState('');
   const [saving,   setSaving]   = useState(false);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const p = { page, limit: 20 };
-      if (search.trim()) p.search = search.trim();
+      if (debouncedSearch.trim()) p.search = debouncedSearch.trim();
       if (roleF !== 'all') p.role = roleF;
       const res = await adminService.getUsers(p);
       const d = res?.data ?? res;
@@ -34,7 +43,7 @@ export default function AdminUsersPage() {
       setTotal(d?.total ?? 0);
     } catch { toast.error('تعذّر تحميل المستخدمين'); }
     finally { setLoading(false); }
-  }, [search, roleF, page]);
+  }, [debouncedSearch, roleF, page]);
 
   useEffect(() => { load(); }, [load]);
 

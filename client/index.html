@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -7,8 +7,10 @@
     <meta property="og:title" content="مستقبل الفراعنة | للاستثمار والتطوير العقاري" />
     <meta property="og:type" content="website" />
 
-    <!-- IBM Plex Sans + Material Symbols (same as Stitch) -->
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Google Fonts: Cairo (Arabic Primary) + IBM Plex Sans + Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <!-- Tailwind CDN with Stitch design system -->
@@ -71,31 +73,31 @@
               "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"
             },
             fontFamily: {
-              "title-lg": ["IBM Plex Sans"],
-              "label-md": ["IBM Plex Sans"],
-              "headline-lg": ["IBM Plex Sans"],
-              "label-sm": ["IBM Plex Sans"],
-              "body-md": ["IBM Plex Sans"],
-              "display-lg": ["IBM Plex Sans"],
-              "headline-sm": ["IBM Plex Sans"],
-              "body-lg": ["IBM Plex Sans"],
-              "title-md": ["IBM Plex Sans"],
-              "financial-numeric": ["IBM Plex Sans"],
-              "headline-md": ["IBM Plex Sans"]
+              "title-lg": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "label-md": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "headline-lg": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "label-sm": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "body-md": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "display-lg": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "headline-sm": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "body-lg": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "title-md": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "financial-numeric": ["Cairo", "IBM Plex Sans", "sans-serif"],
+              "headline-md": ["Cairo", "IBM Plex Sans", "sans-serif"]
             },
             fontSize: {
-              "title-lg":   ["18px", { lineHeight: "26px", fontWeight: "600" }],
-              "label-md":   ["13px", { lineHeight: "18px", fontWeight: "500" }],
-              "headline-lg":["36px", { lineHeight: "48px", fontWeight: "600" }],
-              "label-sm":   ["11px", { lineHeight: "16px", letterSpacing: "0.04em", fontWeight: "600" }],
-              "body-md":    ["14px", { lineHeight: "22px", fontWeight: "400" }],
-              "display-lg": ["56px", { lineHeight: "68px", letterSpacing: "-0.02em", fontWeight: "700" }],
-              "display-lg-mobile": ["36px", { lineHeight: "44px", letterSpacing: "-0.01em", fontWeight: "700" }],
-              "headline-sm":["22px", { lineHeight: "30px", fontWeight: "600" }],
-              "body-lg":    ["16px", { lineHeight: "26px", fontWeight: "400" }],
-              "title-md":   ["16px", { lineHeight: "24px", fontWeight: "500" }],
+              "title-lg":   ["18px", { lineHeight: "26px", fontWeight: "700" }],
+              "label-md":   ["13px", { lineHeight: "19px", fontWeight: "600" }],
+              "headline-lg":["36px", { lineHeight: "48px", fontWeight: "800" }],
+              "label-sm":   ["11px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "700" }],
+              "body-md":    ["14.5px", { lineHeight: "24px", fontWeight: "500" }],
+              "display-lg": ["54px", { lineHeight: "68px", letterSpacing: "-0.01em", fontWeight: "900" }],
+              "display-lg-mobile": ["34px", { lineHeight: "44px", fontWeight: "900" }],
+              "headline-sm":["22px", { lineHeight: "32px", fontWeight: "700" }],
+              "body-lg":    ["16px", { lineHeight: "28px", fontWeight: "500" }],
+              "title-md":   ["16px", { lineHeight: "26px", fontWeight: "600" }],
               "financial-numeric": ["20px", { lineHeight: "26px", letterSpacing: "0.01em", fontWeight: "700" }],
-              "headline-md":["28px", { lineHeight: "38px", fontWeight: "600" }]
+              "headline-md":["28px", { lineHeight: "40px", fontWeight: "700" }]
             }
           }
         }
@@ -105,9 +107,9 @@
     <style>
       @layer base {
         html, body { margin: 0; padding: 0; }
-        body { overscroll-behavior: none; font-family: "IBM Plex Sans", sans-serif; }
+        body { font-family: "Cairo", "IBM Plex Sans", sans-serif; }
       }
-      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: #f8f9ff; }
       ::-webkit-scrollbar-thumb { background: #775a1a; border-radius: 3px; }
     </style>

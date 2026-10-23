@@ -1,4 +1,4 @@
-﻿import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Navbar from "@components/layout/Navbar.jsx";
 import Footer from "@components/layout/Footer.jsx";
 
@@ -9,7 +9,7 @@ import Footer from "@components/layout/Footer.jsx";
 const MainLayout = () => (
   <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f8f3e8" }}>
     <Navbar />
-    <div style={{ paddingTop: "72px", flex: 1 }}>
+    <div style={{ paddingTop: "72px", flex: 1 }} className="pb-20 lg:pb-0">
       <Outlet />
     </div>
     <Footer />
