@@ -4,22 +4,16 @@ import { useAuth } from '@context/AuthContext.jsx';
 import { useLanguage } from '@context/LanguageContext.jsx';
 import projectService from '@services/project.service.js';
 
-const today = new Date().toLocaleDateString('ar-EG', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
-
-function StatCard({ icon, label, value, sub, color, bg, loading }) {
+function StatCard({ icon, label, value, sub, color, bg, loading, liveLabel }) {
   return (
     <div className="bg-white rounded-2xl border border-neutral-100 p-6 shadow-sm hover:shadow-md transition-all">
       <div className="flex items-start justify-between mb-4">
         <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center`}>
           <span className={`material-symbols-outlined text-[24px] ${color}`}>{icon}</span>
         </div>
-        <span className="text-[12px] font-medium text-neutral-400 bg-neutral-50 px-2.5 py-1 rounded-full">
-          مباشر من MongoDB
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          {liveLabel}
         </span>
       </div>
       {loading ? (
@@ -57,10 +51,18 @@ function EmptyState({ icon, title, sub, action, actionLabel }) {
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
+  const { t, isRTL, dir, tStatus } = useLanguage();
   const [stats, setStats] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const todayFormatted = new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   useEffect(() => {
     const load = async () => {
@@ -73,24 +75,33 @@ export default function AdminDashboardPage() {
         setStats(s?.data ?? s);
         setProjects((p?.data ?? p ?? []).slice(0, 5));
       } catch (err) {
-        setError('تعذر تحميل البيانات. يرجى التحقق من اتصال السيرفر.');
+        setError(isRTL ? 'تعذر تحميل البيانات. يرجى التحقق من اتصال السيرفر.' : 'Failed to load data. Please check connection.');
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, []);
+  }, [isRTL]);
 
-  const { t, isRTL, dir } = useLanguage();
   const stat = stats ?? {};
+  const liveBadgeText = t("admin.liveSync", "مباشر • تحديث فوري");
+
+  const tableHeaders = [
+    t("admin.projectCol", "المشروع"),
+    t("admin.locationCol", "الموقع"),
+    t("admin.unitsTotalCol", "الوحدات المسجلة"),
+    t("admin.availableCol", "المتاح"),
+    t("admin.progressCol", "نسبة الإنجاز"),
+    t("admin.statusCol", "الحالة"),
+  ];
 
   return (
     <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir={dir}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-[22px] font-bold text-neutral-900">{t("admin.portalTitle", "لوحة التحكم الإدارية")}</h1>
-          <p className="text-[13px] text-neutral-500 mt-0.5">{today}</p>
+          <p className="text-[13px] text-neutral-500 mt-0.5">{todayFormatted}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white border border-neutral-100 shadow-sm">
@@ -101,8 +112,8 @@ export default function AdminDashboardPage() {
               {user?.name?.[0] || "م"}
             </div>
             <div>
-              <p className="text-[13px] font-bold text-neutral-800 leading-none">{user?.name || "المسؤول"}</p>
-              <p className="text-[11px] text-neutral-400 mt-0.5">مدير النظام</p>
+              <p className="text-[13px] font-bold text-neutral-800 leading-none">{user?.name || (isRTL ? "المسؤول" : "Administrator")}</p>
+              <p className="text-[11px] text-neutral-400 mt-0.5">{t("roles.admin", "مدير النظام")}</p>
             </div>
           </div>
           <Link
@@ -111,7 +122,7 @@ export default function AdminDashboardPage() {
             style={{ background: "#000e1f" }}
           >
             <span className="material-symbols-outlined text-[18px]">add</span>
-            مشروع جديد
+            {t("admin.newProject", "مشروع جديد")}
           </Link>
         </div>
       </div>
@@ -124,56 +135,73 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Dynamic Stats Grid directly bound to MongoDB */}
+      {/* Dynamic Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         <StatCard
           icon="apartment"
-          label="إجمالي المشاريع"
+          label={t("admin.statTotalProjects", "إجمالي المشاريع")}
           value={stat.projects?.total}
-          sub={`تحت الإنشاء: ${stat.projects?.underConstruction ?? 0} — مكتمل: ${stat.projects?.completed ?? 0}`}
+          sub={
+            isRTL
+              ? `تحت الإنشاء: ${stat.projects?.underConstruction ?? 0} — مكتمل: ${stat.projects?.completed ?? 0}`
+              : `Under Const.: ${stat.projects?.underConstruction ?? 0} — Completed: ${stat.projects?.completed ?? 0}`
+          }
           color="text-[#000e1f]"
           bg="bg-[#000e1f]/8"
           loading={loading}
+          liveLabel={liveBadgeText}
         />
         <StatCard
           icon="holiday_village"
-          label="الوحدات المتاحة"
+          label={t("admin.statAvailableUnits", "الوحدات المتاحة")}
           value={stat.units?.available}
-          sub={`من إجمالي ${stat.units?.total ?? 0} وحدة مسجلة`}
+          sub={
+            isRTL
+              ? `من إجمالي ${stat.units?.total ?? 0} وحدة مسجلة`
+              : `Out of ${stat.units?.total ?? 0} registered units`
+          }
           color="text-[#775a1a]"
           bg="bg-[#775a1a]/10"
           loading={loading}
+          liveLabel={liveBadgeText}
         />
         <StatCard
           icon="sell"
-          label="وحدات مباعة / محجوزة"
+          label={t("admin.statSoldReserved", "وحدات مباعة ومحجوزة")}
           value={(stat.units?.sold ?? 0) + (stat.units?.reserved ?? 0)}
-          sub={`مباع: ${stat.units?.sold ?? 0} | محجوز: ${stat.units?.reserved ?? 0}`}
+          sub={
+            isRTL
+              ? `مباع: ${stat.units?.sold ?? 0} | محجوز: ${stat.units?.reserved ?? 0}`
+              : `Sold: ${stat.units?.sold ?? 0} | Reserved: ${stat.units?.reserved ?? 0}`
+          }
           color="text-green-700"
           bg="bg-green-50"
           loading={loading}
+          liveLabel={liveBadgeText}
         />
         <StatCard
           icon="inventory"
-          label="إجمالي الوحدات الفعلي"
+          label={t("admin.statTotalUnits", "إجمالي الوحدات الفعلي")}
           value={stat.units?.total}
-          sub="يتغير ديناميكياً مع الإضافة والحذف"
+          sub={t("admin.statDynamic", "مزامنة فورية لكافة الوحدات")}
           color="text-blue-700"
           bg="bg-blue-50"
           loading={loading}
+          liveLabel={liveBadgeText}
         />
       </div>
 
       {/* Projects table */}
       <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
-          <h2 className="text-[16px] font-bold text-neutral-900">أحدث المشاريع والوحدات</h2>
+          <h2 className="text-[16px] font-bold text-neutral-900">{t("admin.latestProjects", "أحدث المشاريع والوحدات")}</h2>
           <Link
             to="/admin/projects"
             className="text-[13px] font-semibold hover:underline flex items-center gap-1"
             style={{ color: "#775a1a" }}
           >
-            إدارة المشاريع <span className="material-symbols-outlined text-[16px]">arrow_left_alt</span>
+            <span>{t("admin.manageProjects", "إدارة المشاريع")}</span>
+            <span className={`material-symbols-outlined text-[16px] ${!isRTL ? "rotate-180" : ""}`}>arrow_left_alt</span>
           </Link>
         </div>
 
@@ -186,18 +214,18 @@ export default function AdminDashboardPage() {
         ) : projects.length === 0 ? (
           <EmptyState
             icon="apartment"
-            title="لا توجد مشاريع مضافة بعد"
-            sub="أضف مشروعك الأول ليظهر هنا"
+            title={t("admin.noProjects", "لا توجد مشاريع مضافة بعد")}
+            sub={t("admin.addFirstProject", "أضف مشروعك الأول ليظهر هنا")}
             action="/admin/projects"
-            actionLabel="إضافة مشروع"
+            actionLabel={t("admin.newProject", "إضافة مشروع")}
           />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr style={{ background: "#f8f9fa", borderBottom: "1px solid #f1f3f4" }}>
-                  {["المشروع", "الموقع", "الوحدات المسجلة", "المتاح", "نسبة الإنجاز", "الحالة"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-right text-[12px] font-semibold text-neutral-500 whitespace-nowrap">
+                  {tableHeaders.map((h) => (
+                    <th key={h} className={`px-4 py-3 ${isRTL ? "text-right" : "text-left"} text-[12px] font-semibold text-neutral-500 whitespace-nowrap`}>
                       {h}
                     </th>
                   ))}
@@ -207,8 +235,10 @@ export default function AdminDashboardPage() {
                 {projects.map((p) => (
                   <tr key={p._id} className="border-t border-neutral-100 hover:bg-neutral-50 transition-colors">
                     <td className="px-4 py-4">
-                      <p className="text-[14px] font-bold text-neutral-800 whitespace-nowrap">{p.name}</p>
-                      {p.nameEn && <p className="text-[12px] text-neutral-400">{p.nameEn}</p>}
+                      <p className="text-[14px] font-bold text-neutral-800 whitespace-nowrap">
+                        {!isRTL && p.nameEn ? p.nameEn : p.name}
+                      </p>
+                      {isRTL && p.nameEn && <p className="text-[12px] text-neutral-400">{p.nameEn}</p>}
                     </td>
                     <td className="px-4 py-4 text-[13px] text-neutral-600 whitespace-nowrap">{p.location}</td>
                     <td className="px-4 py-4 text-center text-[14px] font-bold text-neutral-800">
@@ -240,7 +270,7 @@ export default function AdminDashboardPage() {
                             : "bg-blue-100 text-blue-800"
                         }`}
                       >
-                        {p.status}
+                        {tStatus(p.status)}
                       </span>
                     </td>
                   </tr>
@@ -254,13 +284,13 @@ export default function AdminDashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { icon: "apartment", label: "إدارة المشاريع", to: "/admin/projects", bg: "#000e1f", tc: "white" },
-          { icon: "holiday_village", label: "إدارة الوحدات", to: "/admin/units", bg: "#775a1a", tc: "white" },
-          { icon: "event_available", label: "الحجوزات", to: "/admin/reservations", bg: "#166534", tc: "white" },
-          { icon: "swap_horiz", label: "توزيع الموظفين", to: "/admin/employee-rotation", bg: "#1e40af", tc: "white" },
+          { icon: "apartment", label: t("admin.quickProjects", "إدارة المشاريع"), to: "/admin/projects", bg: "#000e1f", tc: "white" },
+          { icon: "holiday_village", label: t("admin.quickUnits", "إدارة الوحدات"), to: "/admin/units", bg: "#775a1a", tc: "white" },
+          { icon: "event_available", label: t("admin.quickReservations", "الحجوزات"), to: "/admin/reservations", bg: "#166534", tc: "white" },
+          { icon: "swap_horiz", label: t("admin.quickRotation", "توزيع الموظفين"), to: "/admin/employee-rotation", bg: "#1e40af", tc: "white" },
         ].map((a) => (
           <Link
-            key={a.label}
+            key={a.to}
             to={a.to}
             className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white border border-neutral-100 hover:shadow-md hover:-translate-y-0.5 transition-all"
           >
@@ -269,7 +299,7 @@ export default function AdminDashboardPage() {
                 {a.icon}
               </span>
             </div>
-            <span className="text-[14px] font-semibold text-neutral-700">{a.label}</span>
+            <span className="text-[14px] font-semibold text-neutral-700 text-center">{a.label}</span>
           </Link>
         ))}
       </div>

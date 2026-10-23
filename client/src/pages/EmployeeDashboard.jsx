@@ -48,7 +48,7 @@ const STAGE_STYLES = {
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
-  const { t, isRTL, dir } = useLanguage();
+  const { t, isRTL, dir, tStatus, tType, formatPrice, formatArea } = useLanguage();
 
   const [items, setItems]       = useState([]);
   const [total, setTotal]       = useState(0);
@@ -262,7 +262,7 @@ export default function EmployeeDashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {[
             {
-              label: "طلبات حجز جديدة",
+              label: t("employee.pendingCard", "طلبات حجز جديدة"),
               val: counts.pending,
               icon: "notification_important",
               badgeBg: "bg-blue-50 text-blue-800 border-blue-200",
@@ -270,7 +270,7 @@ export default function EmployeeDashboard() {
               color: "text-blue-700",
             },
             {
-              label: "قيد المراجعة والتواصل",
+              label: t("employee.reviewCard", "قيد المراجعة والتواصل"),
               val: counts.review,
               icon: "support_agent",
               badgeBg: "bg-amber-50 text-amber-800 border-amber-200",
@@ -278,7 +278,7 @@ export default function EmployeeDashboard() {
               color: "text-amber-700",
             },
             {
-              label: "وحدات محجوزة رسمياً",
+              label: t("employee.reservedCard", "وحدات محجوزة رسمياً"),
               val: counts.reserved,
               icon: "lock_clock",
               badgeBg: "bg-purple-50 text-purple-800 border-purple-200",
@@ -286,7 +286,7 @@ export default function EmployeeDashboard() {
               color: "text-purple-700",
             },
             {
-              label: "تعاقدات مكتملة بنجاح",
+              label: t("employee.completedCard", "تعاقدات مكتملة بنجاح"),
               val: counts.completed,
               icon: "verified",
               badgeBg: "bg-emerald-50 text-emerald-800 border-emerald-200",
@@ -298,7 +298,7 @@ export default function EmployeeDashboard() {
               key={card.label}
               className="relative overflow-hidden bg-white rounded-3xl p-5 sm:p-6 border border-neutral-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
-              <div className={`absolute top-0 right-0 w-28 h-28 rounded-full bg-gradient-to-br ${card.accent} blur-xl pointer-events-none`} />
+              <div className={`absolute top-0 ${isRTL ? "right-0" : "left-0"} w-28 h-28 rounded-full bg-gradient-to-br ${card.accent} blur-xl pointer-events-none`} />
               
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs sm:text-sm font-bold text-neutral-600">{card.label}</span>
@@ -311,7 +311,9 @@ export default function EmployeeDashboard() {
                 <span className={`text-3xl sm:text-4xl font-black font-mono tracking-tight ${card.color}`}>
                   {card.val}
                 </span>
-                <span className="text-xs font-semibold text-neutral-500">حجز</span>
+                <span className="text-xs font-semibold text-neutral-500">
+                  {isRTL ? "حجز" : "Bookings"}
+                </span>
               </div>
             </div>
           ))}
@@ -332,7 +334,7 @@ export default function EmployeeDashboard() {
                 }`}
               >
                 {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#c9952a]" />}
-                {s}
+                {s === "الكل" ? t("employee.allFilter", "الكل") : tStatus(s)}
               </button>
             );
           })}
@@ -346,8 +348,10 @@ export default function EmployeeDashboard() {
             <div className="flex items-center gap-2.5">
               <span className="material-symbols-outlined text-[#c9952a] text-[22px]">assignment</span>
               <div>
-                <h2 className="text-base font-extrabold text-neutral-900">قائمة الحجوزات والتعاملات</h2>
-                <p className="text-xs text-neutral-500">إجمالي الحجوزات المسجلة: {total} حجز</p>
+                <h2 className="text-base font-extrabold text-neutral-900">{t("employee.dashboardTitle", "قائمة الحجوزات والتعاملات")}</h2>
+                <p className="text-xs text-neutral-500">
+                  {isRTL ? `إجمالي الحجوزات المسجلة: ${total} حجز` : `Total registered bookings: ${total} bookings`}
+                </p>
               </div>
             </div>
           </div>
@@ -363,22 +367,22 @@ export default function EmployeeDashboard() {
               <div className="w-16 h-16 rounded-full bg-[#000e1f]/5 flex items-center justify-center text-neutral-400 mb-3">
                 <span className="material-symbols-outlined text-[36px]">assignment_late</span>
               </div>
-              <h3 className="text-base font-bold text-neutral-800 mb-1">لا توجد حجوزات ضمن هذا التصنيف</h3>
-              <p className="text-xs text-neutral-500">يمكنك تسجيل حجز جديد أو اختيار تصنيف مختلف من الأعلى</p>
+              <h3 className="text-base font-bold text-neutral-800 mb-1">{t("employee.emptyBookings", "لا توجد حجوزات ضمن هذا التصنيف")}</h3>
+              <p className="text-xs text-neutral-500">{isRTL ? "يمكنك تسجيل حجز جديد أو اختيار تصنيف مختلف من الأعلى" : "You can register a new booking or choose a different filter above"}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-right border-collapse">
+              <table className="w-full border-collapse">
                 <thead className="bg-[#000e1f]/5 border-b border-neutral-200 text-neutral-700 text-xs font-black">
                   <tr>
-                    <th className="px-6 py-4">بيانات العميل</th>
-                    <th className="px-6 py-4">رقم الهاتف</th>
-                    <th className="px-6 py-4">المشروع العقاري</th>
-                    <th className="px-6 py-4">تفاصيل الوحدة</th>
-                    <th className="px-6 py-4">السعر الإجمالي</th>
-                    <th className="px-6 py-4">المرحلة الحالية</th>
-                    <th className="px-6 py-4">تاريخ الحجز</th>
-                    <th className="px-6 py-4 text-center">الإجراءات</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("employee.clientCol", "بيانات العميل")}</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("employee.phoneCol", "رقم الهاتف")}</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("admin.projectCol", "المشروع العقاري")}</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("employee.unitCol", "تفاصيل الوحدة")}</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("employee.priceCol", "السعر الإجمالي")}</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("employee.stageCol", "المرحلة الحالية")}</th>
+                    <th className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>{t("common.date", "تاريخ الحجز")}</th>
+                    <th className="px-6 py-4 text-center">{t("employee.actionsCol", "الإجراءات")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100 text-sm">
@@ -391,53 +395,53 @@ export default function EmployeeDashboard() {
                       <tr key={r._id} className="hover:bg-neutral-50/80 transition-colors">
                         
                         {/* Client info */}
-                        <td className="px-6 py-4">
+                        <td className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>
                           <p className="font-extrabold text-neutral-900 leading-tight">
-                            {r.user?.name || r.clientPhone || "عميل مميز"}
+                            {r.user?.name || r.clientPhone || (isRTL ? "عميل مميز" : "VIP Client")}
                           </p>
                           <p className="text-xs text-neutral-500 font-mono mt-0.5">{r.user?.email || "—"}</p>
                           {r.bookedByAgent && (
                             <span className="inline-flex items-center gap-1 text-[10px] bg-purple-50 text-purple-800 border border-purple-200 px-2 py-0.5 rounded-md font-bold mt-1">
                               <span className="material-symbols-outlined text-[12px]">support_agent</span>
-                              حجز موظف
+                              {isRTL ? "حجز موظف" : "Agent Direct"}
                             </span>
                           )}
                         </td>
 
                         {/* Phone */}
-                        <td className="px-6 py-4 font-mono font-bold text-neutral-800 text-xs" dir="ltr">
+                        <td className={`px-6 py-4 font-mono font-bold text-neutral-800 text-xs ${isRTL ? "text-right" : "text-left"}`} dir="ltr">
                           {r.user?.phone || r.clientPhone || "—"}
                         </td>
 
                         {/* Project */}
-                        <td className="px-6 py-4 font-extrabold text-[#000e1f]">
-                          {r.project?.name || "مشروع رئيسي"}
+                        <td className={`px-6 py-4 font-extrabold text-[#000e1f] ${isRTL ? "text-right" : "text-left"}`}>
+                          {!isRTL && r.project?.nameEn ? r.project.nameEn : (r.project?.name || (isRTL ? "مشروع رئيسي" : "Main Project"))}
                         </td>
 
                         {/* Unit info */}
-                        <td className="px-6 py-4">
-                          <p className="font-bold text-neutral-900">{u?.type} — {u?.area} م²</p>
+                        <td className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>
+                          <p className="font-bold text-neutral-900">{tType(u?.type)} — {formatArea(u?.area)}</p>
                           <p className="text-xs text-neutral-500">
-                            الدور {u?.floor ?? 1} {u?.building ? `| مبنى ${u.building}` : ""}
+                            {isRTL ? `الدور ${u?.floor ?? 1}` : `Floor ${u?.floor ?? 1}`} {u?.building ? `| ${isRTL ? 'مبنى' : 'Bldg'} ${u.building}` : ""}
                           </p>
                         </td>
 
                         {/* Price */}
-                        <td className="px-6 py-4 font-extrabold text-neutral-900 font-mono">
-                          {u?.price ? `${Number(u.price).toLocaleString()} ج.م.` : "غير محدد"}
+                        <td className={`px-6 py-4 font-extrabold text-neutral-900 font-mono ${isRTL ? "text-right" : "text-left"}`}>
+                          {u?.price ? formatPrice(u.price) : "—"}
                         </td>
 
                         {/* Status Badge */}
-                        <td className="px-6 py-4">
+                        <td className={`px-6 py-4 ${isRTL ? "text-right" : "text-left"}`}>
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold border ${stageConfig.badge}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${stageConfig.dot}`} />
-                            {r.status}
+                            {tStatus(r.status)}
                           </span>
                         </td>
 
                         {/* Date */}
-                        <td className="px-6 py-4 text-xs font-semibold text-neutral-500 font-mono">
-                          {new Date(r.createdAt).toLocaleDateString("ar-EG")}
+                        <td className={`px-6 py-4 text-xs font-semibold text-neutral-500 font-mono ${isRTL ? "text-right" : "text-left"}`}>
+                          {new Date(r.createdAt).toLocaleDateString(isRTL ? "ar-EG" : "en-US")}
                         </td>
 
                         {/* Actions */}
@@ -450,11 +454,11 @@ export default function EmployeeDashboard() {
                                 setNewStatus(r.status);
                                 setNote(r.agentNotes || "");
                               }}
-                              title="تحديث مرحلة الحجز والملاحظات"
+                              title={isRTL ? "تحديث مرحلة الحجز والملاحظات" : "Update Stage & Notes"}
                               className="h-9 px-3 rounded-xl bg-[#000e1f] text-white hover:bg-[#c9952a] hover:text-[#000e1f] text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                             >
                               <span className="material-symbols-outlined text-[16px]">edit_note</span>
-                              <span>تحديث</span>
+                              <span>{t("employee.updateStageBtn", "تعديل")}</span>
                             </button>
 
                             {/* Cancel */}
@@ -464,11 +468,11 @@ export default function EmployeeDashboard() {
                                   setCancelItem(r);
                                   setCancelReason("");
                                 }}
-                                title="إلغاء الحجز وتفريغ الوحدة للموقع"
+                                title={isRTL ? "إلغاء الحجز وتفريغ الوحدة للموقع" : "Cancel Booking"}
                                 className="h-9 px-3 rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
                               >
                                 <span className="material-symbols-outlined text-[16px]">cancel</span>
-                                <span>إلغاء</span>
+                                <span>{t("employee.cancelBtn", "إلغاء")}</span>
                               </button>
                             )}
                           </div>
@@ -496,7 +500,7 @@ export default function EmployeeDashboard() {
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#c9952a]">edit_calendar</span>
-                  <h3 className="text-lg font-black text-[#000e1f]">تحديث مرحلة الحجز</h3>
+                  <h3 className="text-lg font-black text-[#000e1f]">{isRTL ? "تحديث مرحلة الحجز" : "Update Booking Stage"}</h3>
                 </div>
                 <button
                   onClick={() => setEditItem(null)}
@@ -509,19 +513,19 @@ export default function EmployeeDashboard() {
               <div className="flex flex-col gap-4">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    المرحلة الجديدة للحجز:
+                    {isRTL ? "المرحلة الجديدة للحجز:" : "New Booking Stage:"}
                   </label>
                   <div className="relative">
                     <select
                       value={newStatus}
                       onChange={(e) => setNewStatus(e.target.value)}
-                      className="w-full h-12 pr-4 pl-10 rounded-xl border border-neutral-200 bg-neutral-50 text-sm font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer"
+                      className={`w-full h-12 ${isRTL ? "pr-4 pl-10" : "pl-4 pr-10"} rounded-xl border border-neutral-200 bg-neutral-50 text-sm font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer`}
                     >
                       {STAGES.map((s) => (
-                        <option key={s} value={s}>{s}</option>
+                        <option key={s} value={s}>{tStatus(s)}</option>
                       ))}
                     </select>
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
+                    <span className={`material-symbols-outlined absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400`}>
                       expand_more
                     </span>
                   </div>
@@ -529,12 +533,12 @@ export default function EmployeeDashboard() {
 
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    ملاحظات المستشار وسجل المحادثة:
+                    {isRTL ? "ملاحظات المستشار وسجل المحادثة:" : "Advisor Notes & Log:"}
                   </label>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder="مثال: تم التواصل هاتفياً وتحديد موعد لزيارة المشروع واستكمال الأوراق..."
+                    placeholder={isRTL ? "مثال: تم التواصل هاتفياً وتحديد موعد لزيارة المشروع واستكمال الأوراق..." : "e.g., Contacted client, scheduled site visit and paperwork..."}
                     rows={4}
                     className="w-full p-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-medium text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white resize-none transition-all"
                   />
@@ -546,14 +550,14 @@ export default function EmployeeDashboard() {
                   onClick={() => setEditItem(null)}
                   className="flex-1 h-12 rounded-xl bg-neutral-100 text-neutral-700 font-bold text-xs hover:bg-neutral-200 transition-colors cursor-pointer"
                 >
-                  تراجع
+                  {t("common.cancel", "تراجع")}
                 </button>
                 <button
                   onClick={handleUpdate}
                   disabled={updating}
                   className="flex-1 h-12 rounded-xl font-bold text-xs text-[#000e1f] disabled:opacity-50 flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer pharaoh-gold-gradient"
                 >
-                  {updating ? "جارٍ الحفظ..." : "حفظ التغييرات"}
+                  {updating ? (isRTL ? "جارٍ الحفظ..." : "Saving...") : t("common.save", "حفظ التغييرات")}
                 </button>
               </div>
             </div>
@@ -576,20 +580,22 @@ export default function EmployeeDashboard() {
               </div>
               
               <h3 className="text-lg font-black text-neutral-900 mb-1">
-                إلغاء الحجز وإعادة الوحدة للسوق
+                {isRTL ? "إلغاء الحجز وإعادة الوحدة للسوق" : "Cancel Reservation & Release Unit"}
               </h3>
               <p className="text-xs text-neutral-600 mb-4 leading-relaxed">
-                عند تأكيد الإلغاء، ستعود الوحدة فوراً إلى حالة "متاح" لتظهر لكافة زوار الموقع مجدداً، وسيتم تدوين السبب في سجل العمليات.
+                {isRTL
+                  ? "عند تأكيد الإلغاء، ستعود الوحدة فوراً إلى حالة 'متاح' لتظهر لكافة زوار الموقع مجدداً، وسيتم تدوين السبب في سجل العمليات."
+                  : "Upon cancellation, the unit will immediately return to 'Available' status for all visitors, and the reason will be logged."}
               </p>
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-neutral-700">
-                  سبب الإلغاء (إلزامي)*:
+                  {isRTL ? "سبب الإلغاء (إلزامي)*:" : "Cancellation Reason (Required)*:"}
                 </label>
                 <textarea
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
-                  placeholder="مثال: بناءً على طلب العميل بسبب ظروف خاصة، أو عدم الجدية خلال المهلة القانونية..."
+                  placeholder={isRTL ? "مثال: بناءً على طلب العميل بسبب ظروف خاصة، أو عدم الجدية خلال المهلة القانونية..." : "e.g., Client requested cancellation or no response during grace period..."}
                   rows={4}
                   className="w-full p-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-medium text-neutral-900 outline-none focus:border-rose-500 focus:bg-white resize-none transition-all"
                 />
@@ -600,14 +606,14 @@ export default function EmployeeDashboard() {
                   onClick={() => setCancelItem(null)}
                   className="flex-1 h-12 rounded-xl bg-neutral-100 text-neutral-700 font-bold text-xs hover:bg-neutral-200 transition-colors cursor-pointer"
                 >
-                  إغلاق
+                  {t("common.close", "إغلاق")}
                 </button>
                 <button
                   onClick={handleCancel}
                   disabled={cancelling || !cancelReason.trim()}
                   className="flex-1 h-12 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs disabled:opacity-50 flex items-center justify-center transition-colors shadow-md cursor-pointer"
                 >
-                  {cancelling ? "جارٍ الإلغاء..." : "تأكيد الإلغاء وتفريغ الوحدة"}
+                  {cancelling ? (isRTL ? "جارٍ الإلغاء..." : "Cancelling...") : (isRTL ? "تأكيد الإلغاء وتفريغ الوحدة" : "Confirm Cancellation & Release")}
                 </button>
               </div>
             </div>
@@ -628,7 +634,7 @@ export default function EmployeeDashboard() {
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#c9952a]">domain_add</span>
-                  <h3 className="text-lg font-black text-[#000e1f]">تسجيل حجز مباشر باسم عميل</h3>
+                  <h3 className="text-lg font-black text-[#000e1f]">{isRTL ? "تسجيل حجز مباشر باسم عميل" : "Register Direct Client Booking"}</h3>
                 </div>
                 <button
                   onClick={() => setShowBook(false)}
@@ -640,10 +646,12 @@ export default function EmployeeDashboard() {
 
               <div className="flex flex-col gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1">معرف كود الوحدة (Unit ID)*</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1">
+                    {isRTL ? "معرف كود الوحدة (Unit ID)*" : "Unit ID Code*"}
+                  </label>
                   <input
                     type="text"
-                    placeholder="أدخل كود الوحدة من النظام"
+                    placeholder={isRTL ? "أدخل كود الوحدة من النظام" : "Enter unit code from system"}
                     value={bookForm.unitId}
                     onChange={(e) => setBookForm((p) => ({ ...p, unitId: e.target.value }))}
                     className="w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-semibold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
@@ -651,10 +659,12 @@ export default function EmployeeDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1">الاسم الكامل للعميل*</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1">
+                    {isRTL ? "الاسم الكامل للعميل*" : "Client Full Name*"}
+                  </label>
                   <input
                     type="text"
-                    placeholder="مثال: أستاذ أحمد خليل"
+                    placeholder={isRTL ? "مثال: أستاذ أحمد خليل" : "e.g., Mr. Ahmed Khalil"}
                     value={bookForm.clientName}
                     onChange={(e) => setBookForm((p) => ({ ...p, clientName: e.target.value }))}
                     className="w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-semibold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
@@ -663,7 +673,9 @@ export default function EmployeeDashboard() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-bold text-neutral-700">رقم هاتف العميل (11 رقم)*</label>
+                    <label className="text-xs font-bold text-neutral-700">
+                      {isRTL ? "رقم هاتف العميل (11 رقم)*" : "Client Phone (11 digits)*"}
+                    </label>
                     <span className={`text-[11px] font-mono ${bookForm.clientPhone.length === 11 ? 'text-emerald-700 font-bold' : 'text-neutral-400'}`}>
                       {bookForm.clientPhone.length}/11
                     </span>
@@ -678,14 +690,16 @@ export default function EmployeeDashboard() {
                       const clean = e.target.value.replace(/\D/g, '').slice(0, 11);
                       setBookForm((p) => ({ ...p, clientPhone: clean }));
                     }}
-                    className="w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-mono text-right text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                    className={`w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-mono ${isRTL ? "text-right" : "text-left"} text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1">ملاحظات وشروط الاتفاق</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1">
+                    {isRTL ? "ملاحظات وشروط الاتفاق" : "Notes & Agreement Terms"}
+                  </label>
                   <textarea
-                    placeholder="أي ملاحظات حول خطة السداد أو الموعد..."
+                    placeholder={isRTL ? "أي ملاحظات حول خطة السداد أو الموعد..." : "Any notes on payment plan or meeting..."}
                     value={bookForm.notes}
                     onChange={(e) => setBookForm((p) => ({ ...p, notes: e.target.value }))}
                     rows={3}
@@ -699,14 +713,14 @@ export default function EmployeeDashboard() {
                   onClick={() => setShowBook(false)}
                   className="flex-1 h-12 rounded-xl bg-neutral-100 text-neutral-700 font-bold text-xs hover:bg-neutral-200 transition-colors cursor-pointer"
                 >
-                  إلغاء
+                  {t("common.cancel", "إلغاء")}
                 </button>
                 <button
                   onClick={handleAgentBook}
                   disabled={booking}
                   className="flex-1 h-12 rounded-xl font-bold text-xs text-[#000e1f] disabled:opacity-50 flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer pharaoh-gold-gradient"
                 >
-                  {booking ? "جارٍ الحجز..." : "تأكيد الحجز باسم العميل"}
+                  {booking ? (isRTL ? "جارٍ الحجز..." : "Booking...") : (isRTL ? "تأكيد الحجز باسم العميل" : "Confirm Client Booking")}
                 </button>
               </div>
             </div>

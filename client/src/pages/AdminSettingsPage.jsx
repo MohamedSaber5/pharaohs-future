@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import adminService from "@services/admin.service.js";
+import { useLanguage } from "@context/LanguageContext.jsx";
 import toast from "react-hot-toast";
 
 export default function AdminSettingsPage() {
+  const { t, isRTL, dir } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -40,7 +42,7 @@ export default function AdminSettingsPage() {
         linkedinUrl: data.linkedinUrl || "",
       });
     } catch {
-      toast.error("تعذر تحميل إعدادات الموقع");
+      toast.error(isRTL ? "تعذر تحميل إعدادات الموقع" : "Failed to load website settings");
     } finally {
       setLoading(false);
     }
@@ -59,9 +61,9 @@ export default function AdminSettingsPage() {
     setSaving(true);
     try {
       await adminService.updateSettings(form);
-      toast.success("تم حفظ إعدادات الموقع بنجاح ✅");
+      toast.success(isRTL ? "تم حفظ إعدادات الموقع بنجاح ✅" : "Website settings saved successfully ✅");
     } catch (err) {
-      toast.error(err?.response?.data?.message || "فشل حفظ الإعدادات");
+      toast.error(err?.response?.data?.message || (isRTL ? "فشل حفظ الإعدادات" : "Failed to save settings"));
     } finally {
       setSaving(false);
     }
@@ -69,7 +71,7 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 lg:p-8 flex flex-col gap-6">
+      <div className="p-6 lg:p-8 flex flex-col gap-6" dir={dir}>
         <div className="h-10 w-64 bg-neutral-200 animate-pulse rounded-xl" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="h-64 bg-neutral-200 animate-pulse rounded-2xl" />
@@ -80,7 +82,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{ background: "#f8f9fa", minHeight: "100vh" }}>
+    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir={dir}>
       
       {/* ── HEADER ── */}
       <div className="flex items-center justify-between flex-wrap gap-4 bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
@@ -89,9 +91,13 @@ export default function AdminSettingsPage() {
             <span className="material-symbols-outlined text-[26px]">tune</span>
           </div>
           <div>
-            <h1 className="text-[22px] font-black text-neutral-900">إعدادات وهوية الموقع</h1>
+            <h1 className="text-[22px] font-black text-neutral-900">
+              {isRTL ? "إعدادات وهوية الموقع" : "Site Settings & Identity"}
+            </h1>
             <p className="text-[13px] text-neutral-500 mt-0.5">
-              التحكم في بيانات التواصل الرسمية للشركة، ساعات العمل، وعدد المشاريع المعروضة بالصفحة الرئيسية
+              {isRTL
+                ? "التحكم في بيانات التواصل الرسمية للشركة، ساعات العمل، وعدد المشاريع المعروضة بالصفحة الرئيسية"
+                : "Manage official company contact info, working hours, and featured projects count on the homepage"}
             </p>
           </div>
         </div>
@@ -103,7 +109,7 @@ export default function AdminSettingsPage() {
           style={{ background: "linear-gradient(135deg, #f0d897 0%, #c9952a 50%, #b07d1f 100%)" }}
         >
           <span className="material-symbols-outlined text-[20px]">save</span>
-          <span>{saving ? "جارٍ الحفظ..." : "حفظ كافة التعديلات"}</span>
+          <span>{saving ? (isRTL ? "جارٍ الحفظ..." : "Saving...") : (isRTL ? "حفظ كافة التعديلات" : "Save All Changes")}</span>
         </button>
       </div>
 
@@ -113,12 +119,14 @@ export default function AdminSettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
           <div className="flex items-center gap-2.5 pb-4 mb-5 border-b border-neutral-100">
             <span className="material-symbols-outlined text-[#c9952a] text-[22px]">view_carousel</span>
-            <h2 className="text-[16px] font-bold text-neutral-900">إعدادات الصفحة الرئيسية والعرض</h2>
+            <h2 className="text-[16px] font-bold text-neutral-900">
+              {isRTL ? "إعدادات الصفحة الرئيسية والعرض" : "Homepage & Display Settings"}
+            </h2>
           </div>
 
           <div className="max-w-2xl">
             <label className="block text-xs font-bold text-neutral-700 mb-2">
-              عدد المشاريع المميزة المعروضة في الصفحة الرئيسية:
+              {isRTL ? "عدد المشاريع المميزة المعروضة في الصفحة الرئيسية:" : "Featured projects count displayed on homepage:"}
             </label>
             
             <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -136,12 +144,16 @@ export default function AdminSettingsPage() {
                   <span className="material-symbols-outlined text-[18px]">
                     {form.homeFeaturedProjectsCount === num ? "check_circle" : "radio_button_unchecked"}
                   </span>
-                  <span>{num} مشاريع {num === 3 && "(الموصى به)"}</span>
+                  <span>
+                    {num} {isRTL ? "مشاريع" : "Projects"} {num === 3 && (isRTL ? "(الموصى به)" : "(Recommended)")}
+                  </span>
                 </button>
               ))}
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-neutral-500 font-semibold">أو رقم مخصص:</span>
+                <span className="text-xs text-neutral-500 font-semibold">
+                  {isRTL ? "أو رقم مخصص:" : "Or custom number:"}
+                </span>
                 <input
                   type="number"
                   name="homeFeaturedProjectsCount"
@@ -157,7 +169,9 @@ export default function AdminSettingsPage() {
             <p className="text-[11px] text-neutral-500 bg-neutral-50 p-3 rounded-xl border border-neutral-100 flex items-center gap-2">
               <span className="material-symbols-outlined text-[#c9952a] text-[18px]">info</span>
               <span>
-                تحديد 3 مشاريع فقط يضمن سرعة فائقة في تحميل الموقع ويقلل استهلاك استعلامات قاعدة البيانات وتكلفة النقل.
+                {isRTL
+                  ? "تحديد 3 مشاريع فقط يضمن سرعة فائقة في تحميل الموقع ويقلل استهلاك استعلامات قاعدة البيانات وتكلفة النقل."
+                  : "Selecting 3 projects ensures fast loading speeds and minimizes database query overhead."}
               </span>
             </p>
           </div>
@@ -167,13 +181,15 @@ export default function AdminSettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
           <div className="flex items-center gap-2.5 pb-4 mb-5 border-b border-neutral-100">
             <span className="material-symbols-outlined text-[#c9952a] text-[22px]">contact_phone</span>
-            <h2 className="text-[16px] font-bold text-neutral-900">بيانات التواصل الرسمية وساعات العمل</h2>
+            <h2 className="text-[16px] font-bold text-neutral-900">
+              {isRTL ? "بيانات التواصل الرسمية وساعات العمل" : "Official Contact Details & Working Hours"}
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                رقم هاتف الشركة الرسمي:
+                {isRTL ? "رقم هاتف الشركة الرسمي:" : "Official Company Phone:"}
               </label>
               <div className="relative">
                 <input
@@ -182,9 +198,9 @@ export default function AdminSettingsPage() {
                   value={form.companyPhone}
                   onChange={handleChange}
                   placeholder="010XXXXXXXX"
-                  className="w-full h-11 pr-10 pl-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                  className={`w-full h-11 ${isRTL ? "pr-10 pl-3.5" : "pl-10 pr-3.5"} rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                 />
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">
+                <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]`}>
                   call
                 </span>
               </div>
@@ -192,7 +208,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                رقم الواتساب الرسمي (خدمة العملاء):
+                {isRTL ? "رقم الواتساب الرسمي (خدمة العملاء):" : "Official WhatsApp (Customer Service):"}
               </label>
               <div className="relative">
                 <input
@@ -201,9 +217,9 @@ export default function AdminSettingsPage() {
                   value={form.companyWhatsapp}
                   onChange={handleChange}
                   placeholder="010XXXXXXXX"
-                  className="w-full h-11 pr-10 pl-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                  className={`w-full h-11 ${isRTL ? "pr-10 pl-3.5" : "pl-10 pr-3.5"} rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                 />
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 text-[18px]">
+                <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-emerald-600 text-[18px]`}>
                   chat
                 </span>
               </div>
@@ -211,7 +227,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                البريد الإلكتروني الرسمي:
+                {isRTL ? "البريد الإلكتروني الرسمي:" : "Official Company Email:"}
               </label>
               <div className="relative">
                 <input
@@ -220,9 +236,9 @@ export default function AdminSettingsPage() {
                   value={form.companyEmail}
                   onChange={handleChange}
                   placeholder="info@pharaohsfuture.com"
-                  className="w-full h-11 pr-10 pl-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                  className={`w-full h-11 ${isRTL ? "pr-10 pl-3.5" : "pl-10 pr-3.5"} rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                 />
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">
+                <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]`}>
                   mail
                 </span>
               </div>
@@ -230,7 +246,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                مواعيد وساعات العمل الرسمية:
+                {isRTL ? "مواعيد وساعات العمل الرسمية:" : "Official Working Hours:"}
               </label>
               <div className="relative">
                 <input
@@ -238,10 +254,10 @@ export default function AdminSettingsPage() {
                   name="workingHours"
                   value={form.workingHours}
                   onChange={handleChange}
-                  placeholder="السبت - الخميس: 9:00 ص - 6:00 م"
-                  className="w-full h-11 pr-10 pl-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                  placeholder={isRTL ? "السبت - الخميس: 9:00 ص - 6:00 م" : "Sat - Thu: 9:00 AM - 6:00 PM"}
+                  className={`w-full h-11 ${isRTL ? "pr-10 pl-3.5" : "pl-10 pr-3.5"} rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                 />
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">
+                <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]`}>
                   schedule
                 </span>
               </div>
@@ -249,7 +265,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                عنوان المقر الرئيسي للشركة:
+                {isRTL ? "عنوان المقر الرئيسي للشركة:" : "Official Headquarters Address:"}
               </label>
               <div className="relative">
                 <input
@@ -257,10 +273,10 @@ export default function AdminSettingsPage() {
                   name="companyAddress"
                   value={form.companyAddress}
                   onChange={handleChange}
-                  placeholder="أسوان الجديدة - الحي الثاني — مصر"
-                  className="w-full h-11 pr-10 pl-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                  placeholder={isRTL ? "أسوان الجديدة - الحي الثاني — مصر" : "New Aswan - Second District — Egypt"}
+                  className={`w-full h-11 ${isRTL ? "pr-10 pl-3.5" : "pl-10 pr-3.5"} rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                 />
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">
+                <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]`}>
                   location_on
                 </span>
               </div>
@@ -268,7 +284,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                رابط خرائط جوجل (Google Maps Link) لمقر الشركة:
+                {isRTL ? "رابط خرائط جوجل (Google Maps Link) لمقر الشركة:" : "Google Maps Link for HQ:"}
               </label>
               <div className="relative">
                 <input
@@ -277,13 +293,17 @@ export default function AdminSettingsPage() {
                   value={form.googleMapsUrl}
                   onChange={handleChange}
                   placeholder="https://maps.google.com/?q=..."
-                  className="w-full h-11 pr-10 pl-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
+                  className={`w-full h-11 ${isRTL ? "pr-10 pl-3.5" : "pl-10 pr-3.5"} rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all`}
                 />
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">
+                <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]`}>
                   map
                 </span>
               </div>
-              <p className="text-[11px] text-neutral-400 mt-1">يظهر هذا الرابط للزوار في صفحة التواصل والصفحة الرئيسية لتمكينهم من الوصول للمقر بسهولة.</p>
+              <p className="text-[11px] text-neutral-400 mt-1">
+                {isRTL
+                  ? "يظهر هذا الرابط للزوار في صفحة التواصل والصفحة الرئيسية لتمكينهم من الوصول للمقر بسهولة."
+                  : "This link allows visitors on the contact and home pages to navigate to the headquarters easily."}
+              </p>
             </div>
           </div>
         </div>
@@ -292,13 +312,15 @@ export default function AdminSettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
           <div className="flex items-center gap-2.5 pb-4 mb-5 border-b border-neutral-100">
             <span className="material-symbols-outlined text-[#c9952a] text-[22px]">share</span>
-            <h2 className="text-[16px] font-bold text-neutral-900">روابط منصات التواصل الاجتماعي</h2>
+            <h2 className="text-[16px] font-bold text-neutral-900">
+              {isRTL ? "روابط منصات التواصل الاجتماعي" : "Social Media Links"}
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                رابط صفحة فيسبوك (Facebook):
+                {isRTL ? "رابط صفحة فيسبوك (Facebook):" : "Facebook Page URL:"}
               </label>
               <input
                 type="url"
@@ -312,7 +334,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                رابط إنستغرام (Instagram):
+                {isRTL ? "رابط إنستغرام (Instagram):" : "Instagram Profile URL:"}
               </label>
               <input
                 type="url"
@@ -326,7 +348,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                رابط لينكد إن (LinkedIn):
+                {isRTL ? "رابط لينكد إن (LinkedIn):" : "LinkedIn Profile URL:"}
               </label>
               <input
                 type="url"
@@ -341,7 +363,7 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* ── SAVE ACTION FOOTER ── */}
-        <div className="flex items-center justify-end gap-4 p-4 bg-white rounded-2xl border border-neutral-100 shadow-sm">
+        <div className={`flex items-center ${isRTL ? "justify-end" : "justify-end"} gap-4 p-4 bg-white rounded-2xl border border-neutral-100 shadow-sm`}>
           <button
             type="submit"
             disabled={saving}
@@ -349,7 +371,7 @@ export default function AdminSettingsPage() {
             style={{ background: "linear-gradient(135deg, #f0d897 0%, #c9952a 50%, #b07d1f 100%)" }}
           >
             <span className="material-symbols-outlined text-[20px]">check_circle</span>
-            <span>{saving ? "جارٍ الحفظ..." : "حفظ التغييرات الآن"}</span>
+            <span>{saving ? (isRTL ? "جارٍ الحفظ..." : "Saving...") : (isRTL ? "حفظ التغييرات الآن" : "Save Changes Now")}</span>
           </button>
         </div>
 

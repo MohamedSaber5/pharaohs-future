@@ -1,16 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import adminService from "@services/admin.service.js";
+import { useLanguage } from "@context/LanguageContext.jsx";
 
 const BADGE = {
-  true:  "bg-emerald-100 text-emerald-800 border border-emerald-200",
+  true: "bg-emerald-100 text-emerald-800 border border-emerald-200",
   false: "bg-red-100 text-red-800 border border-red-200",
 };
 
 export default function AdminEmployeeRotationPage() {
+  const { isRTL, dir } = useLanguage();
   const [employees, setEmployees] = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [saving, setSaving]       = useState(false);
-  const [alert, setAlert]         = useState({ type: "", text: "" });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [alert, setAlert] = useState({ type: "", text: "" });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -19,13 +21,18 @@ export default function AdminEmployeeRotationPage() {
       const list = res?.data ?? res ?? [];
       setEmployees(Array.isArray(list) ? list : []);
     } catch {
-      setAlert({ type: "error", text: "تعذّر تحميل قائمة الموظفين" });
+      setAlert({
+        type: "error",
+        text: isRTL ? "تعذّر تحميل قائمة الموظفين" : "Failed to load employee list",
+      });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isRTL]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const toggleActive = async (emp) => {
     try {
@@ -34,11 +41,16 @@ export default function AdminEmployeeRotationPage() {
       });
       setAlert({
         type: "success",
-        text: `تم ${emp.rotationActive ? "إيقاف" : "تفعيل"} الموظف ${emp.name} في دورة التعيين`,
+        text: isRTL
+          ? `تم ${emp.rotationActive ? "إيقاف" : "تفعيل"} الموظف ${emp.name} في دورة التعيين`
+          : `Employee ${emp.name} has been ${emp.rotationActive ? "paused" : "activated"} in the rotation`,
       });
       load();
     } catch {
-      setAlert({ type: "error", text: "فشل تحديث الحالة" });
+      setAlert({
+        type: "error",
+        text: isRTL ? "فشل تحديث الحالة" : "Failed to update status",
+      });
     }
   };
 
@@ -62,30 +74,45 @@ export default function AdminEmployeeRotationPage() {
     try {
       const orderedIds = newOrder.map((e) => e._id);
       await adminService.reorderEmployeesRotation(orderedIds);
-      setAlert({ type: "success", text: "تم حفظ الترتيب الجديد بنجاح" });
+      setAlert({
+        type: "success",
+        text: isRTL ? "تم حفظ الترتيب الجديد بنجاح" : "New rotation order saved successfully",
+      });
     } catch {
-      setAlert({ type: "error", text: "فشل حفظ الترتيب" });
+      setAlert({
+        type: "error",
+        text: isRTL ? "فشل حفظ الترتيب" : "Failed to save order",
+      });
       load(); // Reload on failure
     } finally {
       setSaving(false);
     }
   };
 
-  const activeCount   = employees.filter((e) => e.rotationActive).length;
+  const activeCount = employees.filter((e) => e.rotationActive).length;
   const inactiveCount = employees.filter((e) => !e.rotationActive).length;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto" dir={dir}>
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "rgba(119,90,26,0.12)" }}>
-            <span className="material-symbols-outlined text-[22px]" style={{ color: "#775a1a" }}>group</span>
+          <div
+            className="w-10 h-10 rounded-2xl flex items-center justify-center"
+            style={{ background: "rgba(119,90,26,0.12)" }}
+          >
+            <span className="material-symbols-outlined text-[22px]" style={{ color: "#775a1a" }}>
+              group
+            </span>
           </div>
           <div>
-            <h1 className="text-[24px] font-bold text-neutral-900">إدارة دورة تعيين موظفي المبيعات</h1>
+            <h1 className="text-[24px] font-bold text-neutral-900">
+              {isRTL ? "إدارة دورة تعيين موظفي المبيعات" : "Sales Team Rotation Management"}
+            </h1>
             <p className="text-[13px] text-neutral-500">
-              تحكم في ترتيب الموظفين ضمن نظام التوزيع التلقائي للعملاء (Round Robin)
+              {isRTL
+                ? "تحكم في ترتيب الموظفين ضمن نظام التوزيع التلقائي للعملاء (Round Robin)"
+                : "Control employee priority in the automated client round-robin assignment system"}
             </p>
           </div>
         </div>
@@ -115,9 +142,24 @@ export default function AdminEmployeeRotationPage() {
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[
-          { label: "إجمالي الموظفين", val: employees.length, color: "text-neutral-900", bg: "bg-neutral-50" },
-          { label: "نشطون في التناوب", val: activeCount, color: "text-emerald-700", bg: "bg-emerald-50" },
-          { label: "موقوفون مؤقتاً", val: inactiveCount, color: "text-red-600", bg: "bg-red-50" },
+          {
+            label: isRTL ? "إجمالي الموظفين" : "Total Staff",
+            val: employees.length,
+            color: "text-neutral-900",
+            bg: "bg-neutral-50",
+          },
+          {
+            label: isRTL ? "نشطون في التناوب" : "Active in Rotation",
+            val: activeCount,
+            color: "text-emerald-700",
+            bg: "bg-emerald-50",
+          },
+          {
+            label: isRTL ? "موقوفون مؤقتاً" : "Temporarily Paused",
+            val: inactiveCount,
+            color: "text-red-600",
+            bg: "bg-red-50",
+          },
         ].map((s) => (
           <div key={s.label} className={`${s.bg} rounded-2xl p-5 border border-neutral-200/80 text-center`}>
             <p className={`text-[28px] font-black ${s.color}`}>{s.val}</p>
@@ -130,9 +172,13 @@ export default function AdminEmployeeRotationPage() {
       <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-[13px] text-blue-800 mb-6 flex items-start gap-3">
         <span className="material-symbols-outlined text-blue-500 mt-0.5">info</span>
         <div>
-          <strong>كيف يعمل نظام التوزيع التلقائي؟</strong>
+          <strong>
+            {isRTL ? "كيف يعمل نظام التوزيع التلقائي؟" : "How does the automatic assignment system work?"}
+          </strong>
           <p className="mt-1 text-blue-700 leading-relaxed">
-            عند قيام عميل بحجز وحدة، يُعيَّن له تلقائياً الموظف النشط الذي يحمل أقل عدد من العملاء الحاليين، مع مراعاة الترتيب المحدد هنا. الموظفون الموقوفون لا يتلقون تعيينات جديدة.
+            {isRTL
+              ? "عند قيام عميل بحجز وحدة، يُعيَّن له تلقائياً الموظف النشط الذي يحمل أقل عدد من العملاء الحاليين، مع مراعاة الترتيب المحدد هنا. الموظفون الموقوفون لا يتلقون تعيينات جديدة."
+              : "When a client books a unit, an active employee with the least active client load is automatically assigned following this priority order. Paused staff do not receive new assignments."}
           </p>
         </div>
       </div>
@@ -147,21 +193,25 @@ export default function AdminEmployeeRotationPage() {
       ) : employees.length === 0 ? (
         <div className="bg-white rounded-3xl border border-neutral-200 p-16 text-center">
           <span className="material-symbols-outlined text-[48px] text-neutral-300 mb-3">group_off</span>
-          <h3 className="text-[18px] font-bold text-neutral-700">لا يوجد موظفو مبيعات حتى الآن</h3>
+          <h3 className="text-[18px] font-bold text-neutral-700">
+            {isRTL ? "لا يوجد موظفو مبيعات حتى الآن" : "No sales staff found yet"}
+          </h3>
           <p className="text-[13px] text-neutral-400 mt-1">
-            قم بتعيين دور "موظف" لمستخدمين من صفحة إدارة المستخدمين أولاً
+            {isRTL
+              ? "قم بتعيين دور 'موظف' لمستخدمين من صفحة إدارة المستخدمين أولاً"
+              : "Assign the 'Employee' role to users from the User Management page first"}
           </p>
         </div>
       ) : (
         <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-neutral-100 bg-neutral-50/80 flex items-center justify-between">
             <h2 className="text-[15px] font-bold text-neutral-800">
-              قائمة الموظفين المرتبة حسب أولوية التعيين
+              {isRTL ? "قائمة الموظفين المرتبة حسب أولوية التعيين" : "Staff List Ordered by Assignment Priority"}
             </h2>
             {saving && (
               <div className="flex items-center gap-2 text-[13px] text-neutral-500">
                 <span className="w-4 h-4 border-2 border-neutral-300 border-t-[#775a1a] rounded-full animate-spin" />
-                جاري الحفظ...
+                {isRTL ? "جاري الحفظ..." : "Saving..."}
               </div>
             )}
           </div>
@@ -171,9 +221,7 @@ export default function AdminEmployeeRotationPage() {
               <div
                 key={emp._id}
                 className={`flex items-center gap-4 px-6 py-4 transition-colors ${
-                  emp.rotationActive
-                    ? "hover:bg-neutral-50/60"
-                    : "bg-neutral-50/40 opacity-70"
+                  emp.rotationActive ? "hover:bg-neutral-50/60" : "bg-neutral-50/40 opacity-70"
                 }`}
               >
                 {/* Priority Number */}
@@ -189,9 +237,7 @@ export default function AdminEmployeeRotationPage() {
 
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#775a1a] to-[#c9952a] flex items-center justify-center flex-shrink-0">
-                  <span className="text-[15px] font-black text-white">
-                    {emp.name?.charAt(0) || "؟"}
-                  </span>
+                  <span className="text-[15px] font-black text-white">{emp.name?.charAt(0) || "؟"}</span>
                 </div>
 
                 {/* Info */}
@@ -203,7 +249,13 @@ export default function AdminEmployeeRotationPage() {
                         BADGE[String(emp.rotationActive)]
                       }`}
                     >
-                      {emp.rotationActive ? "نشط في التناوب" : "موقوف مؤقتاً"}
+                      {emp.rotationActive
+                        ? isRTL
+                          ? "نشط في التناوب"
+                          : "Active in Rotation"
+                        : isRTL
+                        ? "موقوف مؤقتاً"
+                        : "Temporarily Paused"}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 mt-0.5 text-[12px] text-neutral-500">
@@ -215,7 +267,7 @@ export default function AdminEmployeeRotationPage() {
                     )}
                     <span className="flex items-center gap-1">
                       <span className="material-symbols-outlined text-[14px]">assignment_ind</span>
-                      {emp.assignedCount || 0} عميل معيّن
+                      {emp.assignedCount || 0} {isRTL ? "عميل معيّن" : "assigned clients"}
                     </span>
                   </div>
                 </div>
@@ -227,16 +279,16 @@ export default function AdminEmployeeRotationPage() {
                     <button
                       onClick={() => moveUp(idx)}
                       disabled={idx === 0 || saving}
-                      className="w-7 h-7 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                      title="تحريك لأعلى (أولوية أعلى)"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      title={isRTL ? "تحريك لأعلى (أولوية أعلى)" : "Move Up (Higher Priority)"}
                     >
                       <span className="material-symbols-outlined text-[16px]">keyboard_arrow_up</span>
                     </button>
                     <button
                       onClick={() => moveDown(idx)}
                       disabled={idx === employees.length - 1 || saving}
-                      className="w-7 h-7 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                      title="تحريك لأسفل (أولوية أقل)"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      title={isRTL ? "تحريك لأسفل (أولوية أقل)" : "Move Down (Lower Priority)"}
                     >
                       <span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span>
                     </button>
@@ -245,7 +297,7 @@ export default function AdminEmployeeRotationPage() {
                   {/* Toggle Active in Rotation */}
                   <button
                     onClick={() => toggleActive(emp)}
-                    className={`h-9 px-4 rounded-xl text-[12px] font-bold flex items-center gap-1.5 transition-all border ${
+                    className={`h-9 px-4 rounded-xl text-[12px] font-bold flex items-center gap-1.5 transition-all border cursor-pointer ${
                       emp.rotationActive
                         ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
                         : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
@@ -254,7 +306,13 @@ export default function AdminEmployeeRotationPage() {
                     <span className="material-symbols-outlined text-[15px]">
                       {emp.rotationActive ? "pause_circle" : "play_circle"}
                     </span>
-                    {emp.rotationActive ? "إيقاف مؤقت" : "تفعيل"}
+                    {emp.rotationActive
+                      ? isRTL
+                        ? "إيقاف مؤقت"
+                        : "Pause"
+                      : isRTL
+                      ? "تفعيل"
+                      : "Activate"}
                   </button>
                 </div>
               </div>

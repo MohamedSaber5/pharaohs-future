@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import projectService from "@services/project.service.js";
 import { getImageUrl } from "@utils/imageHelper.js";
 import toast from "react-hot-toast";
+import { useLanguage } from "@context/LanguageContext.jsx";
 
 const STATUS_LIST = ["قيد البيع", "تحت الإنشاء", "مكتمل"];
 const TYPE_LIST = [
@@ -28,7 +29,7 @@ const EMPTY_FORM = {
   license: "",
 };
 
-const Badge = ({ status }) => {
+const Badge = ({ status, tStatus }) => {
   const cls =
     status === "قيد البيع"
       ? "bg-amber-100 text-amber-800"
@@ -37,12 +38,13 @@ const Badge = ({ status }) => {
       : "bg-blue-100 text-blue-800";
   return (
     <span className={`px-2.5 py-1 rounded-full text-[12px] font-bold whitespace-nowrap ${cls}`}>
-      {status}
+      {tStatus ? tStatus(status) : status}
     </span>
   );
 };
 
 export default function AdminProjectsPage() {
+  const { t, isRTL, dir, tStatus, formatPrice } = useLanguage();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -201,30 +203,30 @@ export default function AdminProjectsPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }}>
+    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir={dir}>
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-[24px] font-bold text-neutral-900 mb-1">إدارة المشاريع</h1>
-          <p className="text-[14px] text-neutral-500">إضافة وتعديل ومتابعة مشاريع الشركة وحالاتها</p>
+          <h1 className="text-[24px] font-bold text-neutral-900 mb-1">{t("admin.menuProjects", "إدارة المشاريع")}</h1>
+          <p className="text-[14px] text-neutral-500">{isRTL ? "إضافة وتعديل ومتابعة مشاريع الشركة وحالاتها" : "Add, edit, and track company projects and statuses"}</p>
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 h-11 px-5 rounded-xl text-[14px] font-bold text-white shadow-md hover:opacity-90 transition-all"
+          className="inline-flex items-center gap-2 h-11 px-5 rounded-xl text-[14px] font-bold text-white shadow-md hover:opacity-90 transition-all cursor-pointer"
           style={{ background: "#000e1f" }}
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
-          إضافة مشروع جديد
+          {t("admin.newProject", "إضافة مشروع جديد")}
         </button>
       </div>
 
       {/* KPI Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي المشاريع", value: totals.total, icon: "apartment", color: "#000e1f" },
-          { label: "إجمالي الوحدات الفعلية", value: totals.units, icon: "layers", color: "#775a1a" },
-          { label: "الوحدات المتاحة", value: totals.available, icon: "check_circle", color: "#16a34a" },
-          { label: "الوحدات المباعة", value: totals.sold, icon: "sell", color: "#dc2626" },
+          { label: t("admin.statTotalProjects", "إجمالي المشاريع"), value: totals.total, icon: "apartment", color: "#000e1f" },
+          { label: t("admin.statTotalUnits", "إجمالي الوحدات الفعلية"), value: totals.units, icon: "layers", color: "#775a1a" },
+          { label: t("admin.statAvailableUnits", "الوحدات المتاحة"), value: totals.available, icon: "check_circle", color: "#16a34a" },
+          { label: isRTL ? "الوحدات المباعة" : "Sold Units", value: totals.sold, icon: "sell", color: "#dc2626" },
         ].map((kpi, idx) => (
           <div key={idx} className="bg-white rounded-2xl p-5 border border-neutral-100 shadow-sm flex items-center gap-4">
             <div
@@ -244,15 +246,15 @@ export default function AdminProjectsPage() {
       {/* Filters & Search */}
       <div className="bg-white rounded-2xl p-4 border border-neutral-100 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-80">
-          <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[20px]">
+          <span className={`material-symbols-outlined absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 text-neutral-400 text-[20px]`}>
             search
           </span>
           <input
             type="text"
-            placeholder="بحث باسم المشروع أو الموقع..."
+            placeholder={isRTL ? "بحث باسم المشروع أو الموقع..." : "Search by project or location..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pr-10 pl-4 rounded-xl border border-neutral-200 text-[13px] focus:outline-none focus:border-amber-700 transition-colors"
+            className={`w-full h-10 ${isRTL ? "pr-10 pl-4" : "pl-10 pr-4"} rounded-xl border border-neutral-200 text-[13px] focus:outline-none focus:border-amber-700 transition-colors`}
           />
         </div>
 
@@ -261,13 +263,13 @@ export default function AdminProjectsPage() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`h-9 px-4 rounded-xl text-[13px] font-bold whitespace-nowrap transition-all ${
+              className={`h-9 px-4 rounded-xl text-[13px] font-bold whitespace-nowrap transition-all cursor-pointer ${
                 statusFilter === s
                   ? "bg-neutral-900 text-white shadow-sm"
                   : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
               }`}
             >
-              {s}
+              {s === "الكل" ? t("common.all", "الكل") : tStatus(s)}
             </button>
           ))}
         </div>
@@ -276,24 +278,24 @@ export default function AdminProjectsPage() {
       {/* Projects Table */}
       <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="py-20 text-center text-neutral-400 text-[14px]">جاري التحميل...</div>
+          <div className="py-20 text-center text-neutral-400 text-[14px]">{t("common.loading", "جاري التحميل...")}</div>
         ) : error ? (
           <div className="py-20 text-center text-red-500 text-[14px]">{error}</div>
         ) : projects.length === 0 ? (
-          <div className="py-20 text-center text-neutral-400 text-[14px]">لا توجد مشاريع مطابقة</div>
+          <div className="py-20 text-center text-neutral-400 text-[14px]">{t("admin.noProjects", "لا توجد مشاريع مطابقة")}</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-right">
+            <table className="w-full">
               <thead>
                 <tr className="border-b border-neutral-100 text-[12px] font-bold text-neutral-400 bg-neutral-50/50">
-                  <th className="py-4 px-6">المشروع</th>
-                  <th className="py-4 px-4">الموقع</th>
-                  <th className="py-4 px-4">النوع</th>
-                  <th className="py-4 px-4 text-center">الوحدات الفعلية</th>
-                  <th className="py-4 px-4 text-center">المتاح</th>
-                  <th className="py-4 px-4">يبدأ من</th>
-                  <th className="py-4 px-4">الحالة</th>
-                  <th className="py-4 px-6 text-center">إجراءات</th>
+                  <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t("admin.projectCol", "المشروع")}</th>
+                  <th className={`py-4 px-4 ${isRTL ? "text-right" : "text-left"}`}>{t("admin.locationCol", "الموقع")}</th>
+                  <th className={`py-4 px-4 ${isRTL ? "text-right" : "text-left"}`}>{isRTL ? "النوع" : "Type"}</th>
+                  <th className="py-4 px-4 text-center">{t("admin.unitsTotalCol", "الوحدات الفعلية")}</th>
+                  <th className="py-4 px-4 text-center">{t("admin.availableCol", "المتاح")}</th>
+                  <th className={`py-4 px-4 ${isRTL ? "text-right" : "text-left"}`}>{isRTL ? "يبدأ من" : "Starts From"}</th>
+                  <th className={`py-4 px-4 ${isRTL ? "text-right" : "text-left"}`}>{t("admin.statusCol", "الحالة")}</th>
+                  <th className="py-4 px-6 text-center">{t("common.actions", "إجراءات")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 text-[13px]">
@@ -304,7 +306,7 @@ export default function AdminProjectsPage() {
 
                   return (
                     <tr key={p._id} className="hover:bg-neutral-50/60 transition-colors">
-                      <td className="py-4 px-6">
+                      <td className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-xl bg-neutral-100 overflow-hidden shrink-0 flex items-center justify-center border border-neutral-200">
                             {cover ? (
@@ -316,40 +318,40 @@ export default function AdminProjectsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="font-bold text-neutral-900">{p.name}</p>
-                            {p.nameEn && <p className="text-[11px] text-neutral-400">{p.nameEn}</p>}
+                            <p className="font-bold text-neutral-900">{!isRTL && p.nameEn ? p.nameEn : p.name}</p>
+                            {isRTL && p.nameEn && <p className="text-[11px] text-neutral-400">{p.nameEn}</p>}
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-neutral-600">{p.location || "—"}</td>
-                      <td className="py-4 px-4 text-neutral-600">{p.type || "—"}</td>
+                      <td className={`py-4 px-4 text-neutral-600 ${isRTL ? "text-right" : "text-left"}`}>{p.location || "—"}</td>
+                      <td className={`py-4 px-4 text-neutral-600 ${isRTL ? "text-right" : "text-left"}`}>{p.type || "—"}</td>
                       <td className="py-4 px-4 text-center">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-bold bg-amber-50 text-amber-900 border border-amber-200/60">
-                          {unitCount} وحدة
+                          {unitCount} {isRTL ? "وحدة" : "units"}
                         </span>
                       </td>
                       <td className="py-4 px-4 text-center font-bold text-green-700">
                         {availCount}
                       </td>
-                      <td className="py-4 px-4 font-bold text-neutral-900">
-                        {p.startPrice ? `${p.startPrice.toLocaleString()} ج.م` : "—"}
+                      <td className={`py-4 px-4 font-bold text-neutral-900 font-mono ${isRTL ? "text-right" : "text-left"}`}>
+                        {p.startPrice ? formatPrice(p.startPrice) : "—"}
                       </td>
-                      <td className="py-4 px-4">
-                        <Badge status={p.status} />
+                      <td className={`py-4 px-4 ${isRTL ? "text-right" : "text-left"}`}>
+                        <Badge status={p.status} tStatus={tStatus} />
                       </td>
                       <td className="py-4 px-6 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openEdit(p)}
-                            className="w-8 h-8 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center transition-colors"
-                            title="تعديل المشروع"
+                            className="w-8 h-8 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center transition-colors cursor-pointer"
+                            title={isRTL ? "تعديل المشروع" : "Edit Project"}
                           >
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                           </button>
                           <button
                             onClick={() => setDeleteId(p._id)}
-                            className="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors"
-                            title="حذف المشروع"
+                            className="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+                            title={isRTL ? "حذف المشروع" : "Delete Project"}
                           >
                             <span className="material-symbols-outlined text-[18px]">delete</span>
                           </button>

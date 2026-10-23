@@ -6,7 +6,6 @@ import authService from '@services/auth.service.js';
 import logo from '@assets/images/really-logo.png';
 import bgImg from '@assets/images/Aswan Sunset Waterfront with Luxury Resort Branding.png';
 import toast from 'react-hot-toast';
-import LanguageSwitcher from '@components/common/LanguageSwitcher.jsx';
 
 const DARK = '#000e1f';
 
@@ -36,14 +35,14 @@ const checkPasswordStrength = (pass) => {
   };
 };
 
-function PasswordStrengthMeter({ password }) {
+function PasswordStrengthMeter({ password, t }) {
   if (!password) return null;
   const { score } = checkPasswordStrength(password);
   const levels = [
-    { label: 'ضعيفة',  color: '#ef4444' },
-    { label: 'مقبولة', color: '#f59e0b' },
-    { label: 'جيدة',   color: '#3b82f6' },
-    { label: 'قوية',   color: '#16a34a' },
+    { label: t ? t('auth.strengthWeak', 'ضعيفة') : 'ضعيفة',   color: '#ef4444' },
+    { label: t ? t('auth.strengthFair', 'مقبولة') : 'مقبولة', color: '#f59e0b' },
+    { label: t ? t('auth.strengthGood', 'جيدة') : 'جيدة',    color: '#3b82f6' },
+    { label: t ? t('auth.strengthStrong', 'قوية') : 'قوية',   color: '#16a34a' },
   ];
   const cur = levels[Math.max(0, score - 1)] || levels[0];
   return (
@@ -56,7 +55,7 @@ function PasswordStrengthMeter({ password }) {
   );
 }
 
-function Field({ label, icon, type = 'text', value, onChange, placeholder, hint = '', error = '', maxLength, showCounter = false }) {
+function Field({ label, icon, type = 'text', value, onChange, placeholder, hint = '', error = '', maxLength, showCounter = false, isRTL = true }) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -70,7 +69,14 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, hint 
       </div>
       <div style={{ position: 'relative' }}>
         <span className="material-symbols-outlined"
-          style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: error ? '#f87171' : focused ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', transition: 'color 0.2s' }}>
+          style={{
+            position: 'absolute',
+            ...(isRTL ? { right: 11 } : { left: 11 }),
+            top: '50%', transform: 'translateY(-50%)',
+            fontSize: 18,
+            color: error ? '#f87171' : focused ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
+            transition: 'color 0.2s',
+          }}>
           {icon}
         </span>
         <input
@@ -80,7 +86,9 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, hint 
           onBlur={() => setFocused(false)}
           placeholder={placeholder}
           style={{
-            width: '100%', height: 42, paddingRight: 38, paddingLeft: 12,
+            width: '100%', height: 42,
+            paddingRight: isRTL ? 38 : 12,
+            paddingLeft: isRTL ? 12 : 38,
             borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit',
             background: error ? 'rgba(239,68,68,0.15)' : focused ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.1)',
             border: error ? '1.5px solid rgba(248,113,113,0.7)' : focused ? '1.5px solid rgba(255,255,255,0.55)' : '1.5px solid rgba(255,255,255,0.2)',
@@ -120,9 +128,6 @@ export default function AuthPage({ defaultMode = 'login' }) {
   const [password, setPassword] = useState('');
 
   // ─── 3-Step Forgot Password State ─────────────────────────────
-  // step 1: enter email ONLY (NO password fields!)
-  // step 2: enter 6-digit OTP ONLY
-  // step 3: enter new password & confirm
   const [fpStep, setFpStep] = useState(1);
   const [fpEmail, setFpEmail] = useState('');
   const [fpOtp, setFpOtp] = useState(['', '', '', '', '', '']);
@@ -185,12 +190,12 @@ export default function AuthPage({ defaultMode = 'login' }) {
 
   const parseError = (err) => {
     const msg = err?.response?.data?.message || err?.message || '';
-    if (msg.includes('email') || msg.includes('البريد')) return 'هذا البريد الإلكتروني مسجّل مسبقاً أو غير صحيح';
-    if (msg.includes('password') || msg.includes('كلمة') || msg.includes('Invalid')) return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    if (msg.includes('email') || msg.includes('البريد')) return t('auth.errEmailTaken', 'هذا البريد الإلكتروني مسجّل مسبقاً أو غير صحيح');
+    if (msg.includes('password') || msg.includes('كلمة') || msg.includes('Invalid')) return t('auth.errInvalidCreds', 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
     if (msg.includes('هاتف') || msg.includes('phone')) return msg;
     if (msg.includes('رمز') || msg.includes('OTP') || msg.includes('otp')) return msg;
-    if (msg.includes('Network') || msg.includes('ECONNREFUSED')) return 'تعذّر الاتصال بالخادم، يرجى التحقق من اتصالك بالإنترنت';
-    return msg || 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+    if (msg.includes('Network') || msg.includes('ECONNREFUSED')) return t('auth.errNetwork', 'تعذّر الاتصال بالخادم، يرجى التحقق من اتصالك بالإنترنت');
+    return msg || t('auth.errGeneric', 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
   };
 
   // Strictly enforce 11-digit numbers only for phone inputs
@@ -204,38 +209,40 @@ export default function AuthPage({ defaultMode = 'login' }) {
   const validate = useCallback(() => {
     const e = {};
     if (mode === 'register') {
-      if (!name.trim()) e.name = 'الاسم الكامل مطلوب';
-      else if (name.trim().length < 2) e.name = 'الاسم يجب أن يكون حرفين على الأقل';
+      if (!name.trim()) e.name = t('auth.errNameReq', 'الاسم الكامل مطلوب');
+      else if (name.trim().length < 2) e.name = t('auth.errNameShort', 'الاسم يجب أن يكون حرفين على الأقل');
     }
 
     if (!email.trim()) {
-      e.email = 'البريد الإلكتروني مطلوب';
+      e.email = t('auth.errEmailReq', 'البريد الإلكتروني مطلوب');
     } else if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      e.email = 'يرجى إدخال بريد إلكتروني صحيح';
+      e.email = t('auth.errEmailInvalid', 'يرجى إدخال بريد إلكتروني صحيح');
     }
 
     if (mode === 'register') {
       if (!phone.trim()) {
-        e.phone = 'رقم الهاتف مطلوب';
+        e.phone = t('auth.errPhoneReq', 'رقم الهاتف مطلوب');
       } else if (phone.length !== 11) {
-        e.phone = `رقم الهاتف يجب أن يتكون من 11 رقماً بالضبط (أدخلت ${phone.length} رقماً)`;
+        e.phone = isRTL
+          ? `رقم الهاتف يجب أن يتكون من 11 رقماً بالضبط (أدخلت ${phone.length} رقماً)`
+          : `Phone number must be exactly 11 digits (you entered ${phone.length})`;
       } else if (!isEgPhone(phone)) {
-        e.phone = 'رقم الهاتف يجب أن يبدأ بـ (010 أو 011 أو 012 أو 015)';
+        e.phone = t('auth.errPhonePrefix', 'رقم الهاتف يجب أن يبدأ بـ (010 أو 011 أو 012 أو 015)');
       }
     }
 
     if (!password) {
-      e.password = 'كلمة المرور مطلوبة';
+      e.password = t('auth.errPassReq', 'كلمة المرور مطلوبة');
     } else if (mode === 'register') {
       const { isStrong } = checkPasswordStrength(password);
       if (!isStrong) {
-        e.password = 'كلمة المرور يجب أن تكون قوية (8 أحرف + حرف كبير + حرف صغير + رقم/رمز)';
+        e.password = t('auth.errPassStrong', 'كلمة المرور يجب أن تكون قوية (8 أحرف + حرف كبير + حرف صغير + رقم/رمز)');
       }
     }
 
     setErrs(e);
     return Object.keys(e).length === 0;
-  }, [mode, name, email, phone, password]);
+  }, [mode, name, email, phone, password, t, isRTL]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -258,8 +265,8 @@ export default function AuthPage({ defaultMode = 'login' }) {
     } catch (err) {
       const msg = parseError(err);
       setApiError(msg);
-      if (msg.includes('كلمة المرور') || msg.includes('الدخول')) {
-        setErrs((p) => ({ ...p, password: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' }));
+      if (msg.includes('كلمة') || msg.includes('password') || msg.includes('الدخول') || msg.includes('Invalid')) {
+        setErrs((p) => ({ ...p, password: t('auth.errInvalidCreds', 'البريد الإلكتروني أو كلمة المرور غير صحيحة') }));
       }
     } finally {
       setLoading(false);
@@ -268,14 +275,14 @@ export default function AuthPage({ defaultMode = 'login' }) {
 
   // ─── 3-Step Forgot Password Handlers ─────────────────────────
 
-  // Step 1: Request OTP via Email (NO PASSWORD INPUT!)
+  // Step 1: Request OTP via Email
   const handleRequestOtp = async (e) => {
     if (e) e.preventDefault();
     const fe = {};
     if (!fpEmail.trim()) {
-      fe.email = 'البريد الإلكتروني مطلوب';
+      fe.email = t('auth.errEmailReq', 'البريد الإلكتروني مطلوب');
     } else if (!/^\S+@\S+\.\S+$/.test(fpEmail.trim())) {
-      fe.email = 'يرجى إدخال بريد إلكتروني صحيح';
+      fe.email = t('auth.errEmailInvalid', 'يرجى إدخال بريد إلكتروني صحيح');
     }
     if (Object.keys(fe).length) {
       setFpErrs(fe);
@@ -286,7 +293,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
     setFpErrs({});
     try {
       await authService.forgotPassword(fpEmail.trim().toLowerCase());
-      toast.success('تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح 📩');
+      toast.success(isRTL ? 'تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح 📩' : 'Verification code sent to your email 📩');
       setFpStep(2);
       setFpCountdown(60);
       setCanResend(false);
@@ -336,7 +343,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
     e.preventDefault();
     const otpCode = fpOtp.join('');
     if (otpCode.length !== 6) {
-      setFpErrs({ otp: 'يرجى إدخال رمز التحقق المكون من 6 أرقام بالكامل' });
+      setFpErrs({ otp: t('auth.errOtpLen', 'يرجى إدخال رمز التحقق المكون من 6 أرقام بالكامل') });
       return;
     }
 
@@ -344,7 +351,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
     setFpErrs({});
     try {
       await authService.verifyOTP(fpEmail.trim().toLowerCase(), otpCode);
-      toast.success('تم التحقق من هويتك بنجاح ✅');
+      toast.success(isRTL ? 'تم التحقق من هويتك بنجاح ✅' : 'Identity verified successfully ✅');
       setFpStep(3);
     } catch (err) {
       setFpErrs({ otp: parseError(err) });
@@ -360,15 +367,15 @@ export default function AuthPage({ defaultMode = 'login' }) {
     const { isStrong } = checkPasswordStrength(fpPass);
 
     if (!fpPass) {
-      fe.pass = 'كلمة المرور الجديدة مطلوبة';
+      fe.pass = t('auth.errPassReq', 'كلمة المرور الجديدة مطلوبة');
     } else if (!isStrong) {
-      fe.pass = 'كلمة المرور يجب أن تكون قوية (8 أحرف + حرف كبير + حرف صغير + رقم/رمز)';
+      fe.pass = t('auth.errPassStrong', 'كلمة المرور يجب أن تكون قوية (8 أحرف + حرف كبير + حرف صغير + رقم/رمز)');
     }
 
     if (!fpConfirmPass) {
-      fe.confirm = 'يرجى تأكيد كلمة المرور';
+      fe.confirm = t('auth.errPassConfirm', 'يرجى تأكيد كلمة المرور');
     } else if (fpPass !== fpConfirmPass) {
-      fe.confirm = 'كلمتا المرور غير متطابقتين';
+      fe.confirm = t('auth.passMismatch', 'كلمتا المرور غير متطابقتين');
     }
 
     if (Object.keys(fe).length) {
@@ -390,7 +397,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
         localStorage.setItem('authToken', token);
       }
 
-      toast.success('تم تحديث كلمة المرور وتسجيل الدخول بنجاح! 🎉');
+      toast.success(isRTL ? 'تم تحديث كلمة المرور وتسجيل الدخول بنجاح! 🎉' : 'Password updated & logged in successfully! 🎉');
       navigate('/');
     } catch (err) {
       setFpErrs({ pass: parseError(err) });
@@ -417,7 +424,8 @@ export default function AuthPage({ defaultMode = 'login' }) {
   });
 
   const passInput = (hasErr) => ({
-    width: '100%', height: 42, paddingRight: 38, paddingLeft: 38,
+    width: '100%', height: 42,
+    paddingRight: 38, paddingLeft: 38,
     borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit',
     background: hasErr ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.1)',
     border: hasErr ? '1.5px solid rgba(248,113,113,0.7)' : '1.5px solid rgba(255,255,255,0.2)',
@@ -432,7 +440,13 @@ export default function AuthPage({ defaultMode = 'login' }) {
 
   const iconBtn = (icon, onClick, title) => (
     <button type="button" onClick={onClick} title={title}
-      style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.45)', padding: 0 }}>
+      style={{
+        position: 'absolute',
+        ...(isRTL ? { left: 11 } : { right: 11 }),
+        top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: 'none', cursor: 'pointer',
+        color: 'rgba(255,255,255,0.45)', padding: 0
+      }}>
       <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{icon}</span>
     </button>
   );
@@ -445,7 +459,11 @@ export default function AuthPage({ defaultMode = 'login' }) {
   const Stepper = () => (
     <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 20, position: 'relative' }}>
       <div style={{ position: 'absolute', top: 13, right: 14, left: 14, height: 2, background: 'rgba(255,255,255,0.15)', zIndex: 0 }} />
-      {[{ s: 1, lbl: 'البريد' }, { s: 2, lbl: 'الرمز' }, { s: 3, lbl: 'كلمة المرور' }].map(({ s, lbl }) => {
+      {[
+        { s: 1, lbl: t('auth.stepEmail', 'البريد') },
+        { s: 2, lbl: t('auth.stepOtp', 'الرمز') },
+        { s: 3, lbl: t('auth.stepPass', 'كلمة المرور') },
+      ].map(({ s, lbl }) => {
         const active = fpStep === s, passed = fpStep > s;
         return (
           <div key={s} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, position: 'relative', zIndex: 1 }}>
@@ -482,7 +500,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
           justify-content: center;
           padding: 40px 16px 60px;
           overflow: clip;
-          font-family: 'Cairo','Tajawal',sans-serif;
+          font-family: inherit;
         }
         .auth-col {
           position: relative;
@@ -514,9 +532,6 @@ export default function AuthPage({ defaultMode = 'login' }) {
 
         {/* ── Scrollable card column ── */}
         <div className="auth-col">
-          <div style={{ display: 'flex', justifyContent: isRTL ? 'flex-start' : 'flex-end', width: '100%', marginBottom: 12 }}>
-            <LanguageSwitcher variant="button" />
-          </div>
 
           {/* ════════════════════════════════════
               FORGOT PASSWORD — 3-step wizard
@@ -534,9 +549,11 @@ export default function AuthPage({ defaultMode = 'login' }) {
               <div style={{ padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {/* back button */}
                 <button onClick={() => switchMode('login')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 600, marginBottom: 16, padding: 0, fontFamily: 'inherit' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_forward</span>
-                  العودة لتسجيل الدخول
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 700, marginBottom: 16, padding: 0, fontFamily: 'inherit' }}>
+                  <span className={`material-symbols-outlined ${!isRTL ? 'rotate-180' : ''}`} style={{ fontSize: 16 }}>
+                    arrow_forward
+                  </span>
+                  {t('auth.backToLogin', 'العودة لتسجيل الدخول')}
                 </button>
 
                 <Stepper />
@@ -545,16 +562,27 @@ export default function AuthPage({ defaultMode = 'login' }) {
                 {fpStep === 1 && (
                   <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }} noValidate>
                     <div>
-                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>استعادة كلمة المرور</h1>
+                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>
+                        {t('auth.forgotTitle', 'استعادة كلمة المرور')}
+                      </h1>
                       <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0, lineHeight: 1.6 }}>
-                        أدخل بريدك المسجّل وسنرسل رمز تحقق من 6 أرقام.
+                        {t('auth.forgotSub', 'أدخل بريدك المسجّل وسنرسل رمز تحقق من 6 أرقام.')}
                       </p>
                     </div>
-                    <Field label="البريد الإلكتروني *" icon="mail" type="email"
-                      value={fpEmail} onChange={(v) => { setFpEmail(v); setFpErrs(p => ({ ...p, email: '' })); }}
-                      placeholder="example@email.com" error={fpErrs.email} />
+                    <Field
+                      label={t('auth.email', 'البريد الإلكتروني *')}
+                      icon="mail"
+                      type="email"
+                      value={fpEmail}
+                      onChange={(v) => { setFpEmail(v); setFpErrs(p => ({ ...p, email: '' })); }}
+                      placeholder={t('auth.emailPlaceholder', 'example@email.com')}
+                      error={fpErrs.email}
+                      isRTL={isRTL}
+                    />
                     <button type="submit" disabled={loading} style={btn(loading)}>
-                      {loading ? <>{spinner}جارٍ الإرسال...</> : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>send</span>إرسال رمز التحقق</>}
+                      {loading
+                        ? <>{spinner}{t('auth.sendingOtp', 'جارٍ الإرسال...')}</>
+                        : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>send</span>{t('auth.sendOtp', 'إرسال رمز التحقق')}</>}
                     </button>
                   </form>
                 )}
@@ -563,12 +591,19 @@ export default function AuthPage({ defaultMode = 'login' }) {
                 {fpStep === 2 && (
                   <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div>
-                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>رمز التحقق</h1>
+                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>
+                        {t('auth.otpTitle', 'رمز التحقق')}
+                      </h1>
                       <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0 }}>
-                        أُرسل الرمز إلى <strong style={{ color: '#fff' }}>{fpEmail}</strong>
+                        {t('auth.otpSentTo', 'أُرسل الرمز إلى')} <strong style={{ color: '#fff' }}>{fpEmail}</strong>
                         <button type="button" onClick={() => setFpStep(1)}
-                          style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.65)', fontSize: 11, cursor: 'pointer', fontWeight: 700, marginRight: 6, textDecoration: 'underline', fontFamily: 'inherit' }}>
-                          تعديل
+                          style={{
+                            background: 'none', border: 'none', color: '#f0d897',
+                            fontSize: 11, cursor: 'pointer', fontWeight: 700,
+                            marginRight: isRTL ? 6 : 0, marginLeft: !isRTL ? 6 : 0,
+                            textDecoration: 'underline', fontFamily: 'inherit'
+                          }}>
+                          {t('auth.editEmail', 'تعديل')}
                         </button>
                       </p>
                     </div>
@@ -593,13 +628,15 @@ export default function AuthPage({ defaultMode = 'login' }) {
                     <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
                       {canResend
                         ? <button type="button" onClick={handleRequestOtp} disabled={loading}
-                            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontWeight: 700, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', textDecoration: 'underline' }}>
-                            إعادة إرسال رمز جديد
+                            style={{ background: 'none', border: 'none', color: '#f0d897', fontWeight: 700, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                            {t('auth.resendOtp', 'إعادة إرسال رمز جديد')}
                           </button>
-                        : <span>إعادة الإرسال خلال <strong style={{ color: '#fff', fontFamily: 'monospace' }}>{fpCountdown}</strong> ثانية</span>}
+                        : <span>{t('auth.resendIn', 'إعادة الإرسال خلال')} <strong style={{ color: '#fff', fontFamily: 'monospace' }}>{fpCountdown}</strong> {t('auth.seconds', 'ثانية')}</span>}
                     </div>
                     <button type="submit" disabled={loading || fpOtp.join('').length !== 6} style={btn(loading || fpOtp.join('').length !== 6)}>
-                      {loading ? <>{spinner}جارٍ التحقق...</> : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>verified</span>تأكيد الرمز</>}
+                      {loading
+                        ? <>{spinner}{t('auth.verifying', 'جارٍ التحقق...')}</>
+                        : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>verified</span>{t('auth.verifyOtp', 'تأكيد الرمز')}</>}
                     </button>
                   </form>
                 )}
@@ -608,36 +645,74 @@ export default function AuthPage({ defaultMode = 'login' }) {
                 {fpStep === 3 && (
                   <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     <div>
-                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>كلمة المرور الجديدة</h1>
-                      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0 }}>تم التحقق بنجاح ✅ أنشئ كلمة مرور قوية.</p>
+                      <h1 style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>
+                        {t('auth.newPassTitle', 'كلمة المرور الجديدة')}
+                      </h1>
+                      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0 }}>
+                        {t('auth.newPassSub', 'تم التحقق بنجاح ✅ أنشئ كلمة مرور قوية.')}
+                      </p>
                     </div>
                     {/* new pass */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>كلمة المرور الجديدة *</label>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                        {t('auth.newPassLabel', 'كلمة المرور الجديدة *')}
+                      </label>
                       <div style={{ position: 'relative' }}>
-                        <span className="material-symbols-outlined" style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'rgba(255,255,255,0.4)' }}>lock</span>
-                        <input type={fpShowPass ? 'text' : 'password'} value={fpPass} className="auth-input"
+                        <span className="material-symbols-outlined"
+                          style={{
+                            position: 'absolute',
+                            ...(isRTL ? { right: 11 } : { left: 11 }),
+                            top: '50%', transform: 'translateY(-50%)',
+                            fontSize: 18, color: 'rgba(255,255,255,0.4)'
+                          }}>
+                          lock
+                        </span>
+                        <input
+                          type={fpShowPass ? 'text' : 'password'}
+                          value={fpPass}
+                          className="auth-input"
                           onChange={e => { setFpPass(e.target.value); setFpErrs(p => ({ ...p, pass: '' })); }}
-                          placeholder="كلمة المرور الجديدة" style={passInput(!!fpErrs.pass)} />
+                          placeholder={t('auth.passwordPlaceholder', 'كلمة المرور الجديدة')}
+                          style={passInput(!!fpErrs.pass)}
+                        />
                         {iconBtn(fpShowPass ? 'visibility_off' : 'visibility', () => setFpShowPass(v => !v))}
                       </div>
                       {errRow(fpErrs.pass)}
-                      <PasswordStrengthMeter password={fpPass} />
+                      <PasswordStrengthMeter password={fpPass} t={t} />
                     </div>
                     {/* confirm pass */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>تأكيد كلمة المرور *</label>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                        {t('auth.confirmPassLabel', 'تأكيد كلمة المرور *')}
+                      </label>
                       <div style={{ position: 'relative' }}>
-                        <span className="material-symbols-outlined" style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'rgba(255,255,255,0.4)' }}>lock_clock</span>
-                        <input type={fpShowPass ? 'text' : 'password'} value={fpConfirmPass} className="auth-input"
+                        <span className="material-symbols-outlined"
+                          style={{
+                            position: 'absolute',
+                            ...(isRTL ? { right: 11 } : { left: 11 }),
+                            top: '50%', transform: 'translateY(-50%)',
+                            fontSize: 18, color: 'rgba(255,255,255,0.4)'
+                          }}>
+                          lock_clock
+                        </span>
+                        <input
+                          type={fpShowPass ? 'text' : 'password'}
+                          value={fpConfirmPass}
+                          className="auth-input"
                           onChange={e => { setFpConfirmPass(e.target.value); setFpErrs(p => ({ ...p, confirm: '' })); }}
-                          placeholder="تأكيد كلمة المرور"
-                          style={{ ...passInput(!!fpErrs.confirm), paddingLeft: 12, border: fpConfirmPass && fpPass === fpConfirmPass ? '1.5px solid rgba(74,222,128,0.6)' : passInput(!!fpErrs.confirm).border }} />
+                          placeholder={t('auth.confirmPassLabel', 'تأكيد كلمة المرور')}
+                          style={{
+                            ...passInput(!!fpErrs.confirm),
+                            paddingLeft: 38,
+                            paddingRight: 38,
+                            border: fpConfirmPass && fpPass === fpConfirmPass ? '1.5px solid rgba(74,222,128,0.6)' : passInput(!!fpErrs.confirm).border
+                          }}
+                        />
                       </div>
                       {fpConfirmPass && (
                         <p style={{ fontSize: 10, display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700, color: fpPass === fpConfirmPass ? '#4ade80' : '#f87171', margin: 0 }}>
                           <span className="material-symbols-outlined" style={{ fontSize: 12 }}>{fpPass === fpConfirmPass ? 'check_circle' : 'cancel'}</span>
-                          {fpPass === fpConfirmPass ? 'كلمتا المرور متطابقتان' : 'كلمتا المرور غير متطابقتين'}
+                          {fpPass === fpConfirmPass ? t('auth.passMatch', 'كلمتا المرور متطابقتان') : t('auth.passMismatch', 'كلمتا المرور غير متطابقتين')}
                         </p>
                       )}
                       {errRow(fpErrs.confirm)}
@@ -645,7 +720,9 @@ export default function AuthPage({ defaultMode = 'login' }) {
                     <button type="submit"
                       disabled={loading || !checkPasswordStrength(fpPass).isStrong || fpPass !== fpConfirmPass}
                       style={{ ...btn(loading || !checkPasswordStrength(fpPass).isStrong || fpPass !== fpConfirmPass), marginTop: 4 }}>
-                      {loading ? <>{spinner}جارٍ الحفظ...</> : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_reset</span>حفظ كلمة المرور</>}
+                      {loading
+                        ? <>{spinner}{t('auth.savingPass', 'جارٍ الحفظ...')}</>
+                        : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_reset</span>{t('auth.saveNewPass', 'حفظ كلمة المرور')}</>}
                     </button>
                   </form>
                 )}
@@ -670,16 +747,19 @@ export default function AuthPage({ defaultMode = 'login' }) {
                 {/* heading */}
                 <div>
                   <h1 style={{ color: '#fff', fontSize: 19, fontWeight: 800, margin: '0 0 3px' }}>
-                    {isLogin ? 'مرحباً بكم مجدداً' : 'إنشاء حساب جديد'}
+                    {isLogin ? t('auth.loginTitle', 'مرحباً بكم مجدداً') : t('auth.registerTitle', 'إنشاء حساب جديد')}
                   </h1>
                   <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, margin: 0 }}>
-                    {isLogin ? 'سعداء بعودتك — لنبنِ مستقبلاً أفضل معاً' : 'انضم إلى رحلتنا نحو مستقبل عقاري أفضل'}
+                    {isLogin ? t('auth.loginSub', 'سعداء بعودتك — لنبنِ مستقبلاً أفضل معاً') : t('auth.registerSub', 'انضم إلى رحلتنا نحو مستقبل عقاري أفضل')}
                   </p>
                 </div>
 
                 {/* tabs */}
                 <div style={{ display: 'flex', background: 'rgba(255,255,255,0.07)', borderRadius: 10, padding: 3 }}>
-                  {[['login', 'تسجيل الدخول'], ['register', 'إنشاء حساب']].map(([m, lbl]) => (
+                  {[
+                    ['login', t('auth.tabLogin', 'تسجيل الدخول')],
+                    ['register', t('auth.tabRegister', 'إنشاء حساب')]
+                  ].map(([m, lbl]) => (
                     <button key={m} type="button" onClick={() => switchMode(m)} style={{
                       flex: 1, height: 34, borderRadius: 8, border: 'none', cursor: 'pointer',
                       fontSize: 13, fontWeight: 700, transition: 'all 0.2s', fontFamily: 'inherit',
@@ -704,58 +784,94 @@ export default function AuthPage({ defaultMode = 'login' }) {
                 {/* form */}
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 11 }} noValidate>
                   {!isLogin && (
-                    <Field label="الاسم الكامل *" icon="person" value={name}
+                    <Field
+                      label={t('auth.fullName', 'الاسم الكامل *')}
+                      icon="person"
+                      value={name}
                       onChange={v => { setName(v); clearErr('name'); }}
-                      placeholder="اسمك الكامل" error={errs.name} />
+                      placeholder={t('auth.fullNamePlaceholder', 'اسمك الكامل')}
+                      error={errs.name}
+                      isRTL={isRTL}
+                    />
                   )}
-                  <Field label="البريد الإلكتروني *" icon="mail" type="email" value={email}
+                  <Field
+                    label={t('auth.email', 'البريد الإلكتروني *')}
+                    icon="mail"
+                    type="email"
+                    value={email}
                     onChange={v => { setEmail(v); clearErr('email'); }}
-                    placeholder="example@domain.com" error={errs.email} />
+                    placeholder={t('auth.emailPlaceholder', 'example@domain.com')}
+                    error={errs.email}
+                    isRTL={isRTL}
+                  />
                   {!isLogin && (
-                    <Field label="رقم الهاتف *" icon="call" type="tel" value={phone}
-                      maxLength={11} showCounter onChange={handlePhoneChange}
-                      placeholder="01XXXXXXXXX" error={errs.phone}
-                      hint="11 رقماً يبدأ بـ 010 / 011 / 012 / 015" />
+                    <Field
+                      label={t('auth.phone', 'رقم الهاتف *')}
+                      icon="call"
+                      type="tel"
+                      value={phone}
+                      maxLength={11}
+                      showCounter
+                      onChange={handlePhoneChange}
+                      placeholder={t('auth.phonePlaceholder', '01XXXXXXXXX')}
+                      error={errs.phone}
+                      hint={t('auth.phoneHint', '11 رقماً يبدأ بـ 010 / 011 / 012 / 015')}
+                      isRTL={isRTL}
+                    />
                   )}
 
                   {/* password field */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>كلمة المرور *</label>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                        {t('auth.password', 'كلمة المرور *')}
+                      </label>
                       {isLogin && (
                         <button type="button" onClick={() => switchMode('forgot')}
-                          style={{ background: 'none', border: 'none', fontSize: 11, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit', textDecoration: 'underline' }}>
-                          نسيت كلمة المرور؟
+                          style={{ background: 'none', border: 'none', fontSize: 11, color: '#f0d897', cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                          {t('auth.forgotPassLink', 'نسيت كلمة المرور؟')}
                         </button>
                       )}
                     </div>
                     <div style={{ position: 'relative' }}>
-                      <span className="material-symbols-outlined" style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: errs.password ? '#f87171' : 'rgba(255,255,255,0.4)' }}>lock</span>
-                      <input type={showPass ? 'text' : 'password'} value={password} className="auth-input"
+                      <span className="material-symbols-outlined"
+                        style={{
+                          position: 'absolute',
+                          ...(isRTL ? { right: 11 } : { left: 11 }),
+                          top: '50%', transform: 'translateY(-50%)',
+                          fontSize: 18, color: errs.password ? '#f87171' : 'rgba(255,255,255,0.4)'
+                        }}>
+                        lock
+                      </span>
+                      <input
+                        type={showPass ? 'text' : 'password'}
+                        value={password}
+                        className="auth-input"
                         onChange={e => { setPassword(e.target.value); clearErr('password'); }}
-                        placeholder="كلمة المرور"
-                        style={passInput(!!errs.password)} />
+                        placeholder={t('auth.passwordPlaceholder', 'كلمة المرور')}
+                        style={passInput(!!errs.password)}
+                      />
                       {iconBtn(showPass ? 'visibility_off' : 'visibility', () => setShowPass(v => !v))}
                     </div>
                     {errRow(errs.password)}
-                    {!isLogin && <PasswordStrengthMeter password={password} />}
+                    {!isLogin && <PasswordStrengthMeter password={password} t={t} />}
                   </div>
 
                   <button type="submit" disabled={loading} style={{ ...btn(loading), marginTop: 4 }}>
                     {loading
-                      ? <>{spinner}{isLogin ? 'جارٍ تسجيل الدخول...' : 'جارٍ إنشاء الحساب...'}</>
+                      ? <>{spinner}{isLogin ? t('auth.loggingIn', 'جارٍ تسجيل الدخول...') : t('auth.registering', 'جارٍ إنشاء الحساب...')}</>
                       : isLogin
-                        ? <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>← تسجيل الدخول</>
-                        : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>إنشاء الحساب</>}
+                        ? <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>{t('auth.submitLogin', 'تسجيل الدخول')}</>
+                        : <><span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>{t('auth.submitRegister', 'إنشاء الحساب')}</>}
                   </button>
                 </form>
 
                 {/* switch mode */}
-                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-                  {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}{' '}
+                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                  {isLogin ? t('auth.noAccount', 'ليس لديك حساب؟') : t('auth.haveAccount', 'لديك حساب بالفعل؟')}{' '}
                   <button type="button" onClick={() => switchMode(isLogin ? 'register' : 'login')}
-                    style={{ background: 'none', border: 'none', color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', textDecoration: 'underline' }}>
-                    {isLogin ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+                    style={{ background: 'none', border: 'none', color: '#f0d897', fontWeight: 800, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                    {isLogin ? t('auth.tabRegister', 'إنشاء حساب جديد') : t('auth.tabLogin', 'تسجيل الدخول')}
                   </button>
                 </p>
               </div>
@@ -763,11 +879,15 @@ export default function AuthPage({ defaultMode = 'login' }) {
           )}
 
           {/* Privacy */}
-          <p style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 14, marginBottom: 4 }}>
-            بتسجيلك توافق على{' '}
-            <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>شروط الاستخدام</span>
-            {' '}و{' '}
-            <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>سياسة الخصوصية</span>
+          <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 14, marginBottom: 4 }}>
+            {t('auth.agreeTerms', 'بتسجيلك توافق على')}{' '}
+            <span style={{ textDecoration: 'underline', cursor: 'pointer', color: 'rgba(255,255,255,0.6)' }}>
+              {t('auth.terms', 'شروط الاستخدام')}
+            </span>
+            {' '}{t('auth.and', 'و')}{' '}
+            <span style={{ textDecoration: 'underline', cursor: 'pointer', color: 'rgba(255,255,255,0.6)' }}>
+              {t('auth.privacy', 'سياسة الخصوصية')}
+            </span>
           </p>
         </div>
       </div>

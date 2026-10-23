@@ -3,6 +3,7 @@ import unitService from '@services/unit.service.js';
 import projectService from '@services/project.service.js';
 import { getImageUrl } from '@utils/imageHelper.js';
 import toast from 'react-hot-toast';
+import { useLanguage } from '@context/LanguageContext.jsx';
 
 const STATUS_LIST = ["متاح", "محجوز", "مباع"];
 const TYPE_LIST = [
@@ -53,6 +54,7 @@ const SC = {
 };
 
 export default function AdminUnitsPage() {
+  const { t, isRTL, dir, tStatus, tType, formatPrice, formatArea } = useLanguage();
   const [units, setUnits] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -235,13 +237,13 @@ export default function AdminUnitsPage() {
   const lbl = "text-[12px] font-semibold text-neutral-600 mb-1 block";
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }}>
+    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir={dir}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-[22px] font-bold text-neutral-900">إدارة الوحدات العقارية</h1>
+          <h1 className="text-[22px] font-bold text-neutral-900">{t("admin.menuUnits", "إدارة الوحدات العقارية")}</h1>
           <p className="text-[13px] text-neutral-500 mt-0.5">
-            إجمالي الوحدات الحقيقية المسجلة: {units.length} وحدة
+            {isRTL ? `إجمالي الوحدات الحقيقية المسجلة: ${units.length} وحدة` : `Total registered units: ${units.length} units`}
           </p>
         </div>
         <button
@@ -250,39 +252,39 @@ export default function AdminUnitsPage() {
           style={{ background: '#000e1f' }}
         >
           <span className="material-symbols-outlined text-[18px]">add</span>
-          إضافة وحدة جديدة
+          {isRTL ? "إضافة وحدة جديدة" : "Add New Unit"}
         </button>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-neutral-100 p-4 flex items-center gap-3 flex-wrap shadow-sm">
         <div className="flex items-center gap-2">
-          <span className="text-[12px] text-neutral-500 font-semibold">المشروع:</span>
+          <span className="text-[12px] text-neutral-500 font-semibold">{t("admin.projectCol", "المشروع")}:</span>
           <select
             value={projFilter}
             onChange={(e) => setProjFilter(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-neutral-200 text-[13px] outline-none bg-neutral-50"
+            className="h-9 px-3 rounded-lg border border-neutral-200 text-[13px] outline-none bg-neutral-50 cursor-pointer"
           >
-            <option value="الكل">كل المشاريع</option>
+            <option value="الكل">{isRTL ? "كل المشاريع" : "All Projects"}</option>
             {projects.map((p) => (
               <option key={p._id} value={p._id}>
-                {p.name}
+                {!isRTL && p.nameEn ? p.nameEn : p.name}
               </option>
             ))}
           </select>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[12px] text-neutral-500 font-semibold">الحالة:</span>
+          <span className="text-[12px] text-neutral-500 font-semibold">{t("admin.statusCol", "الحالة")}:</span>
           <select
             value={statFilter}
             onChange={(e) => setStatFilter(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-neutral-200 text-[13px] outline-none bg-neutral-50"
+            className="h-9 px-3 rounded-lg border border-neutral-200 text-[13px] outline-none bg-neutral-50 cursor-pointer"
           >
-            <option value="الكل">كل الحالات</option>
+            <option value="الكل">{isRTL ? "كل الحالات" : "All Statuses"}</option>
             {STATUS_LIST.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {tStatus(s)}
               </option>
             ))}
           </select>
@@ -300,15 +302,28 @@ export default function AdminUnitsPage() {
         ) : units.length === 0 ? (
           <div className="flex flex-col items-center py-20">
             <span className="material-symbols-outlined text-[56px] text-neutral-300 mb-4">home</span>
-            <p className="text-neutral-500 text-[15px]">لا توجد وحدات مسجلة تطابق التصفية</p>
+            <p className="text-neutral-500 text-[15px]">{isRTL ? "لا توجد وحدات مسجلة تطابق التصفية" : "No registered units match filters"}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr style={{ background: '#f8f9fa', borderBottom: '1px solid #f1f3f4' }}>
-                  {["#", "الصورة", "المشروع", "النوع", "المساحة", "المبنى", "الدور", "السعر", "المقدم", "التقسيط", "الحالة", "إجراءات"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-right text-[11px] font-semibold text-neutral-500 whitespace-nowrap">
+                  {[
+                    "#",
+                    isRTL ? "الصورة" : "Image",
+                    t("admin.projectCol", "المشروع"),
+                    isRTL ? "النوع" : "Type",
+                    isRTL ? "المساحة" : "Area",
+                    isRTL ? "المبنى" : "Bldg",
+                    isRTL ? "الدور" : "Floor",
+                    isRTL ? "السعر" : "Price",
+                    isRTL ? "المقدم" : "Down Payment",
+                    isRTL ? "التقسيط" : "Installment",
+                    t("admin.statusCol", "الحالة"),
+                    t("common.actions", "إجراءات"),
+                  ].map((h) => (
+                    <th key={h} className={`px-4 py-3 ${isRTL ? "text-right" : "text-left"} text-[11px] font-semibold text-neutral-500 whitespace-nowrap`}>
                       {h}
                     </th>
                   ))}
@@ -323,7 +338,7 @@ export default function AdminUnitsPage() {
                     : null;
                   return (
                     <tr key={u._id} className="border-t border-neutral-100 hover:bg-neutral-50/60 transition-colors">
-                      <td className="px-4 py-3 text-[12px] text-neutral-400 font-mono">{i + 1}</td>
+                      <td className={`px-4 py-3 text-[12px] text-neutral-400 font-mono ${isRTL ? "text-right" : "text-left"}`}>{i + 1}</td>
                       <td className="px-4 py-3">
                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 flex-shrink-0">
                           {img ? (
@@ -335,35 +350,36 @@ export default function AdminUnitsPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-[13px] font-semibold text-neutral-800 whitespace-nowrap">
-                        {u.project?.name || '—'}
+                      <td className={`px-4 py-3 text-[13px] font-semibold text-neutral-800 whitespace-nowrap ${isRTL ? "text-right" : "text-left"}`}>
+                        {!isRTL && u.project?.nameEn ? u.project.nameEn : (u.project?.name || '—')}
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-neutral-700">{u.type}</td>
-                      <td className="px-4 py-3 text-[13px] text-neutral-600 whitespace-nowrap">{u.area} م²</td>
-                      <td className="px-4 py-3 text-[13px] text-neutral-600">{u.building || '—'}</td>
-                      <td className="px-4 py-3 text-[13px] text-neutral-600 text-center">{u.floor ?? 1}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-[13px] font-bold text-neutral-800">{Number(u.price).toLocaleString()}</span>
-                        <span className="text-[10px] text-neutral-400 mr-1"> ج.م.</span>
+                      <td className={`px-4 py-3 text-[13px] text-neutral-700 ${isRTL ? "text-right" : "text-left"}`}>{tType(u.type)}</td>
+                      <td className={`px-4 py-3 text-[13px] text-neutral-600 whitespace-nowrap ${isRTL ? "text-right" : "text-left"}`}>{formatArea(u.area)}</td>
+                      <td className={`px-4 py-3 text-[13px] text-neutral-600 ${isRTL ? "text-right" : "text-left"}`}>{u.building || '—'}</td>
+                      <td className={`px-4 py-3 text-[13px] text-neutral-600 text-center`}>{u.floor ?? 1}</td>
+                      <td className={`px-4 py-3 whitespace-nowrap ${isRTL ? "text-right" : "text-left"}`}>
+                        <span className="text-[13px] font-bold text-neutral-800 font-mono">{formatPrice(u.price)}</span>
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-neutral-600 text-center">{u.downPaymentPercent || 10}%</td>
-                      <td className="px-4 py-3 text-[13px] text-neutral-600 text-center">{u.installmentYears || 0} سنوات</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-[13px] text-neutral-600 text-center font-mono">{u.downPaymentPercent || 10}%</td>
+                      <td className="px-4 py-3 text-[13px] text-neutral-600 text-center">{u.installmentYears || 0} {isRTL ? "سنوات" : "Years"}</td>
+                      <td className={`px-4 py-3 ${isRTL ? "text-right" : "text-left"}`}>
                         <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${SC[u.status] || ""}`}>
-                          {u.status}
+                          {tStatus(u.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 justify-center">
                           <button
                             onClick={() => openEdit(u)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:bg-neutral-100 hover:text-[#775a1a] transition-all"
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:bg-neutral-100 hover:text-[#775a1a] transition-all cursor-pointer"
+                            title={isRTL ? "تعديل" : "Edit"}
                           >
                             <span className="material-symbols-outlined text-[16px]">edit</span>
                           </button>
                           <button
                             onClick={() => setDeleteId(u._id)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:bg-red-50 hover:text-red-600 transition-all"
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:bg-red-50 hover:text-red-600 transition-all cursor-pointer"
+                            title={isRTL ? "حذف" : "Delete"}
                           >
                             <span className="material-symbols-outlined text-[16px]">delete</span>
                           </button>
