@@ -87,7 +87,7 @@ export default function AdminReservationsPage() {
   const s = stats?.summary ?? {};
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{background:'#f8f9fa',minHeight:'100vh'}} dir="rtl">
+    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{background:'#f8f9fa',minHeight:'100vh'}}>
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>

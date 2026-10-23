@@ -1,6 +1,7 @@
 import { getImageUrl } from "@utils/imageHelper.js";
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@context/LanguageContext.jsx';
 import projectService from '@services/project.service.js';
 import { PyramidIcon, PharaohPatternBackground } from "@components/ui/PharaohIcons.jsx";
 
@@ -11,7 +12,9 @@ const STATUS_BADGE = {
 };
 
 function ProjectCard({ p }) {
+  const { t, isRTL, tStatus, formatPrice, formatArea } = useLanguage();
   const img = p.images?.[0] ? getImageUrl(p.images[0]) : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80";
+
   return (
     <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200/90 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group flex flex-col justify-between">
       <div>
@@ -23,11 +26,11 @@ function ProjectCard({ p }) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#000e1f]/85 via-transparent to-transparent" />
           
-          <div className="absolute top-3.5 right-3.5 flex items-center gap-2">
+          <div className={`absolute top-3.5 ${isRTL ? "right-3.5" : "left-3.5"} flex items-center gap-2`}>
             <span className={`px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-sm ${
               STATUS_BADGE[p.status] || "bg-white/90 text-neutral-800"
             }`}>
-              {p.status}
+              {tStatus(p.status)}
             </span>
           </div>
 
@@ -54,9 +57,9 @@ function ProjectCard({ p }) {
         <div className="p-6">
           <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-neutral-100 text-center">
             {[
-              { i: "straighten", l: "المساحة", v: p.totalArea ? `${p.totalArea} م²` : "—" },
-              { i: "holiday_village", l: "الوحدات", v: `${p.unitCount ?? p.totalUnits ?? 0} وحدة` },
-              { i: "event_available", l: "التسليم", v: p.delivery || "—" },
+              { i: "straighten", l: t("properties.area", "المساحة"), v: p.totalArea ? formatArea(p.totalArea) : "—" },
+              { i: "holiday_village", l: t("projects.unitsCount", "الوحدات"), v: `${p.unitCount ?? p.totalUnits ?? 0} ${isRTL ? "وحدة" : "units"}` },
+              { i: "event_available", l: t("projects.delivery", "التسليم"), v: p.delivery || "—" },
             ].map((m) => (
               <div key={m.l} className="flex flex-col items-center gap-0.5 bg-neutral-50/70 p-2.5 rounded-2xl">
                 <span className="material-symbols-outlined text-[18px] text-[#c9952a]">{m.i}</span>
@@ -70,10 +73,9 @@ function ProjectCard({ p }) {
 
       <div className="p-6 pt-0 flex items-center justify-between">
         <div>
-          <p className="text-[10px] text-neutral-400 font-bold">يبدأ السعر من</p>
+          <p className="text-[10px] text-neutral-400 font-bold">{t("projects.startingFrom", "يبدأ السعر من")}</p>
           <p className="text-base font-black text-[#000e1f] font-mono">
-            {p.startPrice ? Number(p.startPrice).toLocaleString() : "اتصل بنا"}
-            {p.startPrice > 0 && <span className="text-xs text-neutral-600 font-sans font-normal mr-1">ج.م.</span>}
+            {p.startPrice ? formatPrice(p.startPrice) : (isRTL ? "اتصل بنا" : "Contact Us")}
           </p>
         </div>
         <Link
@@ -81,8 +83,10 @@ function ProjectCard({ p }) {
           className="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl text-xs font-bold text-white transition-all shadow-md hover:opacity-95"
           style={{ background: "#000e1f" }}
         >
-          <span>عرض المشروع</span>
-          <span className="material-symbols-outlined text-[16px]">arrow_left_alt</span>
+          <span>{t("projects.viewDetails", "عرض المشروع")}</span>
+          <span className={`material-symbols-outlined text-[16px] ${!isRTL ? "rotate-180" : ""}`}>
+            arrow_left_alt
+          </span>
         </Link>
       </div>
     </div>
@@ -90,18 +94,19 @@ function ProjectCard({ p }) {
 }
 
 export default function ProjectsPage() {
+  const { t, isRTL, dir } = useLanguage();
   const [projects, setProjects] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [search,   setSearch]   = useState('');
-  const [status,   setStatus]   = useState('الكل');
-  const [type,     setType]     = useState('الكل');
+  const [status,   setStatus]   = useState('all');
+  const [type,     setType]     = useState('all');
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
         const params = {};
-        if (status !== 'الكل') params.status = status;
+        if (status !== 'all') params.status = status;
         if (search) params.search = search;
         const res = await projectService.getAll(params);
         setProjects(res?.data ?? res ?? []);
@@ -114,11 +119,18 @@ export default function ProjectsPage() {
     load();
   }, [status, search]);
 
-  const types   = ['الكل', ...new Set(projects.map((p) => p.type).filter(Boolean))];
-  const filtered = type === 'الكل' ? projects : projects.filter((p) => p.type === type);
+  const types   = ['all', ...new Set(projects.map((p) => p.type).filter(Boolean))];
+  const filtered = type === 'all' ? projects : projects.filter((p) => p.type === type);
+
+  const statusFilters = [
+    { key: "all", label: t("projects.all", "الكل") },
+    { key: "قيد البيع", label: t("projects.forSale", "قيد البيع") },
+    { key: "تحت الإنشاء", label: t("projects.underConstruction", "تحت الإنشاء") },
+    { key: "مكتمل", label: t("projects.completed", "مكتمل") },
+  ];
 
   return (
-    <div className="flex flex-col bg-[#f8f9fc] min-h-screen text-neutral-900" dir="rtl">
+    <div className="flex flex-col bg-[#f8f9fc] min-h-screen text-neutral-900" dir={dir}>
       
       {/* ── HERO BANNER ── */}
       <div className="relative bg-[#000e1f] overflow-hidden border-b border-[#c9952a]/20">
@@ -131,15 +143,15 @@ export default function ProjectsPage() {
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-3 bg-white/10 backdrop-blur-md border border-[#c9952a]/40 shadow-sm">
             <PyramidIcon className="w-4 h-4 text-[#f0d897]" />
             <span className="text-xs font-bold text-[#f0d897] tracking-wider">
-              صرح الفراعنة — المحفظة والمشاريع العقارية الكبرى
+              {isRTL ? "صرح الفراعنة — المحفظة والمشاريع العقارية الكبرى" : "Pharaohs Landmark — Mega Real Estate Portfolio"}
             </span>
           </div>
 
           <h1 className="text-white font-black text-3xl sm:text-4xl md:text-5xl leading-tight mb-3">
-            المشروعات السكنية والاستثمارية
+            {t("projects.title", "المشروعات السكنية والاستثمارية")}
           </h1>
           <p className="text-white/80 text-sm sm:text-base max-w-2xl leading-relaxed">
-            اكتشف مشاريعنا الاستثنائية المطورة بأعلى معايير الهندسة والفخامة في أرقى المدن والمواقع بمصر.
+            {t("projects.subtitle", "اكتشف مشاريعنا الاستثنائية المطورة بأعلى معايير الهندسة والفخامة في أرقى المدن والمواقع بمصر.")}
           </p>
         </div>
       </div>
@@ -152,26 +164,30 @@ export default function ProjectsPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="ابحث عن مشروع أو موقع استراتيجي..."
-              className="w-full h-12 pr-11 pl-4 rounded-2xl border border-neutral-200 text-sm font-medium outline-none bg-neutral-50 focus:border-[#c9952a] focus:bg-white transition-all text-neutral-900"
+              placeholder={isRTL ? "ابحث عن مشروع أو موقع استراتيجي..." : "Search for a project or location..."}
+              className={`w-full h-12 rounded-2xl border border-neutral-200 text-sm font-medium outline-none bg-neutral-50 focus:border-[#c9952a] focus:bg-white transition-all text-neutral-900 ${
+                isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
+              }`}
             />
-            <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-[22px]">
+            <span className={`material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-neutral-400 text-[22px] ${
+              isRTL ? "right-3.5" : "left-3.5"
+            }`}>
               search
             </span>
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-            {["الكل", "قيد البيع", "تحت الإنشاء", "مكتمل"].map((s) => (
+            {statusFilters.map((s) => (
               <button
-                key={s}
-                onClick={() => setStatus(s)}
+                key={s.key}
+                onClick={() => setStatus(s.key)}
                 className={`h-11 px-5 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-                  status === s
+                  status === s.key
                     ? "bg-[#000e1f] text-white shadow-md shadow-[#000e1f]/20"
                     : "text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80"
                 }`}
               >
-                {s}
+                {s.label}
               </button>
             ))}
           </div>
@@ -180,18 +196,18 @@ export default function ProjectsPage() {
         {/* ── TYPE PILLS ── */}
         {types.length > 1 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold text-neutral-500">نوع العقار:</span>
-            {types.map((t) => (
+            <span className="text-xs font-bold text-neutral-500">{t("home.typeLabel", "نوع العقار:")}</span>
+            {types.map((tKey) => (
               <button
-                key={t}
-                onClick={() => setType(t)}
+                key={tKey}
+                onClick={() => setType(tKey)}
                 className={`h-8 px-4 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  type === t
+                  type === tKey
                     ? "bg-[#c9952a] text-[#000e1f] shadow-sm"
                     : "text-neutral-700 bg-white border border-neutral-200 hover:border-[#c9952a]"
                 }`}
               >
-                {t}
+                {tKey === "all" ? t("projects.all", "الكل") : tKey}
               </button>
             ))}
           </div>
@@ -209,8 +225,8 @@ export default function ProjectsPage() {
             <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-[42px] text-neutral-400">apartment</span>
             </div>
-            <h3 className="text-lg font-bold text-neutral-800 mb-1">لا توجد مشروعات مطابقة</h3>
-            <p className="text-xs text-neutral-500">جرّب تغيير كلمات البحث أو اختيار مرحلة أخرى من الفلاتر</p>
+            <h3 className="text-lg font-bold text-neutral-800 mb-1">{t("projects.notFound", "لا توجد مشروعات مطابقة")}</h3>
+            <p className="text-xs text-neutral-500">{isRTL ? "جرّب تغيير كلمات البحث أو اختيار مرحلة أخرى من الفلاتر" : "Try changing your search terms or filter selection"}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -223,7 +239,11 @@ export default function ProjectsPage() {
         {/* Stats bar */}
         {!loading && filtered.length > 0 && (
           <div className="text-center text-xs font-bold text-neutral-500">
-            يتم عرض <span className="text-[#c9952a] font-mono text-sm">{filtered.length}</span> مشروع معتمد
+            {isRTL ? (
+              <>يتم عرض <span className="text-[#c9952a] font-mono text-sm">{filtered.length}</span> مشروع معتمد</>
+            ) : (
+              <>Displaying <span className="text-[#c9952a] font-mono text-sm">{filtered.length}</span> certified developments</>
+            )}
           </div>
         )}
 

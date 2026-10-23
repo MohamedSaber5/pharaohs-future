@@ -1,6 +1,7 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import reservationService from "@services/reservation.service.js";
+import { useLanguage } from "@context/LanguageContext.jsx";
 
 // Reservation Stages in Order
 const STAGES = ["طلب حجز", "قيد المراجعة", "محجوز", "جاهز للتعاقد", "مكتمل"];
@@ -40,6 +41,7 @@ function formatRemainingTime(expiresAt, createdAt, status) {
 }
 
 export default function MyReservationsPage() {
+  const { t, isRTL, dir } = useLanguage();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState("");
@@ -53,7 +55,7 @@ export default function MyReservationsPage() {
       })
       .catch((err) => {
         console.error(err);
-        setError("تعذّر تحميل قائمة الحجوزات");
+        setError(isRTL ? "تعذّر تحميل قائمة الحجوزات" : "Unable to load reservations");
       })
       .finally(() => setLoading(false));
   };
@@ -63,17 +65,21 @@ export default function MyReservationsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-neutral-50" dir="rtl">
+    <div className="min-h-screen bg-neutral-50" dir={dir}>
       {/* Header */}
       <div className="bg-[#000e1f] text-white pt-32 pb-14 px-6 lg:px-12">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-[#c9952a]">bookmark</span>
-            <span className="text-[13px] font-semibold text-[#c9952a]">بوابة العميل</span>
+            <span className="text-[13px] font-semibold text-[#c9952a]">
+              {isRTL ? "بوابة العميل" : "Client Portal"}
+            </span>
           </div>
-          <h1 className="text-[30px] md:text-[38px] font-bold">حجوزاتي العقارية</h1>
+          <h1 className="text-[30px] md:text-[38px] font-bold">
+            {t("reservations.title", "حجوزاتي العقارية")}
+          </h1>
           <p className="text-white/60 text-[14px] mt-1">
-            تابع حالة كل حجز، والوقت المتبقي لإنهاء الإجراءات، وتواصل مع مستشار المبيعات المخصص لك.
+            {t("reservations.subtitle", "تابع حالة كل حجز، والوقت المتبقي لإنهاء الإجراءات، وتواصل مع مستشار المبيعات المخصص لك.")}
           </p>
         </div>
       </div>

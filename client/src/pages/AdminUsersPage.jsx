@@ -71,7 +71,7 @@ export default function AdminUsersPage() {
   const pages = Math.ceil(total / 20) || 1;
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{background:'#f8f9fa',minHeight:'100vh'}} dir="rtl">
+    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{background:'#f8f9fa',minHeight:'100vh'}}>
       {/* Header */}
       <div>
         <h1 className="text-[22px] font-bold text-neutral-900">إدارة المستخدمين</h1>

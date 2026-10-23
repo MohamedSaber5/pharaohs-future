@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useLanguage } from "@context/LanguageContext.jsx";
 import unitService from "@services/unit.service.js";
 import projectService from "@services/project.service.js";
 import { getImageUrl } from "@utils/imageHelper.js";
-import { PyramidIcon, PharaohPatternBackground, LotusIcon } from "@components/ui/PharaohIcons.jsx";
+import { PyramidIcon, PharaohPatternBackground } from "@components/ui/PharaohIcons.jsx";
 
 const PH = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80";
 
 export default function PropertiesPage() {
+  const { t, isRTL, dir, tType, formatPrice, formatArea } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Filters State
@@ -109,7 +111,7 @@ export default function PropertiesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] text-neutral-900" dir="rtl">
+    <div className="min-h-screen bg-[#f8f9fc] text-neutral-900" dir={dir}>
       
       {/* ── HEADER BANNER ── */}
       <div className="relative bg-[#000e1f] text-white pt-32 pb-16 px-6 lg:px-12 overflow-hidden border-b border-[#c9952a]/20">
@@ -122,15 +124,15 @@ export default function PropertiesPage() {
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-3 bg-white/10 backdrop-blur-md border border-[#c9952a]/40 shadow-sm">
             <PyramidIcon className="w-4 h-4 text-[#f0d897]" />
             <span className="text-xs font-bold text-[#f0d897] tracking-wider">
-              صرح الفراعنة — قائمة الوحدات المتاحة للحجز والتعاقد الفوري
+              {isRTL ? "صرح الفراعنة — قائمة الوحدات المتاحة للحجز والتعاقد الفوري" : "Pharaohs Future — Exclusive Inventory Available for Booking"}
             </span>
           </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-3">
-            ابحث عن وحدتك العقارية الاستثنائية
+            {t("properties.title", "ابحث عن وحدتك العقارية الاستثنائية")}
           </h1>
           <p className="text-white/80 text-sm sm:text-base max-w-3xl leading-relaxed">
-            استعرض باقة مختارة من أرقى الوحدات السكنية والتجارية مع إمكانية التصفية الدقيقة وفق المشروع، المساحة، عدد الغرف، ونطاق السعر.
+            {t("properties.subtitle", "استعرض باقة مختارة من أرقى الوحدات السكنية والتجارية مع إمكانية التصفية الدقيقة وفق المشروع، المساحة، عدد الغرف، ونطاق السعر.")}
           </p>
         </div>
       </div>
@@ -146,13 +148,15 @@ export default function PropertiesPage() {
               <div className="flex items-center justify-between pb-4 mb-5 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[20px] text-[#c9952a]">tune</span>
-                  <h2 className="text-base font-black text-neutral-900">تصفية الوحدات</h2>
+                  <h2 className="text-base font-black text-neutral-900">
+                    {isRTL ? "تصفية الوحدات" : "Filter Properties"}
+                  </h2>
                 </div>
                 <button
                   onClick={handleReset}
                   className="text-xs font-bold text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
                 >
-                  إعادة ضبط
+                  {t("properties.resetFilters", "إعادة ضبط")}
                 </button>
               </div>
 
@@ -161,7 +165,7 @@ export default function PropertiesPage() {
                 {/* Compound / Project */}
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    المشروع / الصرح العقاري
+                    {t("properties.filterByProject", "المشروع / الصرح العقاري")}
                   </label>
                   <div className="relative">
                     <select
@@ -170,16 +174,20 @@ export default function PropertiesPage() {
                         setSelectedProject(e.target.value);
                         setPage(1);
                       }}
-                      className="w-full h-11 pr-3.5 pl-9 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer"
+                      className={`w-full h-11 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer ${
+                        isRTL ? "pr-3.5 pl-9" : "pl-3.5 pr-9"
+                      }`}
                     >
-                      <option value="">جميع المشاريع</option>
+                      <option value="">{t("properties.allProjects", "جميع المشاريع")}</option>
                       {projects.map((p) => (
                         <option key={p._id} value={p._id}>
                           {p.name} {p.location ? `(${p.location})` : ""}
                         </option>
                       ))}
                     </select>
-                    <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-[18px]">
+                    <span className={`material-symbols-outlined absolute top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-[18px] ${
+                      isRTL ? "left-2.5" : "right-2.5"
+                    }`}>
                       expand_more
                     </span>
                   </div>
@@ -188,7 +196,7 @@ export default function PropertiesPage() {
                 {/* Building */}
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    المبنى / العمارة
+                    {isRTL ? "المبنى / العمارة" : "Building / Tower"}
                   </label>
                   <input
                     type="text"
@@ -197,7 +205,7 @@ export default function PropertiesPage() {
                       setBuilding(e.target.value);
                       setPage(1);
                     }}
-                    placeholder="مثال: عمارة B3 أو برج الأمل"
+                    placeholder={isRTL ? "مثال: عمارة B3 أو برج الأمل" : "e.g., Tower A, Building 3"}
                     className="w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-medium text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all"
                   />
                 </div>
@@ -206,7 +214,7 @@ export default function PropertiesPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                      الطابق
+                      {t("properties.floor", "الطابق")}
                     </label>
                     <div className="relative">
                       <select
@@ -215,17 +223,21 @@ export default function PropertiesPage() {
                           setFloor(e.target.value);
                           setPage(1);
                         }}
-                        className="w-full h-11 pr-3 pl-8 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer"
+                        className={`w-full h-11 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer ${
+                          isRTL ? "pr-3 pl-8" : "pl-3 pr-8"
+                        }`}
                       >
-                        <option value="">الكل</option>
-                        <option value="0">الأرضي</option>
-                        <option value="1">الأول</option>
-                        <option value="2">الثاني</option>
-                        <option value="3">الثالث</option>
-                        <option value="4">الرابع</option>
-                        <option value="5">الخامس+</option>
+                        <option value="">{t("projects.all", "الكل")}</option>
+                        <option value="0">{isRTL ? "الأرضي" : "Ground"}</option>
+                        <option value="1">{isRTL ? "الأول" : "1st Floor"}</option>
+                        <option value="2">{isRTL ? "الثاني" : "2nd Floor"}</option>
+                        <option value="3">{isRTL ? "الثالث" : "3rd Floor"}</option>
+                        <option value="4">{isRTL ? "الرابع" : "4th Floor"}</option>
+                        <option value="5">{isRTL ? "الخامس+" : "5th+ Floor"}</option>
                       </select>
-                      <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-[18px]">
+                      <span className={`material-symbols-outlined absolute top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-[18px] ${
+                        isRTL ? "left-2" : "right-2"
+                      }`}>
                         expand_more
                       </span>
                     </div>
@@ -233,7 +245,7 @@ export default function PropertiesPage() {
 
                   <div>
                     <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                      الغرف
+                      {t("properties.bedrooms", "الغرف")}
                     </label>
                     <div className="relative">
                       <select
@@ -242,15 +254,19 @@ export default function PropertiesPage() {
                           setRooms(e.target.value);
                           setPage(1);
                         }}
-                        className="w-full h-11 pr-3 pl-8 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer"
+                        className={`w-full h-11 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 outline-none focus:border-[#c9952a] focus:bg-white transition-all appearance-none cursor-pointer ${
+                          isRTL ? "pr-3 pl-8" : "pl-3 pr-8"
+                        }`}
                       >
-                        <option value="">الكل</option>
-                        <option value="1">1 غرفة</option>
-                        <option value="2">2 غرفة</option>
-                        <option value="3">3 غرف</option>
-                        <option value="4">4+ غرف</option>
+                        <option value="">{t("projects.all", "الكل")}</option>
+                        <option value="1">1 {isRTL ? "غرفة" : "Room"}</option>
+                        <option value="2">2 {isRTL ? "غرفة" : "Rooms"}</option>
+                        <option value="3">3 {isRTL ? "غرف" : "Rooms"}</option>
+                        <option value="4">4+ {isRTL ? "غرف" : "Rooms"}</option>
                       </select>
-                      <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-[18px]">
+                      <span className={`material-symbols-outlined absolute top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-[18px] ${
+                        isRTL ? "left-2" : "right-2"
+                      }`}>
                         expand_more
                       </span>
                     </div>
@@ -260,12 +276,12 @@ export default function PropertiesPage() {
                 {/* Area Range */}
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    المساحة (م²)
+                    {t("properties.area", "المساحة")} ({isRTL ? "م²" : "sqm"})
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="number"
-                      placeholder="من"
+                      placeholder={isRTL ? "من" : "Min"}
                       value={minArea}
                       onChange={(e) => {
                         setMinArea(e.target.value);
@@ -275,7 +291,7 @@ export default function PropertiesPage() {
                     />
                     <input
                       type="number"
-                      placeholder="إلى"
+                      placeholder={isRTL ? "إلى" : "Max"}
                       value={maxArea}
                       onChange={(e) => {
                         setMaxArea(e.target.value);
@@ -289,12 +305,12 @@ export default function PropertiesPage() {
                 {/* Price Range */}
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    نطاق السعر (ج.م.)
+                    {t("properties.price", "نطاق السعر")} ({isRTL ? "ج.م" : "EGP"})
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="number"
-                      placeholder="أدنى سعر"
+                      placeholder={t("properties.minPrice", "أدنى سعر")}
                       value={minPrice}
                       onChange={(e) => {
                         setMinPrice(e.target.value);
@@ -304,7 +320,7 @@ export default function PropertiesPage() {
                     />
                     <input
                       type="number"
-                      placeholder="أعلى سعر"
+                      placeholder={t("properties.maxPrice", "أعلى سعر")}
                       value={maxPrice}
                       onChange={(e) => {
                         setMaxPrice(e.target.value);
@@ -325,14 +341,16 @@ export default function PropertiesPage() {
             {/* Top Bar: Results Count + Sorting */}
             <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-2 text-sm text-neutral-700 font-bold">
-                <span>تم العثور على</span>
+                <span>{isRTL ? "تم العثور على" : "Found"}</span>
                 <span className="font-extrabold text-[#c9952a] text-base font-mono">{total}</span>
-                <span>وحدة سكنية وتجارية متاحة</span>
+                <span>{isRTL ? "وحدة سكنية وتجارية متاحة" : "available residential & commercial properties"}</span>
               </div>
 
               {/* Sorting */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-neutral-500 font-bold whitespace-nowrap">ترتيب حسب:</span>
+                <span className="text-xs text-neutral-500 font-bold whitespace-nowrap">
+                  {t("properties.sortBy", "ترتيب حسب:")}
+                </span>
                 <select
                   value={`${sortBy}-${sortDir}`}
                   onChange={(e) => {
@@ -343,11 +361,11 @@ export default function PropertiesPage() {
                   }}
                   className="h-10 px-3 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-800 outline-none focus:border-[#c9952a] cursor-pointer"
                 >
-                  <option value="createdAt-desc">الأحدث إضافة</option>
-                  <option value="price-asc">السعر: من الأقل للأعلى</option>
-                  <option value="price-desc">السعر: من الأعلى للأقل</option>
-                  <option value="area-asc">المساحة: من الأصغر للأكبر</option>
-                  <option value="area-desc">المساحة: من الأكبر للأصغر</option>
+                  <option value="createdAt-desc">{t("properties.newest", "الأحدث إضافة")}</option>
+                  <option value="price-asc">{t("properties.priceAsc", "السعر: من الأقل للأعلى")}</option>
+                  <option value="price-desc">{t("properties.priceDesc", "السعر: من الأعلى للأقل")}</option>
+                  <option value="area-asc">{t("properties.areaAsc", "المساحة: من الأصغر للأكبر")}</option>
+                  <option value="area-desc">{t("properties.areaDesc", "المساحة: من الأكبر للأصغر")}</option>
                 </select>
               </div>
             </div>
@@ -364,9 +382,13 @@ export default function PropertiesPage() {
                 <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
                   <span className="material-symbols-outlined text-[40px] text-neutral-400">filter_alt_off</span>
                 </div>
-                <h3 className="text-lg font-bold text-neutral-900 mb-2">لا توجد وحدات مطابقة للخيارات</h3>
+                <h3 className="text-lg font-bold text-neutral-900 mb-2">
+                  {t("properties.noUnitsFound", "لا توجد وحدات مطابقة للخيارات")}
+                </h3>
                 <p className="text-xs text-neutral-500 max-w-md mx-auto mb-6">
-                  لم نتمكن من العثور على وحدات تطابق هذه المعايير. يمكنك توسيع نطاق البحث أو الضغط على إعادة الضبط.
+                  {isRTL
+                    ? "لم نتمكن من العثور على وحدات تطابق هذه المعايير. يمكنك توسيع نطاق البحث أو الضغط على إعادة الضبط."
+                    : "No properties match your current criteria. Try expanding filters or click Reset Filters."}
                 </p>
                 <button
                   onClick={handleReset}
@@ -374,7 +396,7 @@ export default function PropertiesPage() {
                   style={{ background: "#000e1f" }}
                 >
                   <span className="material-symbols-outlined text-[18px]">restart_alt</span>
-                  <span>إعادة ضبط الفلاتر</span>
+                  <span>{t("properties.resetFilters", "إعادة ضبط الفلاتر")}</span>
                 </button>
               </div>
             ) : (
@@ -406,21 +428,21 @@ export default function PropertiesPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25" />
 
                           {/* Available Badge */}
-                          <div className="absolute top-3.5 right-3.5">
+                          <div className={`absolute top-3.5 ${isRTL ? "right-3.5" : "left-3.5"}`}>
                             <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-600 text-white shadow-md flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                              متاح للحجز
+                              {t("properties.statusAvailable", "متاح للحجز")}
                             </span>
                           </div>
 
                           {/* Project Name & Location */}
                           <div className="absolute bottom-3 right-3.5 left-3.5">
                             <p className="text-xs text-[#f0d897] font-bold truncate">
-                              {proj?.name || "مشروع مميز"}
+                              {proj?.name || (isRTL ? "مشروع مميز" : "Prime Project")}
                             </p>
                             <p className="text-xs text-white/90 font-medium flex items-center gap-1">
                               <span className="material-symbols-outlined text-[14px]">location_on</span>
-                              {proj?.location || u.building || "مصر"}
+                              {proj?.location || u.building || (isRTL ? "أسوان الجديدة" : "New Aswan")}
                             </p>
                           </div>
                         </div>
@@ -429,7 +451,7 @@ export default function PropertiesPage() {
                         <div className="p-5 flex flex-col flex-1">
                           <div className="flex items-center justify-between mb-3">
                             <h3 className="text-base font-extrabold text-neutral-900 group-hover:text-[#c9952a] transition-colors">
-                              {u.type}
+                              {tType(u.type)}
                             </h3>
                             {u.building && (
                               <span className="text-[11px] font-bold bg-neutral-100 text-neutral-700 px-2.5 py-0.5 rounded-lg border border-neutral-200">
@@ -442,29 +464,29 @@ export default function PropertiesPage() {
                           <div className="grid grid-cols-3 gap-2 py-3 mb-3 border-y border-neutral-100 text-center">
                             <div className="flex flex-col items-center bg-neutral-50/70 p-2 rounded-xl">
                               <span className="material-symbols-outlined text-[18px] text-[#c9952a] mb-0.5">straighten</span>
-                              <span className="text-xs font-bold text-neutral-900 font-mono">{u.area} م²</span>
-                              <span className="text-[10px] text-neutral-500 font-medium">المساحة</span>
+                              <span className="text-xs font-bold text-neutral-900 font-mono">{formatArea(u.area)}</span>
+                              <span className="text-[10px] text-neutral-500 font-medium">{t("properties.area", "المساحة")}</span>
                             </div>
                             <div className="flex flex-col items-center bg-neutral-50/70 p-2 rounded-xl">
                               <span className="material-symbols-outlined text-[18px] text-[#c9952a] mb-0.5">layers</span>
                               <span className="text-xs font-bold text-neutral-900">
-                                {u.floor === 0 ? "الأرضي" : `الدور ${u.floor}`}
+                                {u.floor === 0 ? (isRTL ? "الأرضي" : "Ground") : (isRTL ? `الدور ${u.floor}` : `Floor ${u.floor}`)}
                               </span>
-                              <span className="text-[10px] text-neutral-500 font-medium">الطابق</span>
+                              <span className="text-[10px] text-neutral-500 font-medium">{t("properties.floor", "الطابق")}</span>
                             </div>
                             <div className="flex flex-col items-center bg-neutral-50/70 p-2 rounded-xl">
                               <span className="material-symbols-outlined text-[18px] text-[#c9952a] mb-0.5">bed</span>
-                              <span className="text-xs font-bold text-neutral-900">{u.rooms || 1} غرف</span>
-                              <span className="text-[10px] text-neutral-500 font-medium">الغرف</span>
+                              <span className="text-xs font-bold text-neutral-900">{u.rooms || 1} {isRTL ? "غرف" : "Rooms"}</span>
+                              <span className="text-[10px] text-neutral-500 font-medium">{t("properties.bedrooms", "الغرف")}</span>
                             </div>
                           </div>
 
                           {/* Payment Highlights */}
                           {(u.downPaymentPercent || u.installmentYears) && (
                             <div className="flex items-center justify-between text-xs text-neutral-600 mb-4 bg-neutral-50 rounded-xl px-3 py-2 font-medium">
-                              <span>مقدم {u.downPaymentPercent || 10}%</span>
+                              <span>{isRTL ? `مقدم ${u.downPaymentPercent || 10}%` : `${u.downPaymentPercent || 10}% Down`}</span>
                               <span className="w-1 h-1 rounded-full bg-neutral-300" />
-                              <span>تقسيط {u.installmentYears || 5} سنوات</span>
+                              <span>{isRTL ? `تقسيط ${u.installmentYears || 5} سنوات` : `${u.installmentYears || 5} Yrs Installment`}</span>
                             </div>
                           )}
                         </div>
@@ -473,10 +495,9 @@ export default function PropertiesPage() {
                       {/* Price & Action Button */}
                       <div className="p-5 pt-0 border-t border-neutral-100 flex items-center justify-between mt-auto">
                         <div>
-                          <p className="text-[10px] text-neutral-400 font-bold">السعر الإجمالي</p>
+                          <p className="text-[10px] text-neutral-400 font-bold">{t("properties.price", "السعر الإجمالي")}</p>
                           <p className="text-base font-black text-neutral-900 font-mono">
-                            {Number(u.price).toLocaleString()}
-                            <span className="text-xs text-neutral-600 font-sans font-normal mr-1">ج.م.</span>
+                            {formatPrice(u.price)}
                           </p>
                         </div>
                         <Link
@@ -484,8 +505,10 @@ export default function PropertiesPage() {
                           className="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl text-xs font-bold text-white transition-all shadow-md hover:opacity-90"
                           style={{ background: "#000e1f" }}
                         >
-                          <span>عرض وتفاصيل</span>
-                          <span className="material-symbols-outlined text-[15px]">arrow_left_alt</span>
+                          <span>{t("properties.viewUnit", "عرض وتفاصيل")}</span>
+                          <span className={`material-symbols-outlined text-[15px] ${!isRTL ? "rotate-180" : ""}`}>
+                            arrow_left_alt
+                          </span>
                         </Link>
                       </div>
                     </div>
@@ -502,7 +525,7 @@ export default function PropertiesPage() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   className="h-10 px-4 rounded-xl border border-neutral-200 bg-white text-xs font-bold text-neutral-700 disabled:opacity-40 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
-                  السابق
+                  {isRTL ? "السابق" : "Prev"}
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
                   <button
@@ -522,7 +545,7 @@ export default function PropertiesPage() {
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   className="h-10 px-4 rounded-xl border border-neutral-200 bg-white text-xs font-bold text-neutral-700 disabled:opacity-40 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
-                  التالي
+                  {isRTL ? "التالي" : "Next"}
                 </button>
               </div>
             )}

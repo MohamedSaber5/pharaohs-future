@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@context/AuthContext.jsx";
+import { LanguageProvider, useLanguage } from "@context/LanguageContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import MainLayout  from "@layouts/MainLayout.jsx";
@@ -110,11 +111,13 @@ const AppRoutes = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 

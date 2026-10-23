@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import adminService from "@services/admin.service.js";
 
 const BADGE = {
@@ -75,7 +75,7 @@ export default function AdminEmployeeRotationPage() {
   const inactiveCount = employees.filter((e) => !e.rotationActive).length;
 
   return (
-    <div dir="rtl" className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto">
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">

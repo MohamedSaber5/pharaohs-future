@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '@context/LanguageContext.jsx';
 import projectService from '@services/project.service.js';
 import unitService from '@services/unit.service.js';
 import { getImageUrl } from '@utils/imageHelper.js';
@@ -14,6 +15,7 @@ const PH = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=8
 export default function ProjectDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t, isRTL, dir, tStatus, tType, formatPrice, formatArea } = useLanguage();
   const [project, setProject] = useState(null);
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ export default function ProjectDetailPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-neutral-50 flex flex-col gap-6 p-8 animate-pulse" dir="rtl">
+      <div className="min-h-screen bg-neutral-50 flex flex-col gap-6 p-8 animate-pulse" dir={dir}>
         <div className="h-80 bg-neutral-200 rounded-2xl" />
         <div className="h-6 bg-neutral-200 rounded-lg w-1/2" />
         <div className="h-4 bg-neutral-200 rounded-lg w-3/4" />
@@ -57,11 +59,11 @@ export default function ProjectDetailPage() {
 
   if (error || !project)
     return (
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center flex-col gap-4" dir={dir}>
         <span className="material-symbols-outlined text-[64px] text-neutral-300">error</span>
-        <p className="text-[18px] font-bold text-neutral-600">{error || 'المشروع غير موجود'}</p>
+        <p className="text-[18px] font-bold text-neutral-600">{error || t('projects.notFound', 'المشروع غير موجود')}</p>
         <Link to="/projects" className="h-10 px-6 rounded-xl bg-neutral-900 text-white text-[14px] font-bold flex items-center justify-center">
-          العودة للمشاريع
+          {t('projects.backToList', 'العودة للمشاريع')}
         </Link>
       </div>
     );
@@ -72,7 +74,7 @@ export default function ProjectDetailPage() {
   const availableUnits = units.filter((u) => u.status === 'متاح');
 
   return (
-    <div className="min-h-screen bg-neutral-50" dir="rtl">
+    <div className="min-h-screen bg-neutral-50" dir={dir}>
       {/* Image Gallery */}
       <div className="relative bg-[#000e1f]">
         <div className="max-w-7xl mx-auto px-4 pt-24 pb-6">

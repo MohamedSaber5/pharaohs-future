@@ -235,7 +235,7 @@ export default function AdminUnitsPage() {
   const lbl = "text-[12px] font-semibold text-neutral-600 mb-1 block";
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir="rtl">
+    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

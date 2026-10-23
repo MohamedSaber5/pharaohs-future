@@ -69,7 +69,7 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 lg:p-8 flex flex-col gap-6" dir="rtl">
+      <div className="p-6 lg:p-8 flex flex-col gap-6">
         <div className="h-10 w-64 bg-neutral-200 animate-pulse rounded-xl" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="h-64 bg-neutral-200 animate-pulse rounded-2xl" />
@@ -80,7 +80,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir="rtl">
+    <div className="p-6 lg:p-8 flex flex-col gap-6" style={{ background: "#f8f9fa", minHeight: "100vh" }}>
       
       {/* ── HEADER ── */}
       <div className="flex items-center justify-between flex-wrap gap-4 bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">

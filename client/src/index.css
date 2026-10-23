@@ -86,15 +86,30 @@
   body {
     background-color: var(--color-cream-100);
     color: var(--color-stone-900);
-    font-family: var(--font-sans);
-    direction: rtl;
-    text-align: right;
     line-height: 1.7;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  [dir="rtl"], [dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+    font-family: "Cairo", "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  [dir="ltr"], [dir="ltr"] body {
+    direction: ltr;
+    text-align: left;
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
     font-family: var(--font-arabic);
     line-height: 1.4;
+    color: var(--color-stone-900);
+  }
+
+  [dir="ltr"] h1, [dir="ltr"] h2, [dir="ltr"] h3, [dir="ltr"] h4, [dir="ltr"] h5, [dir="ltr"] h6 {
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.35;
     color: var(--color-stone-900);
   }
 

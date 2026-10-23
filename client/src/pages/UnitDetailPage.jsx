@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext.jsx';
+import { useLanguage } from '@context/LanguageContext.jsx';
 import unitService from '@services/unit.service.js';
 import reservationService from '@services/reservation.service.js';
 import { getImageUrl } from '@utils/imageHelper.js';
@@ -20,6 +21,7 @@ export default function UnitDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { t, isRTL, dir, tStatus, tType, formatPrice, formatArea } = useLanguage();
 
   const [unit, setUnit] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -81,22 +83,22 @@ export default function UnitDetailPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f8f9fa' }} dir="rtl">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f8f9fa' }} dir={dir}>
         <div className="flex flex-col items-center gap-3">
           <div className="w-12 h-12 border-4 border-neutral-200 border-t-[#775a1a] rounded-full animate-spin" />
-          <p className="text-neutral-500 font-medium">جاري تحميل بيانات الوحدة...</p>
+          <p className="text-neutral-500 font-medium">{t("common.loading", "جاري تحميل بيانات الوحدة...")}</p>
         </div>
       </div>
     );
 
   if (!unit)
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f8f9fa' }} dir="rtl">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f8f9fa' }} dir={dir}>
         <div className="text-center">
           <span className="material-symbols-outlined text-[64px] text-neutral-300">home_work</span>
-          <h2 className="text-[20px] font-bold text-neutral-600 mt-4">الوحدة غير موجودة</h2>
+          <h2 className="text-[20px] font-bold text-neutral-600 mt-4">{isRTL ? "الوحدة غير موجودة" : "Unit not found"}</h2>
           <Link to="/properties" className="mt-4 inline-block text-[#775a1a] font-semibold hover:underline">
-            العودة للوحدات المتاحة
+            {isRTL ? "العودة للوحدات المتاحة" : "Back to Available Units"}
           </Link>
         </div>
       </div>
@@ -119,20 +121,20 @@ export default function UnitDetailPage() {
   const whatsappAgent = myRes?.agentWhatsapp || myRes?.agent?.whatsapp;
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8f9fa' }} dir="rtl">
+    <div className="min-h-screen" style={{ background: '#f8f9fa' }} dir={dir}>
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center gap-2 text-[13px] text-neutral-500">
           <Link to="/" className="hover:text-neutral-800 transition-colors">
-            الرئيسية
+            {t("nav.home", "الرئيسية")}
           </Link>
-          <span className="material-symbols-outlined text-[14px]">chevron_left</span>
+          <span className="material-symbols-outlined text-[14px]">{isRTL ? "chevron_left" : "chevron_right"}</span>
           <Link to="/properties" className="hover:text-neutral-800 transition-colors">
-            الوحدات
+            {t("nav.units", "الوحدات")}
           </Link>
-          <span className="material-symbols-outlined text-[14px]">chevron_left</span>
+          <span className="material-symbols-outlined text-[14px]">{isRTL ? "chevron_left" : "chevron_right"}</span>
           <span className="text-neutral-800 font-semibold">
-            {unit.type} — {unit.project?.name || 'مشروع عقاري'}
+            {tType(unit.type)} — {unit.project?.name || (isRTL ? 'مشروع عقاري' : 'Development')}
           </span>
         </div>
       </div>

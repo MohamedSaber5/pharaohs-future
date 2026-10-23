@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import reservationService from "@services/reservation.service.js";
 import { useAuth } from "@context/AuthContext.jsx";
+import { useLanguage } from "@context/LanguageContext.jsx";
 import { PyramidIcon, ScarabIcon, PharaohPatternBackground } from "@components/ui/PharaohIcons.jsx";
+import LanguageSwitcher from "@components/common/LanguageSwitcher.jsx";
 
 const STAGES = ["طلب حجز", "قيد المراجعة", "محجوز", "جاهز للتعاقد", "مكتمل", "ملغي"];
 
@@ -46,6 +48,7 @@ const STAGE_STYLES = {
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
+  const { t, isRTL, dir } = useLanguage();
 
   const [items, setItems]       = useState([]);
   const [total, setTotal]       = useState(0);
@@ -173,15 +176,15 @@ export default function EmployeeDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] text-neutral-900" dir="rtl">
+    <div className="min-h-screen bg-[#f8f9fc] text-neutral-900" dir={dir}>
       
       {/* ── 1. PHARAONIC EXECUTIVE HEADER ── */}
       <div className="relative bg-[#000e1f] text-white pt-28 pb-16 px-6 lg:px-12 overflow-hidden border-b border-[#c9952a]/20">
         <PharaohPatternBackground className="opacity-10" />
         
         {/* Ambient royal glow orbs */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-[#c9952a]/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-[#775a1a]/15 blur-3xl pointer-events-none" />
+        <div className={`absolute top-0 ${isRTL ? "right-1/4" : "left-1/4"} w-96 h-96 rounded-full bg-[#c9952a]/10 blur-3xl pointer-events-none`} />
+        <div className={`absolute bottom-0 ${isRTL ? "left-10" : "right-10"} w-80 h-80 rounded-full bg-[#775a1a]/15 blur-3xl pointer-events-none`} />
 
         <div className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -189,26 +192,32 @@ export default function EmployeeDashboard() {
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-3 bg-white/10 backdrop-blur-md border border-[#c9952a]/40 shadow-sm">
               <PyramidIcon className="w-4 h-4 text-[#f0d897]" />
               <span className="text-xs font-bold text-[#f0d897] tracking-wider">
-                منظومة مبيعات الفراعنة — لوحة تحكم المستشار العقاري
+                {isRTL ? "منظومة مبيعات الفراعنة — لوحة تحكم المستشار العقاري" : "Pharaohs Sales Portal — Real Estate Consultant Dashboard"}
               </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight">
-              إدارة حجوزات العملاء والتعاقدات
+              {t("employee.dashboardTitle", "إدارة حجوزات العملاء والتعاقدات")}
             </h1>
             <p className="text-white/80 text-sm mt-1.5 max-w-2xl leading-relaxed">
-              أهلاً بك، <span className="text-[#f0d897] font-bold">{user?.name || "المستشار العقاري"}</span>. تابع العملاء المحالين إليك، وقم بتحديث مراحل التفاوض والتعاقد أو الحجز المباشر.
+              {isRTL ? (
+                <>أهلاً بك، <span className="text-[#f0d897] font-bold">{user?.name || "المستشار العقاري"}</span>. تابع العملاء المحالين إليك، وقم بتحديث مراحل التفاوض والتعاقد أو الحجز المباشر.</>
+              ) : (
+                <>Welcome, <span className="text-[#f0d897] font-bold">{user?.name || "Sales Consultant"}</span>. Manage assigned client leads, update negotiation stages, or register direct bookings.</>
+              )}
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons & Language Switcher */}
           <div className="flex items-center gap-3 self-start md:self-auto flex-wrap">
+            <LanguageSwitcher variant="button" />
+
             <Link
               to="/"
               className="h-12 px-5 rounded-2xl font-bold text-xs sm:text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 flex items-center gap-2 transition-all shadow-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-[19px]">home</span>
-              <span>العودة للرئيسية</span>
+              <span>{t("employee.backToHome", "العودة للرئيسية")}</span>
             </Link>
 
             <button
@@ -217,7 +226,7 @@ export default function EmployeeDashboard() {
               style={{ background: "linear-gradient(135deg, #f0d897 0%, #c9952a 50%, #b07d1f 100%)" }}
             >
               <span className="material-symbols-outlined text-[20px]">add_circle</span>
-              <span>حجز وحدة جديدة لعميل</span>
+              <span>{isRTL ? "حجز وحدة جديدة لعميل" : "New Client Booking"}</span>
             </button>
           </div>
         </div>

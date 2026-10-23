@@ -1,5 +1,6 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import notificationService from "@services/notification.service.js";
+import { useLanguage } from "@context/LanguageContext.jsx";
 
 const TYPE_ICON = {
   reservation_status: "notifications",
@@ -16,6 +17,7 @@ const TYPE_BG = {
 };
 
 export default function NotificationBell() {
+  const { isRTL, dir } = useLanguage();
   const [open, setOpen]                     = useState(false);
   const [notifications, setNotifications]   = useState([]);
   const [unreadCount, setUnreadCount]       = useState(0);
@@ -93,22 +95,24 @@ export default function NotificationBell() {
 
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-[360px] bg-white rounded-3xl shadow-2xl border border-neutral-200/80 z-50 overflow-hidden"
-          style={{ direction: "rtl" }}>
+        <div
+          className={`absolute top-full ${isRTL ? "left-0" : "right-0"} mt-2 w-[360px] bg-white rounded-3xl shadow-2xl border border-neutral-200/80 z-50 overflow-hidden`}
+          dir={dir}
+        >
           {/* Header */}
           <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
             <div>
-              <h3 className="text-[15px] font-bold text-neutral-900">الإشعارات</h3>
+              <h3 className="text-[15px] font-bold text-neutral-900">{isRTL ? "الإشعارات" : "Notifications"}</h3>
               {unreadCount > 0 && (
-                <p className="text-[12px] text-neutral-400">{unreadCount} غير مقروء</p>
+                <p className="text-[12px] text-neutral-400">{unreadCount} {isRTL ? "غير مقروء" : "unread"}</p>
               )}
             </div>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-[12px] font-bold text-[#775a1a] hover:text-[#000e1f] transition-colors"
+                className="text-[12px] font-bold text-[#775a1a] hover:text-[#000e1f] transition-colors cursor-pointer"
               >
-                تحديد الكل كمقروء
+                {isRTL ? "تحديد الكل كمقروء" : "Mark all as read"}
               </button>
             )}
           </div>
@@ -124,7 +128,7 @@ export default function NotificationBell() {
             ) : notifications.length === 0 ? (
               <div className="py-14 text-center">
                 <span className="material-symbols-outlined text-[40px] text-neutral-300 mb-2">notifications_off</span>
-                <p className="text-[13px] font-semibold text-neutral-400">لا توجد إشعارات بعد</p>
+                <p className="text-[13px] font-semibold text-neutral-400">{isRTL ? "لا توجد إشعارات بعد" : "No notifications yet"}</p>
               </div>
             ) : (
               <div className="divide-y divide-neutral-50">
@@ -132,7 +136,7 @@ export default function NotificationBell() {
                   <button
                     key={n._id}
                     onClick={() => { if (!n.isRead) handleMarkOne(n._id); }}
-                    className={`w-full text-right px-5 py-4 flex items-start gap-3.5 transition-colors ${
+                    className={`w-full text-start px-5 py-4 flex items-start gap-3.5 transition-colors cursor-pointer ${
                       n.isRead ? "bg-white hover:bg-neutral-50/70" : "bg-blue-50/50 hover:bg-blue-50"
                     }`}
                   >

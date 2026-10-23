@@ -1,28 +1,31 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext.jsx";
-import logoSrc from "@assets/images/erasebg-transformed.png";
+import { useLanguage } from "@context/LanguageContext.jsx";
+import logoSrc from "@assets/images/really-logo.png";
 import NotificationBell from "@components/NotificationBell.jsx";
-
-const NAV_ITEMS = [
-  { to: "/",           label: "الرئيسية",          exact: true  },
-  { to: "/projects",   label: "المشاريع",           exact: false },
-  { to: "/properties", label: "الوحدات المتاحة",    exact: false },
-  { to: "/about",      label: "عن الشركة",          exact: false },
-  { to: "/contact",    label: "تواصل معنا",         exact: false },
-];
-
-const ROLE_BADGES = {
-  admin: { label: "مسؤول النظام", color: "bg-red-500/20 text-red-300 border-red-500/30" },
-  employee: { label: "مستشار مبيعات", color: "bg-amber-500/20 text-amber-300 border-amber-500/30" },
-  user: { label: "عميل متميز", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
-};
+import LanguageSwitcher from "@components/common/LanguageSwitcher.jsx";
 
 export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { t, isRTL, dir } = useLanguage();
   const navigate = useNavigate();
   const profileRef = useRef(null);
+
+  const navItems = [
+    { to: "/", label: t("nav.home", "الرئيسية"), exact: true },
+    { to: "/projects", label: t("nav.projects", "المشاريع"), exact: false },
+    { to: "/properties", label: t("nav.properties", "الوحدات المتاحة"), exact: false },
+    { to: "/about", label: t("nav.about", "عن الشركة"), exact: false },
+    { to: "/contact", label: t("nav.contact", "تواصل معنا"), exact: false },
+  ];
+
+  const roleBadges = {
+    admin: { label: t("roles.admin", "مسؤول النظام"), color: "bg-red-500/20 text-red-300 border-red-500/30" },
+    employee: { label: t("roles.employee", "مستشار مبيعات"), color: "bg-amber-500/20 text-amber-300 border-amber-500/30" },
+    user: { label: t("roles.user", "عميل متميز"), color: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
+  };
 
   // Close profile dropdown when clicking outside on desktop
   useEffect(() => {
@@ -41,26 +44,29 @@ export default function Navbar() {
     navigate("/");
   };
 
-  const roleInfo = user ? ROLE_BADGES[user.role] || ROLE_BADGES.user : null;
+  const roleInfo = user ? roleBadges[user.role] || roleBadges.user : null;
 
   return (
     <>
       {/* ── 1. TOP HEADER (Desktop & Mobile) ── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#000e1f]/95 backdrop-blur-xl border-b border-white/10 shadow-lg" dir="rtl">
-        <div className="h-20 max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 flex items-center justify-between">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-[#000e1f]/95 backdrop-blur-xl border-b border-white/10 shadow-lg"
+        dir={dir}
+      >
+        <div className="h-20 max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 flex items-center justify-between">
 
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-3 flex-shrink-0 group py-1">
             <img
               src={logoSrc}
-              alt="مستقبل الفراعنة"
+              alt={t("brand.name", "مستقبل الفراعنة")}
               className="h-11 sm:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
             />
           </Link>
 
           {/* Desktop Navigation Links (hidden on mobile) */}
           <nav className="hidden lg:flex items-center gap-7">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -78,8 +84,12 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Header Left Actions */}
-          <div className="flex items-center gap-3">
+          {/* Header Action Elements */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language Switcher in Header (Desktop & Mobile) */}
+            <LanguageSwitcher variant="button" className="hidden sm:flex" />
+            <LanguageSwitcher variant="compact" className="flex sm:hidden" />
+
             {user ? (
               <div className="flex items-center gap-2 sm:gap-3" ref={profileRef}>
                 {/* Notification Bell */}
@@ -99,7 +109,7 @@ export default function Navbar() {
                       {user.name?.[0]?.toUpperCase() || "؟"}
                     </div>
 
-                    <div className="hidden sm:flex flex-col items-start text-right min-w-0">
+                    <div className={`hidden sm:flex flex-col ${isRTL ? "items-start text-right" : "items-start text-left"} min-w-0`}>
                       <span className="text-[13px] font-bold text-white truncate max-w-[120px] leading-tight">
                         {user.name}
                       </span>
@@ -119,7 +129,10 @@ export default function Navbar() {
 
                   {/* Desktop Dropdown Menu */}
                   {profileOpen && (
-                    <div className="hidden lg:block absolute left-0 mt-2 w-72 rounded-3xl bg-[#000e1f] border border-[#c9952a]/30 shadow-2xl backdrop-blur-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div
+                      className={`hidden lg:block absolute ${isRTL ? "left-0" : "right-0"} mt-2 w-72 rounded-3xl bg-[#000e1f] border border-[#c9952a]/30 shadow-2xl backdrop-blur-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150`}
+                      dir={dir}
+                    >
                       {/* Header: User Info Card */}
                       <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 mb-2">
                         <div className="flex items-center gap-3 mb-2">
@@ -146,7 +159,7 @@ export default function Navbar() {
                             className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[18px] text-[#c9952a]">bookmark</span>
-                            <span>حجوزاتي العقارية</span>
+                            <span>{t("nav.myReservations", "حجوزاتي العقارية")}</span>
                           </Link>
                         )}
 
@@ -157,7 +170,7 @@ export default function Navbar() {
                             className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[18px] text-[#c9952a]">support_agent</span>
-                            <span>لوحة مبيعات الموظف</span>
+                            <span>{t("nav.employeeDashboard", "لوحة مبيعات الموظف")}</span>
                           </Link>
                         )}
 
@@ -169,7 +182,7 @@ export default function Navbar() {
                               className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[#c9952a] hover:bg-[#c9952a]/10 transition-colors font-bold"
                             >
                               <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
-                              <span>لوحة تحكم الإدارة</span>
+                              <span>{t("nav.adminDashboard", "لوحة تحكم الإدارة")}</span>
                             </Link>
                             <Link
                               to="/admin/projects"
@@ -177,7 +190,7 @@ export default function Navbar() {
                               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors"
                             >
                               <span className="material-symbols-outlined text-[18px]">apartment</span>
-                              <span>إدارة المشاريع</span>
+                              <span>{t("nav.manageProjects", "إدارة المشاريع")}</span>
                             </Link>
                           </>
                         )}
@@ -188,7 +201,7 @@ export default function Navbar() {
                           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors"
                         >
                           <span className="material-symbols-outlined text-[18px]">holiday_village</span>
-                          <span>تصفح الوحدات المتاحة</span>
+                          <span>{t("nav.browseUnits", "تصفح الوحدات المتاحة")}</span>
                         </Link>
                       </div>
 
@@ -200,7 +213,7 @@ export default function Navbar() {
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-[13px] font-semibold cursor-pointer"
                       >
                         <span className="material-symbols-outlined text-[18px]">logout</span>
-                        <span>تسجيل الخروج</span>
+                        <span>{t("nav.logout", "تسجيل الخروج")}</span>
                       </button>
                     </div>
                   )}
@@ -210,11 +223,11 @@ export default function Navbar() {
               /* Unauthenticated: Clean Login Button */
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 sm:gap-2 h-10 sm:h-11 px-4 sm:px-5 rounded-2xl text-xs sm:text-[13.5px] font-bold transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-[#c9952a]/20 hover:-translate-y-0.5 active:translate-y-0 text-[#000e1f]"
+                className="inline-flex items-center gap-1.5 sm:gap-2 h-10 sm:h-11 px-3.5 sm:px-5 rounded-2xl text-xs sm:text-[13.5px] font-bold transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-[#c9952a]/20 hover:-translate-y-0.5 active:translate-y-0 text-[#000e1f]"
                 style={{ background: "linear-gradient(135deg, #f0d897 0%, #c9952a 50%, #b07d1f 100%)" }}
               >
                 <span className="material-symbols-outlined text-[18px]">login</span>
-                <span>تسجيل الدخول</span>
+                <span>{t("nav.login", "تسجيل الدخول")}</span>
               </Link>
             )}
           </div>
@@ -225,7 +238,7 @@ export default function Navbar() {
       {/* ── 2. MODERN APP-LIKE BOTTOM NAVIGATION BAR (Mobile Only) ── */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#000e1f]/95 backdrop-blur-2xl border-t border-[#c9952a]/30 shadow-[0_-8px_32px_rgba(0,14,31,0.65)] select-none"
-        dir="rtl"
+        dir={dir}
         style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="max-w-md mx-auto px-3 h-16 flex items-center justify-between">
@@ -247,7 +260,7 @@ export default function Navbar() {
                 <div className={`p-1 rounded-xl transition-all ${isActive ? "bg-white/10 shadow-sm" : ""}`}>
                   <span className="material-symbols-outlined text-[22px] block">home</span>
                 </div>
-                <span className="text-[10.5px] mt-0.5 tracking-tight">الرئيسية</span>
+                <span className="text-[10px] mt-0.5 tracking-tight">{t("nav.home", "الرئيسية")}</span>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#c9952a] mt-0.5 shadow-[0_0_8px_#c9952a]" />
                 )}
@@ -271,7 +284,7 @@ export default function Navbar() {
                 <div className={`p-1 rounded-xl transition-all ${isActive ? "bg-white/10 shadow-sm" : ""}`}>
                   <span className="material-symbols-outlined text-[22px] block">apartment</span>
                 </div>
-                <span className="text-[10.5px] mt-0.5 tracking-tight">المشاريع</span>
+                <span className="text-[10px] mt-0.5 tracking-tight">{t("nav.projects", "المشاريع")}</span>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#c9952a] mt-0.5 shadow-[0_0_8px_#c9952a]" />
                 )}
@@ -299,8 +312,8 @@ export default function Navbar() {
                 >
                   <span className="material-symbols-outlined text-[26px] font-bold">domain</span>
                 </div>
-                <span className={`text-[10.5px] font-bold mt-1 tracking-tight ${isActive ? "text-[#f0d897]" : "text-white/70"}`}>
-                  الوحدات
+                <span className={`text-[10px] font-bold mt-1 tracking-tight ${isActive ? "text-[#f0d897]" : "text-white/70"}`}>
+                  {t("nav.units", "الوحدات")}
                 </span>
               </>
             )}
@@ -322,7 +335,7 @@ export default function Navbar() {
                 <div className={`p-1 rounded-xl transition-all ${isActive ? "bg-white/10 shadow-sm" : ""}`}>
                   <span className="material-symbols-outlined text-[22px] block">support_agent</span>
                 </div>
-                <span className="text-[10.5px] mt-0.5 tracking-tight">تواصل</span>
+                <span className="text-[10px] mt-0.5 tracking-tight">{t("nav.contactShort", "تواصل")}</span>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#c9952a] mt-0.5 shadow-[0_0_8px_#c9952a]" />
                 )}
@@ -345,8 +358,12 @@ export default function Navbar() {
                   {user.name?.[0]?.toUpperCase() || "؟"}
                 </div>
               </div>
-              <span className="text-[10.5px] mt-0.5 tracking-tight truncate max-w-[55px]">
-                {user.role === "admin" ? "الإدارة" : user.role === "employee" ? "المبيعات" : "حسابي"}
+              <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-[55px]">
+                {user.role === "admin"
+                  ? t("nav.admin", "الإدارة")
+                  : user.role === "employee"
+                  ? t("nav.sales", "المبيعات")
+                  : t("nav.myAccount", "حسابي")}
               </span>
               {profileOpen && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#c9952a] mt-0.5 shadow-[0_0_8px_#c9952a]" />
@@ -368,7 +385,7 @@ export default function Navbar() {
                   <div className={`p-1 rounded-xl transition-all ${isActive ? "bg-white/10 shadow-sm" : ""}`}>
                     <span className="material-symbols-outlined text-[22px] block">account_circle</span>
                   </div>
-                  <span className="text-[10.5px] mt-0.5 tracking-tight">دخول</span>
+                  <span className="text-[10px] mt-0.5 tracking-tight">{t("nav.login", "دخول")}</span>
                   {isActive && (
                     <span className="w-1.5 h-1.5 rounded-full bg-[#c9952a] mt-0.5 shadow-[0_0_8px_#c9952a]" />
                   )}
@@ -387,14 +404,14 @@ export default function Navbar() {
           onClick={(e) => {
             if (e.target === e.currentTarget) setProfileOpen(false);
           }}
-          dir="rtl"
+          dir={dir}
         >
           <div className="bg-[#000e1f] border-2 border-[#c9952a]/40 rounded-3xl p-5 shadow-2xl animate-in slide-in-from-bottom-8 duration-250 mb-20">
             {/* Top Close bar */}
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#c9952a] text-[20px]">manage_accounts</span>
-                <span className="text-sm font-bold text-white">إدارة الحساب والجلسة</span>
+                <span className="text-sm font-bold text-white">{t("nav.accountManagement", "إدارة الحساب والجلسة")}</span>
               </div>
               <button
                 onClick={() => setProfileOpen(false)}
@@ -402,6 +419,11 @@ export default function Navbar() {
               >
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
+            </div>
+
+            {/* Language Switcher in Mobile Sheet */}
+            <div className="mb-3">
+              <LanguageSwitcher className="w-full justify-center" />
             </div>
 
             {/* User Profile Card */}
@@ -430,7 +452,7 @@ export default function Navbar() {
                   className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-colors"
                 >
                   <span className="material-symbols-outlined text-[20px] text-[#c9952a]">bookmark</span>
-                  <span>حجوزاتي العقارية</span>
+                  <span>{t("nav.myReservations", "حجوزاتي العقارية")}</span>
                 </Link>
               )}
 
@@ -441,7 +463,7 @@ export default function Navbar() {
                   className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#c9952a]/15 text-[#f0d897] font-bold transition-colors"
                 >
                   <span className="material-symbols-outlined text-[20px] text-[#c9952a]">support_agent</span>
-                  <span>لوحة مبيعات الموظف</span>
+                  <span>{t("nav.employeeDashboard", "لوحة مبيعات الموظف")}</span>
                 </Link>
               )}
 
@@ -452,7 +474,7 @@ export default function Navbar() {
                   className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#c9952a] text-[#000e1f] font-black transition-colors"
                 >
                   <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
-                  <span>لوحة تحكم الإدارة</span>
+                  <span>{t("nav.adminDashboard", "لوحة تحكم الإدارة")}</span>
                 </Link>
               )}
 
@@ -462,7 +484,7 @@ export default function Navbar() {
                 className="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-white/5 text-white/75 hover:text-white transition-colors"
               >
                 <span className="material-symbols-outlined text-[19px] text-white/50">info</span>
-                <span>عن شركة مستقبل الفراعنة</span>
+                <span>{t("nav.about", "عن شركة مستقبل الفراعنة")}</span>
               </Link>
             </div>
 
@@ -474,7 +496,7 @@ export default function Navbar() {
               className="w-full h-11 flex items-center justify-center gap-2 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-300 font-bold text-xs sm:text-sm hover:bg-red-500/25 transition-colors cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">logout</span>
-              <span>تسجيل الخروج</span>
+              <span>{t("nav.logout", "تسجيل الخروج")}</span>
             </button>
           </div>
         </div>

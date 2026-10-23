@@ -1,10 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext.jsx';
+import { useLanguage } from '@context/LanguageContext.jsx';
 import authService from '@services/auth.service.js';
-import logo from '@assets/images/erasebg-transformed.png';
+import logo from '@assets/images/really-logo.png';
 import bgImg from '@assets/images/Aswan Sunset Waterfront with Luxury Resort Branding.png';
 import toast from 'react-hot-toast';
+import LanguageSwitcher from '@components/common/LanguageSwitcher.jsx';
 
 const DARK = '#000e1f';
 
@@ -101,6 +103,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { login, register } = useAuth();
+  const { t, isRTL, dir } = useLanguage();
 
   // Mode: 'login' | 'register' | 'forgot'
   const initialMode = searchParams.get('mode') || defaultMode;
@@ -493,7 +496,7 @@ export default function AuthPage({ defaultMode = 'login' }) {
         }
       `}</style>
 
-      <div dir="rtl" className="auth-outer">
+      <div dir={dir} className="auth-outer">
 
         {/* ── Background image ── */}
         <img src={bgImg} alt="" style={{
@@ -504,11 +507,16 @@ export default function AuthPage({ defaultMode = 'login' }) {
         {/* ── Overlay ── */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1,
-          background: 'linear-gradient(to left, rgba(0,14,31,0.82) 0%, rgba(0,14,31,0.55) 45%, rgba(0,14,31,0.15) 100%)',
+          background: isRTL
+            ? 'linear-gradient(to left, rgba(0,14,31,0.82) 0%, rgba(0,14,31,0.55) 45%, rgba(0,14,31,0.15) 100%)'
+            : 'linear-gradient(to right, rgba(0,14,31,0.82) 0%, rgba(0,14,31,0.55) 45%, rgba(0,14,31,0.15) 100%)',
         }} />
 
         {/* ── Scrollable card column ── */}
         <div className="auth-col">
+          <div style={{ display: 'flex', justifyContent: isRTL ? 'flex-start' : 'flex-end', width: '100%', marginBottom: 12 }}>
+            <LanguageSwitcher variant="button" />
+          </div>
 
           {/* ════════════════════════════════════
               FORGOT PASSWORD — 3-step wizard

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext.jsx';
+import { useLanguage } from '@context/LanguageContext.jsx';
 import projectService from '@services/project.service.js';
 
 const today = new Date().toLocaleDateString('ar-EG', {
@@ -80,14 +81,15 @@ export default function AdminDashboardPage() {
     load();
   }, []);
 
+  const { t, isRTL, dir } = useLanguage();
   const stat = stats ?? {};
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir="rtl">
+    <div className="p-6 lg:p-8 flex flex-col gap-7" style={{ background: "#f8f9fa", minHeight: "100vh" }} dir={dir}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold text-neutral-900">لوحة التحكم الإدارية</h1>
+          <h1 className="text-[22px] font-bold text-neutral-900">{t("admin.portalTitle", "لوحة التحكم الإدارية")}</h1>
           <p className="text-[13px] text-neutral-500 mt-0.5">{today}</p>
         </div>
         <div className="flex items-center gap-3">
