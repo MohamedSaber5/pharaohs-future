@@ -15,7 +15,10 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console({
-      format: combine(colorize(), timestamp({ format: "HH:mm:ss" }), logFormat),
+      format:
+        process.env.NODE_ENV === "production"
+          ? combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), logFormat)
+          : combine(colorize(), timestamp({ format: "HH:mm:ss" }), logFormat),
     }),
     new winston.transports.File({
       filename: "logs/error.log",
@@ -29,10 +32,5 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: "logs/exceptions.log" }),
   ],
 });
-
-// In production, don't log to console
-if (process.env.NODE_ENV === "production") {
-  logger.remove(new winston.transports.Console());
-}
 
 export default logger;

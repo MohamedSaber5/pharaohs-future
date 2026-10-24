@@ -82,9 +82,11 @@ export const login = catchAsync(async (req, res, next) => {
  * @access  Private
  */
 export const logout = (req, res) => {
-  res.cookie("accessToken", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000),
+  res.clearCookie("accessToken", {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
   });
 
   sendSuccess(res, 200, "Logged out successfully");
@@ -231,6 +233,14 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 // ─── Legacy Reset Password via Phone (Fallback) ───────────────────────────────
 
 export const resetPasswordByPhone = catchAsync(async (req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    return next(
+      new AppError(
+        "هذه الطريقة معطلة في بيئة الإنتاج لدواعي أمنية. يرجى استخدام استعادة كلمة المرور عبر البريد الإلكتروني ورمز التحقق (OTP).",
+        403
+      )
+    );
+  }
   const { phone, newPassword } = req.body;
   if (!phone || !newPassword) return next(new AppError('يرجى إدخال رقم الهاتف وكلمة المرور الجديدة', 400));
   if (newPassword.length < 8) return next(new AppError('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 400));

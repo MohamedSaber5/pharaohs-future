@@ -142,4 +142,17 @@ describe("Security & Middleware Tests", () => {
       .send({ email: "user@example.com", otp: "123456", newPassword: "weak" });
     assert.equal(res.status, 422);
   });
+
+  it("should have trust proxy enabled and disable X-Powered-By header", async () => {
+    assert.equal(app.get("trust proxy"), 1);
+    const res = await request(app).get("/api/v1/health");
+    assert.equal(res.headers["x-powered-by"], undefined);
+  });
+
+  it("should prevent directory listing on uploads folder", async () => {
+    const res = await request(app).get("/uploads");
+    // Should either redirect or return 404, never a directory index HTML
+    assert.notEqual(res.text.includes("Index of /uploads"), true);
+  });
 });
+

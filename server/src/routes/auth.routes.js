@@ -13,6 +13,7 @@ import {
 import { protect }      from "../middlewares/auth.middleware.js";
 import validate         from "../middlewares/validate.js";
 import { authLimiter }  from "../config/rateLimiter.js";
+import verifyCaptcha    from "../middlewares/captcha.middleware.js";
 
 const router = Router();
 
@@ -82,13 +83,13 @@ const resetPasswordValidation = [
 ];
 
 // Routes
-router.post("/register", authLimiter, registerValidation, validate, register);
-router.post("/login",    authLimiter, loginValidation,    validate, login);
+router.post("/register", authLimiter, verifyCaptcha, registerValidation, validate, register);
+router.post("/login",    authLimiter, verifyCaptcha, loginValidation,    validate, login);
 router.post("/logout",   protect, logout);
 router.get("/me",        protect, getMe);
 
 // Email + OTP Password Reset Flow
-router.post("/forgot-password", authLimiter, forgotPasswordValidation, validate, forgotPassword);
+router.post("/forgot-password", authLimiter, verifyCaptcha, forgotPasswordValidation, validate, forgotPassword);
 router.post("/verify-otp",      authLimiter, verifyOtpValidation,      validate, verifyOTP);
 router.post("/reset-password",   authLimiter, resetPasswordValidation,  validate, resetPassword);
 

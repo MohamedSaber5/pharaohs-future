@@ -26,24 +26,44 @@ import notificationRoutes from "./routes/notification.routes.js";
 import settingRoutes from "./routes/setting.routes.js";
 
 const app = express();
+const isProd = process.env.NODE_ENV === "production";
 
+// Enable trust proxy for production reverse proxies (Nginx, Cloudflare, Render, etc.)
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+// Enhanced security headers via Helmet
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
+    hsts: isProd
+      ? {
+          maxAge: 31536000,
+          includeSubDomains: true,
+          preload: true,
+        }
+      : false,
+    frameguard: { action: "deny" },
+    noSniff: true,
   })
 );
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  "http://localhost:4173",
-  "http://127.0.0.1:5173",
-  "http://127.0.0.1:5174",
-  "http://127.0.0.1:5175",
-  "http://127.0.0.1:4173",
   ...(process.env.CLIENT_URL
     ? process.env.CLIENT_URL.split(",").map((url) => url.trim())
+    : []),
+  ...(!isProd
+    ? [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:4173",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://127.0.0.1:4173",
+      ]
     : []),
 ];
 
@@ -83,7 +103,10 @@ app.use(
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     next();
   },
-  express.static(join(__dirname, "..", "uploads"))
+  express.static(join(__dirname, "..", "uploads"), {
+    dotfiles: "ignore",
+    index: false,
+  })
 );
 app.use("/api", apiLimiter);
 

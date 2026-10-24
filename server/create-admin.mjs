@@ -1,13 +1,16 @@
-﻿import mongoose from "mongoose";
+import "dotenv/config";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-const MONGODB_URI = "mongodb+srv://mohamedmahmoudsbr11_db_user:U9CkoEyKZG5BkHip@pharaohs-cluster.lntvpkt.mongodb.net/pharaohs-future?retryWrites=true&w=majority&appName=pharaohs-cluster";
+const MONGODB_URI =
+  process.env.MONGODB_URI ||
+  "mongodb://localhost:27017/pharaohs-future";
 
 const ADMIN = {
-  name:     "Mohamed Admin",
-  email:    "admin@pharaohs.com",
-  password: "Admin@2025!",
-  phone:    "+201000000000",
+  name:     process.env.ADMIN_NAME || "System Admin",
+  email:    process.env.ADMIN_EMAIL || "admin@pharaohs.com",
+  password: process.env.ADMIN_PASSWORD || "Admin@2025!",
+  phone:    process.env.ADMIN_PHONE || "+201000000000",
   role:     "admin",
 };
 
